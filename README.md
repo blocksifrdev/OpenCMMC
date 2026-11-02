@@ -1,8 +1,14 @@
 # FreeCompliance
 
-**Veterans Day 2026 service initiative | Free for the Defense Industrial Base, permanently.**
+> **AVAILABLE NOW | OFFICIAL VETERANS DAY LAUNCH: NOVEMBER 11, 2026**
+>
+> Free, open-source CMMC readiness for defense contractors, assessors, and government technical teams. No subscription, login, or mandatory cloud service. Core tools work offline.
+>
+> **[Get started today](#get-started-in-three-steps)** | **[Read the November 2 early-access announcement](docs/AVAILABLE_NOW_2026_11_02.md)** | **[Veterans Day service commitment](docs/VETERANS_DAY_2026.md)**
 
-This project honors U.S. military service and is inspired by the founder's father, a lieutenant colonel in the U.S. Army. Our contribution is practical: open-source cybersecurity readiness that small defense suppliers, assessors, and government teams can run without a subscription or mandatory cloud connection. [Read the Veterans Day dedication, current scope, and release commitments](docs/VETERANS_DAY_2026.md).
+FreeCompliance is **publicly accessible today, November 2, 2026**. Our formal Veterans Day launch is **Wednesday, November 11, 2026**. Early access is for use, testing, and community feedback, not a claim of completed CMMC assessment or government approval.
+
+This initiative honors U.S. military service and is inspired by the founder's father, a lieutenant colonel in the U.S. Army. The core project is and will remain free and open source.
 
 ## Stop guessing about CMMC. Start proving your controls.
 
