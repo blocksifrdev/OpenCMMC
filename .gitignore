@@ -1,0 +1,8 @@
+freecompliance
+*.exe
+*.test
+readiness.json
+readiness.html
+report.json
+report.html
+.DS_Store

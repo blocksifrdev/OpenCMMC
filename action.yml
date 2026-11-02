@@ -1,0 +1,51 @@
+name: FreeCompliance
+branding:
+  icon: shield
+  color: blue
+description: Local evidence-first repository readiness scan, free and open source
+inputs:
+  fail-on-gap:
+    description: Fail only when an observable GAP is found
+    required: false
+    default: 'false'
+outputs:
+  report-json:
+    description: Absolute path to the JSON report on the workflow runner
+    value: ${{ steps.assess.outputs.json_path }}
+  report-html:
+    description: Absolute path to the standalone HTML report on the workflow runner
+    value: ${{ steps.assess.outputs.html_path }}
+runs:
+  using: composite
+  steps:
+    - name: Build FreeCompliance
+      shell: bash
+      run: |
+        set -euo pipefail
+        cd "$GITHUB_ACTION_PATH"
+        go build -o "$RUNNER_TEMP/freecompliance-cli" ./cmd/freecompliance
+    - name: Assess checked-out repository
+      id: assess
+      shell: bash
+      env:
+        FC_FAIL_ON_GAP: ${{ inputs.fail-on-gap }}
+      run: |
+        set -euo pipefail
+        mkdir -p "$RUNNER_TEMP/freecompliance-reports"
+        extra=()
+        if [[ "$FC_FAIL_ON_GAP" == 'true' ]]; then extra+=(--fail-on-gap); fi
+        set +e
+        "$RUNNER_TEMP/freecompliance-cli" scan --path "$GITHUB_WORKSPACE" \
+          --json "$RUNNER_TEMP/freecompliance-reports/report.json" \
+          --html "$RUNNER_TEMP/freecompliance-reports/report.html" \
+          "${extra[@]}" | tee "$RUNNER_TEMP/freecompliance-reports/summary.txt"
+        status=${PIPESTATUS[0]}
+        set -e
+        {
+          printf '%s\n' '## FreeCompliance evidence readiness' '' '```text'
+          cat "$RUNNER_TEMP/freecompliance-reports/summary.txt"
+          printf '%s\n' '```' '' 'Repository signals only. No framework certification or audit opinion is implied.'
+        } >> "$GITHUB_STEP_SUMMARY"
+        echo "json_path=$RUNNER_TEMP/freecompliance-reports/report.json" >> "$GITHUB_OUTPUT"
+        echo "html_path=$RUNNER_TEMP/freecompliance-reports/report.html" >> "$GITHUB_OUTPUT"
+        exit "$status"
