@@ -14,8 +14,14 @@ func officialShapeCSV() []byte {
 	writer := csv.NewWriter(&b)
 	writer.Write([]string{"Family", "Identifier", "Sort-As", "Security Requirement", "Assessment Objective", "Potential Assessment Method and Objects: Examine", "Potential Assessment Method and Objects: Interview", "Potential Assessment Method and Objects: Test"})
 	for _, c := range w.Controls {
-		writer.Write([]string{c.ID, c.ID, "", "synthetic requirement statement", "Determine If:", "policy", "interview", "test"})
-		writer.Write([]string{c.ID, c.ID + "[a]", "", "", "synthetic determination for " + c.ID, "", "", ""})
+		objective := "Determine If:"
+		if c.ID == "3.4.4" {
+			objective = "Determine if the security impact of changes is reviewed prior to implementation."
+		}
+		writer.Write([]string{c.ID, c.ID, "", "synthetic requirement statement", objective, "policy", "interview", "test"})
+		if c.ID != "3.4.4" {
+			writer.Write([]string{c.ID, c.ID + "[a]", "", "", "synthetic determination for " + c.ID, "", "", ""})
+		}
 	}
 	writer.Flush()
 	return []byte(b.String())
@@ -29,6 +35,11 @@ func TestImportCompleteOfficialLayoutSynthetic(t *testing.T) {
 	}
 	if s.Requirements != 110 || s.Objectives != 110 || len(w.Controls) != 110 || s.IndependentPDFReconciliation != "NOT_PERFORMED" {
 		t.Fatalf("bad coverage: %+v", s)
+	}
+	for _, ctrl := range w.Controls {
+		if ctrl.ID == "3.4.4" && (len(ctrl.Objectives) != 1 || ctrl.Objectives[0].ID != "3.4.4") {
+			t.Fatalf("lost official unlettered 3.4.4 objective %+v", ctrl.Objectives)
+		}
 	}
 	if w.Controls[0].Objectives[0].ID != "3.1.1[a]" || w.Controls[0].Methods.Examine != "policy" || w.Controls[0].RequirementText == "" {
 		t.Fatalf("lost source metadata %+v", w.Controls[0])
