@@ -163,3 +163,15 @@ go run ./cmd/freecompliance prove-github --repo blocksifrdev/freecompliance --js
 This command retrieves repository identity and active branch rules from fixed GitHub GET endpoints, records SHA-256 response digests, requires fresh HTTP Date/Age metadata and complete bounded pagination before admitting evidence, and builds a finite model. It reports **MODEL_SUPPORTED** only for the narrow proposition that active rulesets contain a positive required review count and at least one required status check context, when these are observed. It **never** establishes absence of bypass actors, effective enforcement, classic branch protection rules or real-world compliance. The broad no-bypass proposition remains unproven. An unavailable or stale API source yields `UNKNOWN`, not green. See [source-bound proof limits](docs/SOURCE_BOUND_GITHUB.md).
 
 For private repositories a read-only GitHub token may be supplied in `GITHUB_TOKEN` (Metadata: read); do not pass tokens in command arguments. No write APIs or third-party dependencies are used. The CLI and report are free under Apache-2.0.
+
+## Enterprise Proof Challenge and comparative measurement
+
+FreeCompliance is designed to work alongside an existing GRC platform, not to invent claims about competitor capabilities. See the [30-Day Enterprise Proof Challenge](docs/ENTERPRISE_30_DAY_CHALLENGE.md), [independent measurement protocol](docs/MEASUREMENT_PROTOCOL.md), [Vanta and Symetri competitive positioning](docs/COMPETITIVE_CHALLENGE.md), and [customer one-pager](docs/ENTERPRISE_ONE_PAGER.md).
+
+To summarize independently adjudicated, customer-entered evidence and review effort across matched technical cases:
+
+```bash
+go run ./cmd/pilotbench --input examples/pilot/synthetic_benchmark.csv
+```
+
+The bundled CSV is **synthetic**, not a real comparison with Vanta, Symetri or any customer. The scorer cannot validate uploaded evidence or infer real-world product efficacy. No benchmark results should be claimed without independently reviewed source packets and transparent denominators.

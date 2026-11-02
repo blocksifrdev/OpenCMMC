@@ -1,0 +1,7 @@
+case_id,system,minutes,expected,observed,reviewed,reference
+SYN-01,Baseline,42,COUNTEREXAMPLE,SUPPORTED,true,synthetic-review-01
+SYN-01,FreeCompliance,18,COUNTEREXAMPLE,COUNTEREXAMPLE,true,synthetic-review-01
+SYN-02,Baseline,32,SUPPORTED,SUPPORTED,true,synthetic-review-02
+SYN-02,FreeCompliance,19,SUPPORTED,UNKNOWN,true,synthetic-review-02
+SYN-03,Baseline,28,UNDETERMINED,UNKNOWN,false,synthetic-review-03
+SYN-03,FreeCompliance,15,UNDETERMINED,UNKNOWN,false,synthetic-review-03
