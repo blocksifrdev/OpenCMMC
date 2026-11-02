@@ -1,0 +1,6 @@
+FreeCompliance v0.5.0-preview.2
+Release branch: release/v0.5.0-preview.2
+Source: reviewed main after PR #19 (base 498604da5e677a151d851cec70f58f775d2b7c55)
+Purpose: trigger the guarded GitHub Actions cross-build, checksum, offline smoke test and prerelease publication.
+Scope: offline CMMC importer, objective workbench and draft scoring CLI.
+This marker is not a signature, government certification, or release artifact.
