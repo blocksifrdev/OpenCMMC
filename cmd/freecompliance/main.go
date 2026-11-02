@@ -36,8 +36,10 @@ func run(args []string, out io.Writer) error {
 		return compareCommand(args[1:], out)
 	case "prove":
 		return proveCommand(args[1:], out)
+	case "prove-github":
+		return proveGithubCommand(args[1:], out)
 	case "version", "--version", "-v":
-		fmt.Fprintln(out, "FreeCompliance v0.3.0-dev")
+		fmt.Fprintln(out, "FreeCompliance v0.4.0-dev")
 		return nil
 	case "help", "-h", "--help":
 		return usage(out)
@@ -53,6 +55,7 @@ Usage:
   freecompliance github --repo owner/name [--json report.json] [--html report.html] [--fail-on-gap]
   freecompliance compare --before old.json --after new.json
   freecompliance prove --input obligations.json [--json proof.json] [--html proof.html] [--fail-on-counterexample]
+  freecompliance prove-github --repo owner/name [--json github-proof.json] [--html github-proof.html] [--fail-on-unproven]
   freecompliance version
 
 A local scan DOES NOT certify SOC 2, CMMC, ISO 27001 or any NIST framework.
