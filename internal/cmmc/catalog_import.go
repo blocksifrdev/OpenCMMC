@@ -109,7 +109,7 @@ func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace
 				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("duplicate requirement header %s", id)
 			}
 			requirementRow[id] = true
-			if !strings.HasPrefix(strings.ToLower(text), "determine if") || strings.TrimSpace(row[reqCol]) == "" {
+			if strings.TrimSpace(row[reqCol]) == "" {
 				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d requirement header malformed", rowN+2)
 			}
 			w.Controls[ci].RequirementText = strings.TrimSpace(row[reqCol])
