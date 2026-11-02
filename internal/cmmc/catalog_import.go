@@ -16,7 +16,7 @@ import (
 const SourceCSV = "https://csrc.nist.gov/files/pubs/sp/800/171/a/final/docs/sp800-171a-assessment-procedures.csv"
 const SourcePDF = "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171a.pdf"
 
-var csvIdentifier = regexp.MustCompile(`^(3\.(?:[1-9]|1[0-4])\.[0-9]{1,2})(\[[a-z][0-9]{0,2}\])?$`)
+var csvIdentifier = regexp.MustCompile(`^(3\.(?:[1-9]|1[0-4])\.[0-9]{1,2})(\.?\[[a-z][0-9]{0,2}\])?$`)
 
 type ImportSummary struct {
 	Source                       string `json:"source"`
@@ -98,7 +98,7 @@ func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace
 		if match == nil {
 			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d invalid identifier %q", rowN+2, raw)
 		}
-		id, suffix := match[1], match[2]
+		id, suffix := match[1], strings.TrimPrefix(match[2], ".")
 		ci, ok := index[id]
 		if !ok {
 			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d unexpected requirement %q", rowN+2, id)
