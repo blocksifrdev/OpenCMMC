@@ -22,6 +22,7 @@ type ObjectiveEvidence struct {
 	CapturedAt string `json:"captured_at"`
 }
 type ObjectiveItem struct {
+	Statement string              `json:"statement,omitempty"` // imported supplemental objective text; PDF validation pending
 	ID        string              `json:"id"`
 	Decision  string              `json:"decision"`         // UNASSESSED, ASSERTED_MET, ASSERTED_NOT_MET, NOT_APPLICABLE
 	Method    string              `json:"method,omitempty"` // EXAMINE, INTERVIEW, TEST
@@ -140,7 +141,7 @@ func ValidateObjectiveWorkspace(w ObjectiveWorkspace) error {
 			default:
 				return fmt.Errorf("unsupported decision for %q", o.ID)
 			}
-			if len(o.Reviewer) > 256 || len(o.Rationale) > 2048 || len(o.Evidence) > 16 {
+			if len(o.Reviewer) > 256 || len(o.Rationale) > 2048 || len(o.Evidence) > 16 || len(o.Statement) > 4096 {
 				return fmt.Errorf("oversized objective metadata %q", o.ID)
 			}
 			if o.Decision != "UNASSESSED" {
