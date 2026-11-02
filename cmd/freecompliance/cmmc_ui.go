@@ -15,7 +15,10 @@ import (
     "io"
     "net"
     "net/http"
+    "net/url"
     "os"
+    "os/exec"
+    "runtime"
     "path/filepath"
     "strconv"
     "strings"
@@ -154,7 +157,11 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
     default: http.NotFound(w,r);return
     }
     if err!=nil {http.Error(w,"FreeCompliance: "+err.Error(),http.StatusBadRequest);return}
-    if r.Method=="POST" {http.Redirect(w,r,"/",http.StatusSeeOther)}
+    if r.Method=="POST" {
+        dest:="/"
+        if control:=r.FormValue("control");control!="" {dest="/?control="+url.QueryEscape(control)}
+        http.Redirect(w,r,dest,http.StatusSeeOther)
+    }
 }
 func (u *localUI) create(r *http.Request) error {
     s,err:=u.state();if err!=nil{return err}
@@ -332,11 +339,26 @@ func (u *localUI) view(w http.ResponseWriter,r *http.Request) error {
     w.Header().Set("Content-Type","text/html; charset=utf-8")
     return uiHTML.Execute(w,p)
 }
+func openLocalBrowser(target string) error {
+    var cmd *exec.Cmd
+    switch runtime.GOOS {
+    case "windows":
+        cmd=exec.Command("rundll32","url.dll,FileProtocolHandler",target)
+    case "darwin":
+        cmd=exec.Command("open",target)
+    default:
+        cmd=exec.Command("xdg-open",target)
+    }
+    if err:=cmd.Start();err!=nil{return err}
+    go func(){_ = cmd.Wait()}()
+    return nil
+}
 func cmmcUICommand(args []string,out io.Writer) error {
     fs:=flag.NewFlagSet("cmmc ui",flag.ContinueOnError)
     fs.SetOutput(io.Discard)
     dir:=fs.String("data-dir","./freecompliance-workspace","private local assessment directory")
     port:=fs.Int("port",8765,"127.0.0.1-only port (1024..65535)")
+    autoOpen:=fs.Bool("open-browser",false,"open the private loopback URL in the default browser")
     if err:=fs.Parse(args);err!=nil{return err}
     if fs.NArg()!=0{return errors.New("unexpected positional arguments")}
     if *port<1024 || *port>65535{return errors.New("port must be 1024..65535")}
@@ -347,8 +369,14 @@ func cmmcUICommand(args []string,out io.Writer) error {
     handler:=&localUI{root:root,port:strconv.Itoa(*port),secret:token}
     server:=&http.Server{Handler:handler,ReadHeaderTimeout:5*time.Second,ReadTimeout:45*time.Second,WriteTimeout:60*time.Second,IdleTimeout:40*time.Second,MaxHeaderBytes:8192}
     fmt.Fprintln(out,"FreeCompliance LOCAL ONLY | no cloud, telemetry, certification or government submission.")
-    fmt.Fprintf(out,"Open this private URL on the same computer: http://127.0.0.1:%d/?access=%s\n",*port,token)
+    privateURL:=fmt.Sprintf("http://127.0.0.1:%d/?access=%s",*port,token)
+    fmt.Fprintln(out,"Open this private URL on the same computer:",privateURL)
     fmt.Fprintln(out,"Keep the URL private. Press Ctrl+C to stop. Evidence remains in",root)
+    if *autoOpen {
+        if err:=openLocalBrowser(privateURL);err!=nil {
+            fmt.Fprintln(out,"Could not launch the browser automatically; open the private URL manually:",err)
+        }
+    }
     return server.Serve(ln)
 }
 
