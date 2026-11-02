@@ -114,9 +114,6 @@ func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace
 			}
 			w.Controls[ci].RequirementText = strings.TrimSpace(row[reqCol])
 			w.Controls[ci].Methods = AssessmentMethodGuidance{Examine: strings.TrimSpace(row[examineCol]), Interview: strings.TrimSpace(row[interviewCol]), Test: strings.TrimSpace(row[testCol])}
-			if w.Controls[ci].Methods.Examine == "" && w.Controls[ci].Methods.Interview == "" && w.Controls[ci].Methods.Test == "" {
-				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d has no assessment method guidance", rowN+2)
-			}
 			continue
 		}
 		if !requirementRow[id] {
