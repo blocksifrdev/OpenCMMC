@@ -26,6 +26,6 @@ Only the newest published [GitHub Release](https://github.com/blocksifrdev/freec
 
 ## Secure development and releases
 
-Changes require regression tests and passing GitHub CI before merge. Release packages include a manifest and checksum; the next release line adds attestable provenance and a machine-readable dependency inventory. See [enterprise evaluation gates](docs/ENTERPRISE_EVALUATION.md) and [release integrity](docs/RELEASE_INTEGRITY.md).
+Changes require regression tests and passing GitHub CI before merge. Release packages include a manifest and checksum; Preview 4 includes GitHub/Sigstore build-provenance attestations and an SPDX Go-module inventory, both requiring independent verification against a customer's trust policy. See [enterprise evaluation gates](docs/ENTERPRISE_EVALUATION.md) and [release integrity](docs/RELEASE_INTEGRITY.md).
 
 This project follows selected secure-software-development practices informed by NIST SP 800-218, **not** a NIST/DoD-certified SSDF conformance program.

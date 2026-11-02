@@ -26,7 +26,7 @@ Or:
 
 Open the printed private URL on the **same Linux computer**.
 
-**Available package:** The current [Preview 3 Windows/Linux downloads](https://github.com/blocksifrdev/freecompliance/releases/tag/v0.5.0-preview.3) contain this browser UI. Earlier Preview 2 archives do not.
+**Available package:** The current [Preview 4 Windows/Linux downloads](https://github.com/blocksifrdev/freecompliance/releases/tag/v0.5.0-preview.4) contain this browser UI. Earlier Preview 2 archives do not.
 
 ## Complete customer workflow available in this preview
 
