@@ -19,7 +19,7 @@ jobs:
           curl --fail --location --silent --show-error --retry 2 \
             https://csrc.nist.gov/files/pubs/sp/800/171/a/final/docs/sp800-171a-assessment-procedures.csv \
             --output /tmp/nist171a.csv
-          python3 -c 'import csv; f=open("/tmp/nist171a.csv",newline="",encoding="utf-8-sig"); r=csv.reader(f); print("NIST CSV header", [(i,x[:100]) for i,x in enumerate(next(r))]); print("NIST CSV first row", [(i,x[:150]) for i,x in enumerate(next(r))])'
+          python3 -c 'import csv; f=open("/tmp/nist171a.csv",newline="",encoding="utf-8-sig"); r=csv.reader(f); print("NIST CSV header", [(i,x[:100]) for i,x in enumerate(next(r))]); print("NIST CSV rows", [(row[1][:50],row[4][:110]) for _,row in zip(range(12),r)])'
           sha=$(sha256sum /tmp/nist171a.csv | cut -d' ' -f1)
           go run ./cmd/freecompliance cmmc objectives-import \
             --csv /tmp/nist171a.csv --sha256 "$sha" --scope "CI synthetic boundary" \
