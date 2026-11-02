@@ -1,0 +1,96 @@
+name: portable-downloads
+on:
+  pull_request:
+    paths:
+      - 'scripts/package_release.py'
+      - 'scripts/start-cmmc-demo.sh'
+      - 'scripts/START-CMMC-DEMO.cmd'
+      - 'docs/DOWNLOADS.md'
+      - 'docs/RELEASE_NOTES_v0.5.0-preview.1.md'
+      - '.github/workflows/downloads.yml'
+      - 'cmd/freecompliance/**'
+  push:
+    branches:
+      - 'release/v0.5.0-preview.1'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: go.mod
+      - name: Test and vet
+        run: |
+          go test ./...
+          go vet ./...
+      - name: Cross-compile and package
+        run: python3 scripts/package_release.py --version v0.5.0-preview.1 --out dist
+      - name: Verify checksums and offline smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd dist
+          sha256sum -c SHA256SUMS
+          sha256sum -c SHA256SUMS.sha256
+          mkdir linux-smoke
+          tar -xzf freecompliance-v0.5.0-preview.1-linux-amd64.tar.gz -C linux-smoke
+          cd linux-smoke
+          ./freecompliance version | grep -Fx 'FreeCompliance v0.5.0-preview.1'
+          ./start-cmmc-demo.sh
+          test -s demo-readiness.json
+          python3 - <<'PY'
+          import json
+          with open('demo-readiness.json', encoding='utf-8') as f:
+              obj=json.load(f)
+          assert obj['summary']['total'] == 110
+          assert obj['summary']['documented'] == 0
+          assert obj['summary']['unassessed'] == 110
+          PY
+      - name: Store preview packages for review
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: freecompliance-v0.5.0-preview.1-downloads
+          path: |
+            dist/*.zip
+            dist/*.tar.gz
+            dist/SHA256SUMS
+            dist/SHA256SUMS.sha256
+          if-no-files-found: error
+          retention-days: 30
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0-preview.1'
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: freecompliance-v0.5.0-preview.1-downloads
+          path: dist
+      - name: Verify release checksums
+        run: |
+          cd dist
+          sha256sum -c SHA256SUMS
+          sha256sum -c SHA256SUMS.sha256
+      - name: Publish prerelease only after tests pass
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = 'refs/heads/release/v0.5.0-preview.1'
+          gh release create v0.5.0-preview.1 \
+            dist/*.zip dist/*.tar.gz dist/SHA256SUMS dist/SHA256SUMS.sha256 \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title 'FreeCompliance v0.5.0 Preview 1 | Portable Offline Downloads' \
+            --notes-file docs/RELEASE_NOTES_v0.5.0-preview.1.md \
+            --prerelease --latest=false
