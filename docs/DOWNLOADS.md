@@ -1,21 +1,23 @@
 # FreeCompliance portable downloads
 
-**Public preview v0.5.0-preview.3:** [GitHub Releases](https://github.com/blocksifrdev/freecompliance/releases).
+**Public preview v0.5.0-preview.4:** [GitHub Releases](https://github.com/blocksifrdev/freecompliance/releases).
 
-This download is a **portable Go executable with a self-contained local browser interface**, not a native MSI or EXE installer. Use START-CMMC-UI.cmd on Windows or start-cmmc-ui.sh on Linux to open the graphical workflow without editing JSON. The CLI is also included. Preview 3 includes the offline NIST SP 800-171A supplemental CSV objective importer and the **draft-only** Level 2 score worksheet. See [CMMC assessment and scoring instructions](CMMC_ASSESSMENT_NEXT.md). Windows users can double-click the browser UI launcher; the synthetic demo launcher is also included. No Go compiler, subscription, login, or internet is needed for the packaged offline tools. The browser UI is available now; a native signed installer remains a separate milestone.
+This download is a **portable Go executable with a self-contained local browser interface**, not a native MSI or EXE installer. Use START-CMMC-UI.cmd on Windows or start-cmmc-ui.sh on Linux to open the graphical workflow without editing JSON. The CLI is also included. Preview 4 includes the offline NIST SP 800-171A supplemental CSV objective importer and the **draft-only** Level 2 score worksheet. See [CMMC assessment and scoring instructions](CMMC_ASSESSMENT_NEXT.md). Windows users can double-click the browser UI launcher; the synthetic demo launcher is also included. No Go compiler, subscription, login, or internet is needed for the packaged offline tools. The browser UI is available now; a native signed installer remains a separate milestone.
+
+**Provenance:** Preview 4 publishes an SPDX Go-module inventory and is gated by GitHub/Sigstore build-provenance verification. Verify the actual published artifact; this is not Windows Authenticode signing or an agency ATO. See [release-integrity instructions](RELEASE_INTEGRITY.md).
 
 ## Choose your computer
 
 | Computer | File name | Offline demo |
 | --- | --- | --- |
-| Windows x64 (Intel/AMD) | `freecompliance-v0.5.0-preview.3-windows-amd64.zip` | Double-click `START-CMMC-UI.cmd` |
-| Windows ARM64 | `freecompliance-v0.5.0-preview.3-windows-arm64.zip` | Double-click `START-CMMC-UI.cmd` |
-| Linux x64 | `freecompliance-v0.5.0-preview.3-linux-amd64.tar.gz` | Run `./start-cmmc-ui.sh` |
-| Linux ARM64 | `freecompliance-v0.5.0-preview.3-linux-arm64.tar.gz` | Run `./start-cmmc-ui.sh` |
+| Windows x64 (Intel/AMD) | `freecompliance-v0.5.0-preview.4-windows-amd64.zip` | Double-click `START-CMMC-UI.cmd` |
+| Windows ARM64 | `freecompliance-v0.5.0-preview.4-windows-arm64.zip` | Double-click `START-CMMC-UI.cmd` |
+| Linux x64 | `freecompliance-v0.5.0-preview.4-linux-amd64.tar.gz` | Run `./start-cmmc-ui.sh` |
+| Linux ARM64 | `freecompliance-v0.5.0-preview.4-linux-arm64.tar.gz` | Run `./start-cmmc-ui.sh` |
 
-**Windows:** Download the ZIP and SHA256SUMS, verify the ZIP using PowerShell `Get-FileHash .\freecompliance-v0.5.0-preview.3-windows-amd64.zip -Algorithm SHA256` and compare the output with the matching row in SHA256SUMS. Extract to an approved local folder, then double-click `START-CMMC-UI.cmd`. The launcher attempts to open the private local browser URL automatically. If your browser does not open, copy the URL shown in the command window. To use the CLI directly, run `.\freecompliance.exe help` from PowerShell in the extracted folder.
+**Windows:** Download the ZIP and SHA256SUMS, verify the ZIP using PowerShell `Get-FileHash .\freecompliance-v0.5.0-preview.4-windows-amd64.zip -Algorithm SHA256` and compare the output with the matching row in SHA256SUMS. Extract to an approved local folder, then double-click `START-CMMC-UI.cmd`. The launcher attempts to open the private local browser URL automatically. If your browser does not open, copy the URL shown in the command window. To use the CLI directly, run `.\freecompliance.exe help` from PowerShell in the extracted folder.
 
-**Linux:** Download the TAR.GZ and SHA256SUMS; run `sha256sum` on the archive and compare it to the matching row in SHA256SUMS. Extract using `tar -xzf freecompliance-v0.5.0-preview.3-linux-amd64.tar.gz`, then run `./start-cmmc-ui.sh` or `./freecompliance help`. The script attempts to open your browser on the same computer. Review the launch script before running it.
+**Linux:** Download the TAR.GZ and SHA256SUMS; run `sha256sum` on the archive and compare it to the matching row in SHA256SUMS. Extract using `tar -xzf freecompliance-v0.5.0-preview.4-linux-amd64.tar.gz`, then run `./start-cmmc-ui.sh` or `./freecompliance help`. The script attempts to open your browser on the same computer. Review the launch script before running it.
 
 The browser launcher creates a private assessment directory when you choose your CMMC level and system scope. Level 2 initializes with 110 requirement identifiers and no claimed objective completions. To populate assessment objectives, import the separately verified official NIST CSV. Nothing automatically passes or is submitted. The old START-CMMC-DEMO launcher remains available for synthetic CLI demonstration. No credentials or network are required.
 
