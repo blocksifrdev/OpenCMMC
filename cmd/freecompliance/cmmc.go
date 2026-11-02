@@ -14,10 +14,12 @@ import (
 
 func cmmcCommand(args []string, out io.Writer) error {
 	if len(args) == 0 {
-		return errors.New("usage: freecompliance cmmc init|assess|verify-bundle|objectives-init|objectives-assess")
+		return errors.New("usage: freecompliance cmmc init|assess|verify-bundle|objectives-init|objectives-import|objectives-assess|score-template|score-draft")
 	}
 	switch args[0] {
-	case "objectives-init", "objectives-assess":
+	case "score-template", "score-draft":
+		return cmmcScoringCommand(args, out)
+	case "objectives-init", "objectives-import", "objectives-assess":
 		return cmmcObjectivesCommand(args, out)
 	case "init":
 		fs := flag.NewFlagSet("cmmc init", flag.ContinueOnError)
