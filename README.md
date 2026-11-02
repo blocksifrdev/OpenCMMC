@@ -4,6 +4,8 @@
 
 **Windows and Linux portable preview packages:** [GitHub Releases](https://github.com/blocksifrdev/freecompliance/releases) | [Download and offline installation guide](docs/DOWNLOADS.md)
 
+**Download now:** [Windows x64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-windows-amd64.zip) | [Windows ARM64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-windows-arm64.zip) | [Linux x64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-linux-amd64.tar.gz) | [Linux ARM64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-linux-arm64.tar.gz) | [SHA256SUMS](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/SHA256SUMS)
+
 No Go compiler is required to run the packaged executable. The Windows ZIP includes a double-click **offline demo launcher**. This is a preview command-line release, **not yet a graphical installer, complete CMMC objective catalog, independently validated SPRS scoring system, or certification**. Follow your organization's software approval and CUI handling rules.
 
 > **AVAILABLE NOW | OFFICIAL VETERANS DAY LAUNCH: NOVEMBER 11, 2026**
