@@ -1,0 +1,6 @@
+FreeCompliance v0.5.0-preview.3
+Release source base: 492ed42538ed59d36193d58738bad30ecefa5b11 (merged PR #21)
+Release preview: Windows and Linux amd64/arm64 offline local browser workbench
+Scope: offline CMMC readiness with locally stored reviewer evidence and JSON report export
+Publisher: gated GitHub Actions workflow on the release branch
+Limits: unsigned publisher identity; not CMMC certification, accredited assessment, or validated SPRS
