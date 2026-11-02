@@ -17,6 +17,44 @@ func cmmcObjectivesCommand(args []string, out io.Writer) error {
 		return errors.New("usage: cmmc objectives-init|objectives-assess")
 	}
 	switch args[0] {
+	case "objectives-import":
+		fs := flag.NewFlagSet("cmmc objectives-import", flag.ContinueOnError)
+		fs.SetOutput(io.Discard)
+		csvPath := fs.String("csv", "", "offline NIST SP 800-171A 2018 supplemental CSV path")
+		sha := fs.String("sha256", "", "expected SHA-256 checked independently against original CSV")
+		scope := fs.String("scope", "", "explicit system / enclave boundary")
+		dest := fs.String("out", "", "generated objective workspace JSON")
+		if err := fs.Parse(args[1:]); err != nil {
+			return err
+		}
+		if fs.NArg() != 0 || *csvPath == "" || *sha == "" || *dest == "" {
+			return errors.New("--csv, --sha256 and --out are required; no positional arguments")
+		}
+		fi, err := os.Stat(*csvPath)
+		if err != nil {
+			return err
+		}
+		if fi.Size() == 0 || fi.Size() > 12<<20 {
+			return errors.New("CSV must be 1..12 MiB")
+		}
+		data, err := os.ReadFile(*csvPath)
+		if err != nil {
+			return err
+		}
+		workspace, summary, err := cmmc.Import171ACSV(data, *scope, *sha)
+		if err != nil {
+			return err
+		}
+		jsonData, err := json.MarshalIndent(workspace, "", "  ")
+		if err != nil {
+			return err
+		}
+		if err = writeSafe(*dest, append(jsonData, '\n')); err != nil {
+			return err
+		}
+		fmt.Fprintf(out, "IMPORTED SOURCE CSV: %d controls, %d objective statements | SHA-256 %s\n", summary.Requirements, summary.Objectives, summary.SourceSHA256)
+		fmt.Fprintln(out, "SOURCE CSV IMPORT ONLY. Reconciliation with NIST normative PDF is not performed, control effectiveness NOT verified, no official CMMC score or certification.")
+		return nil
 	case "objectives-init":
 		fs := flag.NewFlagSet("cmmc objectives-init", flag.ContinueOnError)
 		fs.SetOutput(io.Discard)
