@@ -12,14 +12,11 @@ import (
 	"strings"
 )
 
-// SourceCSV is an assisted import of NIST SP 800-171A June 2018 CSV data.
-// NIST specifies that the PDF, not the CSV, is the authoritative source.
+// The June 2018 NIST PDF is authoritative; the supplemental CSV is an import aid.
 const SourceCSV = "https://csrc.nist.gov/files/pubs/sp/800/171/a/final/docs/sp800-171a-assessment-procedures.csv"
-
 const SourcePDF = "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171a.pdf"
 
-var reqToken = regexp.MustCompile(`\b3\.(?:[1-9]|1[0-4])\.[0-9]{1,2}\b`)
-var objToken = regexp.MustCompile(`(?:3\.(?:[1-9]|1[0-4])\.[0-9]{1,2})?\[[a-z](?:[0-9]{1,2})?\]`)
+var csvIdentifier = regexp.MustCompile(`^(3\.(?:[1-9]|1[0-4])\.[0-9]{1,2})(\[[a-z][0-9]{0,2}\])?$`)
 
 type ImportSummary struct {
 	Source                       string `json:"source"`
@@ -30,11 +27,11 @@ type ImportSummary struct {
 	IndependentPDFReconciliation string `json:"independent_pdf_reconciliation"`
 }
 
-func csvHeaderIndex(row []string, want ...string) int {
+func csvHeaderIndex(row []string, wants ...string) int {
 	for i, s := range row {
-		text := strings.ToLower(strings.TrimSpace(strings.TrimPrefix(s, "\ufeff")))
-		for _, w := range want {
-			if strings.Contains(text, w) {
+		lower := strings.ToLower(strings.TrimSpace(strings.TrimPrefix(s, "\ufeff")))
+		for _, w := range wants {
+			if strings.Contains(lower, w) {
 				return i
 			}
 		}
@@ -42,10 +39,9 @@ func csvHeaderIndex(row []string, want ...string) int {
 	return -1
 }
 
-// Import171ACSV turns a locally supplied official-format NIST assessment CSV
-// into a Level 2 workspace. The expected SHA-256 must be independently acquired
-// and checked. The import proves structural completeness only, NEVER that the
-// supplementary CSV was reconciled with the normative PDF.
+// Import171ACSV supports the actual official NIST spreadsheet: each row
+// identifies either requirement 3.x.y (including methods) or one objective
+// 3.x.y[a]. Refuses partial coverage and never claims PDF reconciliation.
 func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace, ImportSummary, error) {
 	if len(source) == 0 || len(source) > 12<<20 {
 		return ObjectiveWorkspace{}, ImportSummary{}, errors.New("CSV must be 1..12 MiB")
@@ -55,10 +51,9 @@ func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace
 	if !hexDigest.MatchString(expectedSHA) || expectedSHA != digest {
 		return ObjectiveWorkspace{}, ImportSummary{}, errors.New("source CSV SHA-256 must match independently verified --sha256")
 	}
-	r := csv.NewReader(bytes.NewReader(bytes.TrimPrefix(source, []byte{0xef, 0xbb, 0xbf})))
-	r.FieldsPerRecord = -1
-	r.LazyQuotes = false
-	rows, err := r.ReadAll()
+	reader := csv.NewReader(bytes.NewReader(bytes.TrimPrefix(source, []byte{0xef, 0xbb, 0xbf})))
+	reader.FieldsPerRecord = -1
+	rows, err := reader.ReadAll()
 	if err != nil {
 		return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("parse CSV: %w", err)
 	}
@@ -66,81 +61,90 @@ func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace
 		return ObjectiveWorkspace{}, ImportSummary{}, errors.New("unexpected CSV row count")
 	}
 	header := rows[0]
-	reqCol := csvHeaderIndex(header, "security requirement", "requirement id", "requirement number")
-	objCol := csvHeaderIndex(header, "assessment objective", "determination statement")
-	if reqCol < 0 || objCol < 0 || reqCol == objCol {
-		return ObjectiveWorkspace{}, ImportSummary{}, errors.New("CSV must have separate security requirement and assessment objective columns; cannot safely infer format")
+	idCol := csvHeaderIndex(header, "identifier")
+	reqCol := csvHeaderIndex(header, "security requirement")
+	objCol := csvHeaderIndex(header, "assessment objective")
+	examineCol := csvHeaderIndex(header, "method and objects: examine")
+	interviewCol := csvHeaderIndex(header, "method and objects: interview")
+	testCol := csvHeaderIndex(header, "method and objects: test")
+	if idCol < 0 || reqCol < 0 || objCol < 0 || len(map[int]bool{idCol: true, reqCol: true, objCol: true}) != 3 {
+		return ObjectiveWorkspace{}, ImportSummary{}, errors.New("unsupported NIST CSV: Identifier, Security Requirement and Assessment Objective columns required")
+	}
+	if examineCol < 0 || interviewCol < 0 || testCol < 0 {
+		return ObjectiveWorkspace{}, ImportSummary{}, errors.New("NIST assessment methods columns missing")
 	}
 	w, err := NewObjectiveWorkspace(2, scope)
 	if err != nil {
 		return ObjectiveWorkspace{}, ImportSummary{}, err
 	}
-	w.ProcedureSource = "NIST SP 800-171A (June 2018) supplemental CSV, SHA-256: " + digest + "; normative PDF reconciliation PENDING"
+	w.ProcedureSource = "NIST SP 800-171A (June 2018) supplemental CSV; SHA-256 " + digest + "; normative PDF reconciliation PENDING"
 	w.ProcedureSHA256 = digest
-	idx := map[string]int{}
+	index := map[string]int{}
 	for i, c := range w.Controls {
-		idx[c.ID] = i
+		index[c.ID] = i
 	}
-	known := map[string]map[string]string{}
-	current := ""
+	requirementRow := map[string]bool{}
+	objectives := map[string]bool{}
+	count := 0
 	for rowN, row := range rows[1:] {
-		if reqCol >= len(row) || objCol >= len(row) {
+		if idCol >= len(row) || reqCol >= len(row) || objCol >= len(row) || testCol >= len(row) {
 			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d missing required columns", rowN+2)
 		}
-		rawReq := strings.TrimSpace(row[reqCol])
-		if rawReq != "" {
-			ids := reqToken.FindAllString(rawReq, -1)
-			if len(ids) != 1 {
-				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d ambiguous requirement", rowN+2)
-			}
-			current = ids[0]
+		raw := strings.TrimSpace(row[idCol])
+		if raw == "" {
+			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d missing identifier", rowN+2)
 		}
-		objText := strings.TrimSpace(row[objCol])
-		if objText == "" {
+		match := csvIdentifier.FindStringSubmatch(raw)
+		if match == nil {
+			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d invalid identifier %q", rowN+2, raw)
+		}
+		id, suffix := match[1], match[2]
+		ci, ok := index[id]
+		if !ok {
+			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d unexpected requirement %q", rowN+2, id)
+		}
+		text := strings.TrimSpace(row[objCol])
+		if suffix == "" {
+			if requirementRow[id] {
+				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("duplicate requirement header %s", id)
+			}
+			requirementRow[id] = true
+			if !strings.HasPrefix(strings.ToLower(text), "determine if") || strings.TrimSpace(row[reqCol]) == "" {
+				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d requirement header malformed", rowN+2)
+			}
+			w.Controls[ci].RequirementText = strings.TrimSpace(row[reqCol])
+			w.Controls[ci].Methods = AssessmentMethodGuidance{Examine: strings.TrimSpace(row[examineCol]), Interview: strings.TrimSpace(row[interviewCol]), Test: strings.TrimSpace(row[testCol])}
+			if w.Controls[ci].Methods.Examine == "" && w.Controls[ci].Methods.Interview == "" && w.Controls[ci].Methods.Test == "" {
+				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d has no assessment method guidance", rowN+2)
+			}
 			continue
 		}
-		if current == "" {
-			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d has objective before requirement", rowN+2)
+		if !requirementRow[id] {
+			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d objective before requirement header %q", rowN+2, id)
 		}
-		ci, ok := idx[current]
-		if !ok {
-			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d unknown requirement %q", rowN+2, current)
+		oid := id + suffix
+		if objectives[oid] {
+			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("duplicate objective %s", oid)
 		}
-		locations := objToken.FindAllStringIndex(objText, -1)
-		if len(locations) == 0 {
-			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d objective text lacks bracketed ID", rowN+2)
+		if text == "" || len(text) > 4096 {
+			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("empty/oversized objective text for %s", oid)
 		}
-		if known[current] == nil {
-			known[current] = map[string]string{}
-		}
-		for i, loc := range locations {
-			token := objText[loc[0]:loc[1]]
-			if strings.HasPrefix(token, "3.") && !strings.HasPrefix(token, current+"[") {
-				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d objective references wrong requirement %q", rowN+2, token)
-			}
-			id := current + token[strings.Index(token, "["):]
-			end := len(objText)
-			if i+1 < len(locations) {
-				end = locations[i+1][0]
-			}
-			statement := strings.TrimSpace(objText[loc[1]:end])
-			if statement == "" {
-				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d objective %s lacks text", rowN+2, id)
-			}
-			if _, exists := known[current][id]; exists {
-				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("duplicate objective %s (row %d)", id, rowN+2)
-			}
-			known[current][id] = statement
-			w.Controls[ci].Objectives = append(w.Controls[ci].Objectives, ObjectiveItem{ID: id, Decision: "UNASSESSED", Statement: statement})
-		}
+		objectives[oid] = true
+		w.Controls[ci].Objectives = append(w.Controls[ci].Objectives, ObjectiveItem{ID: oid, Statement: text, Decision: "UNASSESSED"})
+		count++
 	}
-	count := 0
 	for i := range w.Controls {
-		if len(w.Controls[i].Objectives) == 0 {
-			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("incomplete CSV: no objectives for %s", w.Controls[i].ID)
+		c := &w.Controls[i]
+		if !requirementRow[c.ID] || len(c.Objectives) == 0 {
+			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("incomplete CSV: %s is missing a header or objectives", c.ID)
 		}
-		sort.Slice(w.Controls[i].Objectives, func(a, b int) bool { return w.Controls[i].Objectives[a].ID < w.Controls[i].Objectives[b].ID })
-		count += len(w.Controls[i].Objectives)
+		sort.Slice(c.Objectives, func(i, j int) bool { return c.Objectives[i].ID < c.Objectives[j].ID })
+		for idx, obj := range c.Objectives {
+			expected := fmt.Sprintf("%s[%c]", c.ID, 'a'+idx)
+			if idx >= 26 || obj.ID != expected {
+				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("non-contiguous objective IDs in %s: expected %s, found %s", c.ID, expected, obj.ID)
+			}
+		}
 	}
 	if err := ValidateObjectiveWorkspace(w); err != nil {
 		return ObjectiveWorkspace{}, ImportSummary{}, err
