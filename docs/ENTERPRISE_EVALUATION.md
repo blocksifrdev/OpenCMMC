@@ -1,21 +1,21 @@
 # Enterprise and Government evaluation readiness: evidence gates
 
-**Target:** 8/10 verified technical evaluation gates **before the November 11, 2026 service launch**. This is an internal product-quality checklist, not a government readiness certification or a promised score. Recompute only after checking live evidence. An item cannot be marked complete because it appears on a roadmap.
+**Current assessment as of November 2, 2026:** **8/10 internal technical evaluation gates verified** against release Preview 4 and CI run [41532097431](https://github.com/blocksifrdev/freecompliance/actions/runs/41532097431). This is a software-engineering evaluation rubric, **not** an 8/10 federal/government production approval or CMMC compliance score. The two independent-assessment gates remain open. See [P0 issue #24](https://github.com/blocksifrdev/freecompliance/issues/24).
 
-| # | Gate | Acceptance evidence | Status on Nov. 2 before hardening |
+| # | Gate | Acceptance evidence | Verified status (Preview 4) |
 | --- | --- | --- | --- |
 | 1 | Public, inspectable, permanent free core | Apache-2.0 source, LICENSE, public repo | Verified |
 | 2 | Portable deployable downloads | Windows/Linux amd64/arm64 GitHub Release, checksum manifest | Verified |
-| 3 | Offline baseline functionality | No cloud needed for local CMMC workbench; isolated smoke demonstration | CI-verified; disconnected VM test outstanding |
+| 3 | Offline baseline functionality | No cloud needed for local CMMC workbench; isolated smoke demonstration | Verified in CI with Docker --network none; actual customer enclave test pending |
 | 4 | Locally usable interface | Loopback UI creates and reviews CMMC workspaces | CI-verified |
 | 5 | Evidence fail-closed semantics | Missing objective/evidence remains unresolved; incomplete score rejected | CI-verified |
 | 6 | Engineering regression gates | Tests, race detection, vet and release CI green | CI-verified |
-| 7 | Publisher provenance | Actual release archives bound to signed GitHub/Sigstore build attestations and successful verification | Not delivered in Preview 3 |
+| 7 | Publisher provenance | Actual release archives bound to signed GitHub/Sigstore build attestations and successful verification | Verified for Preview 4, run 41532097431 |
 | 8 | Machine-readable composition inventory | Version/commit-linked SPDX module inventory packaged, hash-checked | Not delivered in Preview 3 |
 | 9 | Independent adversarial deployment/security evaluation | Signed independent test report, findings remediated and rerun in isolated VM | Not verified |
 | 10 | Qualified independent CMMC assessment review | NIST normative PDF objectives and CMMC scoring independently reconciled, with reviewer attribution | Not verified |
 
-**Quantitative interpretation:** Existing CI is evidence of software **evaluation** capability, not of an approved deployment. Gates 3-6 are validated by the project's own automated tests only. Independent external validation is needed for stronger government/customer assurance. An eight-of-ten engineering checklist score does **not** mean "80% CMMC compliant", "8/10 government approved", approved for CUI, or ready for production use by an agency.
+**Quantitative interpretation:** The first eight engineering gates have project CI and release evidence. Gate 3 includes network-disabled container testing, **not** a physically air-gapped/customer-authorized installation. Gates 3-8 are validated by the project's own automated checks only. Independent external validation is needed for stronger government/customer assurance. An eight-of-ten engineering checklist score does **not** mean "80% CMMC compliant", "8/10 government approved", approved for CUI, or ready for production use by an agency.
 
 ## Required before treating the product as a government-ready solution
 
