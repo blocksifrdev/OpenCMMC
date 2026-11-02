@@ -109,6 +109,16 @@ func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace
 				return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("duplicate requirement header %s", id)
 			}
 			requirementRow[id] = true
+			// NIST also publishes unlettered single-statement objectives (e.g. 3.4.4).
+			// Preserve their official requirement identifier rather than invent [a].
+			if text != "" && !strings.EqualFold(strings.TrimSuffix(text, ":"), "Determine if") {
+				if !strings.HasPrefix(strings.ToLower(text), "determine if ") {
+					return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d unexpected unlettered objective", rowN+2)
+				}
+				objectives[id] = true
+				w.Controls[ci].Objectives = append(w.Controls[ci].Objectives, ObjectiveItem{ID: id, Statement: text, Decision: "UNASSESSED"})
+				count++
+			}
 			w.Controls[ci].RequirementText = strings.TrimSpace(row[reqCol])
 			w.Controls[ci].Methods = AssessmentMethodGuidance{Examine: strings.TrimSpace(row[examineCol]), Interview: strings.TrimSpace(row[interviewCol]), Test: strings.TrimSpace(row[testCol])}
 			continue
@@ -133,6 +143,9 @@ func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace
 			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("incomplete CSV: %s is missing a header or objectives", c.ID)
 		}
 		sort.Slice(c.Objectives, func(i, j int) bool { return c.Objectives[i].ID < c.Objectives[j].ID })
+		if len(c.Objectives) == 1 && c.Objectives[0].ID == c.ID {
+			continue // official unlettered assessment objective
+		}
 		for idx, obj := range c.Objectives {
 			expected := fmt.Sprintf("%s[%c]", c.ID, 'a'+idx)
 			if idx >= 26 || obj.ID != expected {
