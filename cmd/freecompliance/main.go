@@ -17,6 +17,8 @@ import (
 	"github.com/blocksifrdev/freecompliance/internal/scan"
 )
 
+var releaseVersion = "v0.4.0-dev"
+
 func main() {
 	if err := run(os.Args[1:], os.Stdout); err != nil {
 		fmt.Fprintln(os.Stderr, "freecompliance:", err)
@@ -41,7 +43,7 @@ func run(args []string, out io.Writer) error {
 	case "cmmc":
 		return cmmcCommand(args[1:], out)
 	case "version", "--version", "-v":
-		fmt.Fprintln(out, "FreeCompliance v0.4.0-dev")
+		fmt.Fprintf(out, "FreeCompliance %s\n", releaseVersion)
 		return nil
 	case "help", "-h", "--help":
 		return usage(out)
