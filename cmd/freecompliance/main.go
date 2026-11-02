@@ -60,6 +60,7 @@ Usage:
   freecompliance compare --before old.json --after new.json
   freecompliance prove --input obligations.json [--json proof.json] [--html proof.html] [--fail-on-counterexample]
   freecompliance prove-github --repo owner/name [--json github-proof.json] [--html github-proof.html] [--fail-on-unproven]
+  freecompliance cmmc ui --data-dir ./private-assessment --port 8765
   freecompliance cmmc init --level 2 --scope "enclave-1" --out workspace.json
   freecompliance cmmc assess --input workspace.json --evidence-dir ./evidence --json readiness.json
   freecompliance cmmc objectives-init --level 2 --scope "enclave-1" --out objectives.json
@@ -72,6 +73,7 @@ Usage:
 
 A local scan DOES NOT certify SOC 2, CMMC, ISO 27001 or any NIST framework.
 VERIFIED means a specific check passed using local artifacts, not organizational compliance.
+Local browser UI binds only to 127.0.0.1 and serves no remote scripts or telemetry.
 Local scan needs no network, secrets, cloud credentials or telemetry.
 GitHub scan makes read-only requests and optionally uses GITHUB_TOKEN.
 The theorem command evaluates bounded caller-defined models, never certifies compliance.

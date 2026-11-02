@@ -73,11 +73,14 @@ def build(version, out_dir):
                  archive_file('CMMC_AIRGAP.md', (ROOT / 'docs/CMMC_AIRGAP.md').read_bytes()),
                  archive_file('CMMC_OBJECTIVE_WORKBENCH.md', (ROOT / 'docs/CMMC_OBJECTIVE_WORKBENCH.md').read_bytes()),
                  archive_file('CMMC_ASSESSMENT_NEXT.md', (ROOT / 'docs/CMMC_ASSESSMENT_NEXT.md').read_bytes()),
+                 archive_file('LOCAL_UI.md', (ROOT / 'docs/LOCAL_UI.md').read_bytes()),
                  archive_file('INSTALL-OFFLINE.txt', (ROOT / 'docs/DOWNLOADS.md').read_bytes())]
         if goos == 'windows':
             files.append(archive_file('START-CMMC-DEMO.cmd', (ROOT / 'scripts/START-CMMC-DEMO.cmd').read_bytes()))
+            files.append(archive_file('START-CMMC-UI.cmd', (ROOT / 'scripts/START-CMMC-UI.cmd').read_bytes()))
         else:
             files.append(archive_file('start-cmmc-demo.sh', (ROOT / 'scripts/start-cmmc-demo.sh').read_bytes(), 0o755))
+            files.append(archive_file('start-cmmc-ui.sh', (ROOT / 'scripts/start-cmmc-ui.sh').read_bytes(), 0o755))
         files.append(archive_file('PACKAGE-MANIFEST.json', manifest_bytes([name for name, _, _ in files], name, version, goos, goarch)))
         output = out_dir / f'{name}'
         if goos == 'windows':

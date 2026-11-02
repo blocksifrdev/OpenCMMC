@@ -4,15 +4,18 @@ on:
     paths:
       - 'scripts/package_release.py'
       - 'scripts/start-cmmc-demo.sh'
+      - 'scripts/start-cmmc-ui.sh'
+      - 'scripts/START-CMMC-UI.cmd'
+      - 'docs/LOCAL_UI.md'
       - 'scripts/START-CMMC-DEMO.cmd'
       - 'docs/DOWNLOADS.md'
-      - 'docs/RELEASE_NOTES_v0.5.0-preview.2.md'
+      - 'docs/RELEASE_NOTES_v0.5.0-preview.3.md'
       - '.github/workflows/downloads.yml'
       - 'cmd/freecompliance/**'
       - 'internal/cmmc/**'
   push:
     branches:
-      - 'release/v0.5.0-preview.2'
+      - 'release/v0.5.0-preview.3'
   workflow_dispatch:
 permissions:
   contents: read
@@ -33,7 +36,7 @@ jobs:
           go test -race ./internal/cmmc ./cmd/freecompliance
           go vet ./...
       - name: Cross-compile and package
-        run: python3 scripts/package_release.py --version v0.5.0-preview.2 --out dist
+        run: python3 scripts/package_release.py --version v0.5.0-preview.3 --out dist
       - name: Verify checksums and offline assessment smoke
         shell: bash
         run: |
@@ -42,10 +45,22 @@ jobs:
           sha256sum -c SHA256SUMS
           sha256sum -c SHA256SUMS.sha256
           mkdir linux-smoke
-          tar -xzf freecompliance-v0.5.0-preview.2-linux-amd64.tar.gz -C linux-smoke
+          tar -xzf freecompliance-v0.5.0-preview.3-linux-amd64.tar.gz -C linux-smoke
           cd linux-smoke
-          ./freecompliance version | grep -Fx 'FreeCompliance v0.5.0-preview.2'
+          ./freecompliance version | grep -Fx 'FreeCompliance v0.5.0-preview.3'
           ./start-cmmc-demo.sh
+          test -s LOCAL_UI.md
+          test -s start-cmmc-ui.sh
+          test -s CMMC_ASSESSMENT_NEXT.md
+          timeout 12s ./freecompliance cmmc ui --data-dir ./ui-smoke --port 18965 > ui-smoke.log 2>&1 &
+          ui_pid=$!
+          for i in $(seq 1 45); do
+            if grep -q 'Open this private URL' ui-smoke.log; then break; fi
+            sleep 0.1
+          done
+          grep -q 'Open this private URL' ui-smoke.log
+          kill "$ui_pid" 2>/dev/null || true
+          wait "$ui_pid" 2>/dev/null || true
           ./freecompliance cmmc objectives-init --level 2 --scope "Synthetic offline enclave" --out objectives.json
           ./freecompliance cmmc objectives-assess --input objectives.json --evidence-dir demo-evidence --json objective-report.json
           ./freecompliance cmmc score-template --scope "Synthetic offline enclave" --out draft-score-input.json
@@ -58,7 +73,7 @@ jobs:
       - name: Store preview packages for review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: freecompliance-v0.5.0-preview.2-downloads
+          name: freecompliance-v0.5.0-preview.3-downloads
           path: |
             dist/*.zip
             dist/*.tar.gz
@@ -67,7 +82,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
   publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0-preview.2'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0-preview.3' && contains(github.event.head_commit.message, 'publish-preview3')
     needs: package
     runs-on: ubuntu-latest
     permissions:
@@ -76,7 +91,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: freecompliance-v0.5.0-preview.2-downloads
+          name: freecompliance-v0.5.0-preview.3-downloads
           path: dist
       - name: Verify release checksums
         run: |
@@ -88,15 +103,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          test "$GITHUB_REF" = 'refs/heads/release/v0.5.0-preview.2'
-          if gh release view v0.5.0-preview.2 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release v0.5.0-preview.2 already exists; refusing duplicate publication." >&2
+          test "$GITHUB_REF" = 'refs/heads/release/v0.5.0-preview.3'
+          if gh release view v0.5.0-preview.3 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release v0.5.0-preview.3 already exists; refusing duplicate publication." >&2
             exit 1
           fi
-          gh release create v0.5.0-preview.2 \
+          gh release create v0.5.0-preview.3 \
             dist/*.zip dist/*.tar.gz dist/SHA256SUMS dist/SHA256SUMS.sha256 \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title 'FreeCompliance v0.5.0 Preview 2 | Offline CMMC Objective Import and Draft Scoring' \
-            --notes-file docs/RELEASE_NOTES_v0.5.0-preview.2.md \
+            --notes-file docs/RELEASE_NOTES_v0.5.0-preview.3.md \
             --prerelease --latest=false
