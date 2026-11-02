@@ -1,5 +1,11 @@
 # FreeCompliance
 
+## Download FreeCompliance
+
+**Windows and Linux portable preview packages:** [GitHub Releases](https://github.com/blocksifrdev/freecompliance/releases) | [Download and offline installation guide](docs/DOWNLOADS.md)
+
+No Go compiler is required to run the packaged executable. The Windows ZIP includes a double-click **offline demo launcher**. This is a preview command-line release, **not yet a graphical installer, complete CMMC objective catalog, independently validated SPRS scoring system, or certification**. Follow your organization's software approval and CUI handling rules.
+
 > **AVAILABLE NOW | OFFICIAL VETERANS DAY LAUNCH: NOVEMBER 11, 2026**
 >
 > Free, open-source CMMC readiness for defense contractors, assessors, and government technical teams. No subscription, login, or mandatory cloud service. Core tools work offline.
