@@ -144,7 +144,7 @@ jobs:
             exit 1
           fi
           gh release create v0.5.0-preview.4 \
-            dist/*.zip dist/*.tar.gz dist/SHA256SUMS dist/SHA256SUMS.sha256 \
+            dist/*.zip dist/*.tar.gz dist/SHA256SUMS dist/SHA256SUMS.sha256 dist/SBOM.spdx.json \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title 'FreeCompliance v0.5.0 Preview 4 | Provenance and Offline CMMC Evaluation' \
