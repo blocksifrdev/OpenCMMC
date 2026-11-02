@@ -3,19 +3,23 @@ on:
   pull_request:
     paths:
       - 'scripts/package_release.py'
+      - 'scripts/create_sbom.py'
+      - 'scripts/test_create_sbom.py'
+      - 'docs/RELEASE_INTEGRITY.md'
+      - 'docs/RELEASE_NOTES_v0.5.0-preview.4.md'
       - 'scripts/start-cmmc-demo.sh'
       - 'scripts/start-cmmc-ui.sh'
       - 'scripts/START-CMMC-UI.cmd'
       - 'docs/LOCAL_UI.md'
       - 'scripts/START-CMMC-DEMO.cmd'
       - 'docs/DOWNLOADS.md'
-      - 'docs/RELEASE_NOTES_v0.5.0-preview.3.md'
+      - 'docs/RELEASE_NOTES_v0.5.0-preview.4.md'
       - '.github/workflows/downloads.yml'
       - 'cmd/freecompliance/**'
       - 'internal/cmmc/**'
   push:
     branches:
-      - 'release/v0.5.0-preview.3'
+      - 'release/v0.5.0-preview.4'
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,6 +29,9 @@ jobs:
     timeout-minutes: 35
     permissions:
       contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
@@ -35,8 +42,17 @@ jobs:
           go test ./...
           go test -race ./internal/cmmc ./cmd/freecompliance
           go vet ./...
+      - name: Check dependency inventory generator
+        run: python3 -m unittest discover -s scripts -p 'test_create_sbom.py' -v
       - name: Cross-compile and package
-        run: python3 scripts/package_release.py --version v0.5.0-preview.3 --out dist
+        run: python3 scripts/package_release.py --version v0.5.0-preview.4 --out dist
+      - name: Generate version-pinned SPDX Go module inventory
+        run: |
+          set -euo pipefail
+          python3 scripts/create_sbom.py --version v0.5.0-preview.4 --source-sha "$GITHUB_SHA" --out dist/SBOM.spdx.json
+          sha256sum dist/SBOM.spdx.json >> dist/SHA256SUMS
+          (cd dist && sha256sum SHA256SUMS > SHA256SUMS.sha256)
+          python3 -c 'import json; x=json.load(open("dist/SBOM.spdx.json")); assert x["spdxVersion"]=="SPDX-2.3" and len(x["packages"])>=2 and all(p["SPDXID"] for p in x["packages"])'
       - name: Verify checksums and offline assessment smoke
         shell: bash
         run: |
@@ -45,9 +61,9 @@ jobs:
           sha256sum -c SHA256SUMS
           sha256sum -c SHA256SUMS.sha256
           mkdir linux-smoke
-          tar -xzf freecompliance-v0.5.0-preview.3-linux-amd64.tar.gz -C linux-smoke
+          tar -xzf freecompliance-v0.5.0-preview.4-linux-amd64.tar.gz -C linux-smoke
           cd linux-smoke
-          ./freecompliance version | grep -Fx 'FreeCompliance v0.5.0-preview.3'
+          ./freecompliance version | grep -Fx 'FreeCompliance v0.5.0-preview.4'
           ./start-cmmc-demo.sh
           test -s LOCAL_UI.md
           test -s start-cmmc-ui.sh
@@ -70,19 +86,38 @@ jobs:
           fi
           test ! -e draft-score.json
           python3 -c 'import json; a=json.load(open("demo-readiness.json")); b=json.load(open("objective-report.json")); c=json.load(open("draft-score-input.json")); assert a["summary"]["total"]==110 and a["summary"]["documented"]==0 and a["summary"]["unassessed"]==110; assert b["summary"]["total_controls"]==110 and b["summary"]["missing_objective_lists"]==110; assert len(c["adjudications"])==110'
+      - name: Create signed build provenance attestations (release branch only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0-preview.4' && contains(github.event.head_commit.message, 'publish-preview4')
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: |
+            dist/*.zip
+            dist/*.tar.gz
+            dist/SHA256SUMS
+            dist/SBOM.spdx.json
+      - name: Verify generated release attestations before publishing
+        if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0-preview.4' && contains(github.event.head_commit.message, 'publish-preview4')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for artifact in dist/*.zip dist/*.tar.gz dist/SHA256SUMS dist/SBOM.spdx.json; do
+            gh attestation verify "$artifact" -R "$GITHUB_REPOSITORY"
+          done
       - name: Store preview packages for review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: freecompliance-v0.5.0-preview.3-downloads
+          name: freecompliance-v0.5.0-preview.4-downloads
           path: |
             dist/*.zip
             dist/*.tar.gz
             dist/SHA256SUMS
             dist/SHA256SUMS.sha256
+            dist/SBOM.spdx.json
           if-no-files-found: error
           retention-days: 30
   publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0-preview.3' && contains(github.event.head_commit.message, 'publish-preview3')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0-preview.4' && contains(github.event.head_commit.message, 'publish-preview4')
     needs: package
     runs-on: ubuntu-latest
     permissions:
@@ -91,7 +126,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: freecompliance-v0.5.0-preview.3-downloads
+          name: freecompliance-v0.5.0-preview.4-downloads
           path: dist
       - name: Verify release checksums
         run: |
@@ -103,15 +138,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          test "$GITHUB_REF" = 'refs/heads/release/v0.5.0-preview.3'
-          if gh release view v0.5.0-preview.3 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release v0.5.0-preview.3 already exists; refusing duplicate publication." >&2
+          test "$GITHUB_REF" = 'refs/heads/release/v0.5.0-preview.4'
+          if gh release view v0.5.0-preview.4 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release v0.5.0-preview.4 already exists; refusing duplicate publication." >&2
             exit 1
           fi
-          gh release create v0.5.0-preview.3 \
+          gh release create v0.5.0-preview.4 \
             dist/*.zip dist/*.tar.gz dist/SHA256SUMS dist/SHA256SUMS.sha256 \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title 'FreeCompliance v0.5.0 Preview 2 | Offline CMMC Objective Import and Draft Scoring' \
-            --notes-file docs/RELEASE_NOTES_v0.5.0-preview.3.md \
+            --title 'FreeCompliance v0.5.0 Preview 4 | Provenance and Offline CMMC Evaluation' \
+            --notes-file docs/RELEASE_NOTES_v0.5.0-preview.4.md \
             --prerelease --latest=false
