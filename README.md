@@ -76,6 +76,18 @@ The result shows which items are `DOCUMENTED`, `GAP`, `UNASSESSED`, `UNVERIFIABL
 
 **What is not yet included:** Complete CMMC assessment objectives and procedures, authoritative control effectiveness testing across systems, validated SPRS scoring, official government submission, C3PAO accreditation, OSCAL-certified export, or a government endorsement. The local CMMC catalog is an **identifier index**, not a replacement for the authoritative requirement text or an approved assessment methodology.
 
+## Objective-level CMMC review (experimental)
+
+The offline objective workbench goes one level deeper than the requirement index. It records individual reviewer-assessed objectives, methods (examine/interview/test), source references, and evidence hashes without sending information outside the enclave.
+
+```bash
+./freecompliance cmmc objectives-init --level 2 --scope "CUI enclave A" --out objectives.json
+mkdir -p evidence
+./freecompliance cmmc objectives-assess --input objectives.json --evidence-dir evidence --json objective-report.json
+```
+
+**Important:** The generated 110-control workspace contains **empty objective lists**. Reviewers must populate those from the applicable, version-pinned authoritative NIST assessment procedures. The tool cannot yet validate that all official objectives have been included. Even an evidence-review-ready finding describes **listed objectives only**, not a passed CMMC requirement. No SPRS score, government submission, or CMMC certification is produced. See [the objective workbench guide](docs/CMMC_OBJECTIVE_WORKBENCH.md).
+
 ## Air-gapped deployment
 
 FreeCompliance's `cmmc`, local `scan`, and local `prove` commands need **no network access, API keys, account, cloud tenant, telemetry, or LLM**. The optional `github` and `prove-github` commands **do** call GitHub and must not be used inside an air-gapped enclave.
