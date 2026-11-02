@@ -22,6 +22,7 @@ type ObjectiveEvidence struct {
 	CapturedAt string `json:"captured_at"`
 }
 type ObjectiveItem struct {
+	Statement string              `json:"statement,omitempty"` // imported supplemental objective text; PDF validation pending
 	ID        string              `json:"id"`
 	Decision  string              `json:"decision"`         // UNASSESSED, ASSERTED_MET, ASSERTED_NOT_MET, NOT_APPLICABLE
 	Method    string              `json:"method,omitempty"` // EXAMINE, INTERVIEW, TEST
@@ -29,9 +30,16 @@ type ObjectiveItem struct {
 	Rationale string              `json:"rationale,omitempty"`
 	Evidence  []ObjectiveEvidence `json:"evidence,omitempty"`
 }
+type AssessmentMethodGuidance struct {
+	Examine   string `json:"examine,omitempty"`
+	Interview string `json:"interview,omitempty"`
+	Test      string `json:"test,omitempty"`
+}
 type ObjectiveControl struct {
-	ID         string          `json:"id"`
-	Objectives []ObjectiveItem `json:"objectives"`
+	RequirementText string                   `json:"requirement_text,omitempty"`
+	Methods         AssessmentMethodGuidance `json:"methods,omitempty"`
+	ID              string                   `json:"id"`
+	Objectives      []ObjectiveItem          `json:"objectives"`
 }
 type ObjectiveWorkspace struct {
 	SchemaVersion   string             `json:"schema_version"`
@@ -117,30 +125,37 @@ func ValidateObjectiveWorkspace(w ObjectiveWorkspace) error {
 			return fmt.Errorf("missing, unknown or duplicate control %q", c.ID)
 		}
 		seen[c.ID] = true
+		if len(c.RequirementText) > 4096 || len(c.Methods.Examine) > 16384 || len(c.Methods.Interview) > 16384 || len(c.Methods.Test) > 16384 {
+			return fmt.Errorf("oversized requirement or methods for %s", c.ID)
+		}
 		if len(c.Objectives) > 64 {
 			return fmt.Errorf("too many objectives for %q", c.ID)
 		}
 		objectIDs := map[string]bool{}
 		for _, o := range c.Objectives {
-			if len(o.ID) < len(c.ID)+3 || !strings.HasPrefix(o.ID, c.ID+"[") || !strings.HasSuffix(o.ID, "]") || objectIDs[o.ID] || len(o.ID) > 64 {
+			single := o.ID == c.ID && len(c.Objectives) == 1 && strings.TrimSpace(o.Statement) != ""
+			if (!single && (len(o.ID) < len(c.ID)+3 || !strings.HasPrefix(o.ID, c.ID+"[") || !strings.HasSuffix(o.ID, "]"))) || objectIDs[o.ID] || len(o.ID) > 64 {
 				return fmt.Errorf("invalid or duplicate objective ID %q", o.ID)
 			}
-			suffix := o.ID[len(c.ID)+1 : len(o.ID)-1]
-			if suffix == "" {
-				return fmt.Errorf("empty objective ID suffix %q", o.ID)
-			}
-			for _, r := range suffix {
-				if !(r >= 'a' && r <= 'z') && !(r >= '0' && r <= '9') && r != '.' {
-					return fmt.Errorf("invalid objective ID %q", o.ID)
+			if !single {
+				suffix := o.ID[len(c.ID)+1 : len(o.ID)-1]
+				if suffix == "" {
+					return fmt.Errorf("empty objective ID suffix %q", o.ID)
+				}
+				for _, r := range suffix {
+					if !(r >= 'a' && r <= 'z') && !(r >= '0' && r <= '9') && r != '.' {
+						return fmt.Errorf("invalid objective ID %q", o.ID)
+					}
 				}
 			}
+
 			objectIDs[o.ID] = true
 			switch o.Decision {
 			case "UNASSESSED", "ASSERTED_MET", "ASSERTED_NOT_MET", "NOT_APPLICABLE":
 			default:
 				return fmt.Errorf("unsupported decision for %q", o.ID)
 			}
-			if len(o.Reviewer) > 256 || len(o.Rationale) > 2048 || len(o.Evidence) > 16 {
+			if len(o.Reviewer) > 256 || len(o.Rationale) > 2048 || len(o.Evidence) > 16 || len(o.Statement) > 4096 {
 				return fmt.Errorf("oversized objective metadata %q", o.ID)
 			}
 			if o.Decision != "UNASSESSED" {
