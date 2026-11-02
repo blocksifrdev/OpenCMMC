@@ -6,7 +6,7 @@
 
 **Download now:** [Windows x64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-windows-amd64.zip) | [Windows ARM64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-windows-arm64.zip) | [Linux x64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-linux-amd64.tar.gz) | [Linux ARM64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-linux-arm64.tar.gz) | [SHA256SUMS](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/SHA256SUMS)
 
-No Go compiler is required to run the packaged executable. The Windows ZIP includes a double-click **offline demo launcher**. This is a preview command-line release, **not yet a graphical installer, complete CMMC objective catalog, independently validated SPRS scoring system, or certification**. Follow your organization's software approval and CUI handling rules.
+No Go compiler is required to run the packaged executable. The Windows ZIP includes a double-click **offline demo launcher**. **The v0.5.0-preview.1 binaries predate the newly merged CMMC objective importer and draft scoring code.** For those commands, build the latest reviewed source from `main` until a new release is verified. Neither build is an independently validated SPRS scoring system, CMMC certification, or graphical installer. Follow your organization's software approval and CUI handling rules.
 
 > **AVAILABLE NOW | OFFICIAL VETERANS DAY LAUNCH: NOVEMBER 11, 2026**
 >
@@ -37,6 +37,19 @@ This initiative honors U.S. military service and is inspired by the founder's fa
 | A security or compliance lead | Identify undocumented, unresolved, or missing evidence and assign follow-up reviews. |
 | An assessor or internal auditor | Review consistent, traceable files and see which conclusions require independent testing. |
 | A restricted or disconnected organization | Run local assessments without sending CUI, source code, or evidence to BlockSiFr. |
+
+## Complete NIST assessment-objective source import (new in source)
+
+The latest Go source includes an **offline importer** for the official NIST SP 800-171A (June 2018) supplemental CSV. In GitHub CI, it imported all **110 Level 2 requirement identifiers and 320 objective statements**. This establishes validated CSV-format ingestion, **not** independent reconciliation against the normative NIST PDF or a passing CMMC assessment.
+
+```bash
+# First obtain the official CSV through an approved, independently verified staging process.
+./freecompliance cmmc objectives-import --csv sp800-171a-assessment-procedures.csv --sha256 YOUR_VERIFIED_SHA256 --scope "Approved CUI enclave" --out objectives.json
+mkdir -p evidence
+./freecompliance cmmc objectives-assess --input objectives.json --evidence-dir evidence --json objective-report.json
+```
+
+A separate `cmmc score-template` command creates a draft 110-item worksheet. The `cmmc score-draft` calculator will **reject incomplete human determinations** and labels every result as unvalidated. See [source imports and draft scoring instructions](docs/CMMC_ASSESSMENT_NEXT.md). Neither function submits to SPRS.
 
 ## Get started in three steps
 
