@@ -14,6 +14,15 @@ jobs:
           go-version-file: go.mod
       - name: Unit tests
         run: go test ./...
+      - name: Official NIST SP 800-171A CSV format check
+        run: |
+          curl --fail --location --silent --show-error --retry 2 \
+            https://csrc.nist.gov/files/pubs/sp/800/171/a/final/docs/sp800-171a-assessment-procedures.csv \
+            --output /tmp/nist171a.csv
+          sha=$(sha256sum /tmp/nist171a.csv | cut -d' ' -f1)
+          go run ./cmd/freecompliance cmmc objectives-import \
+            --csv /tmp/nist171a.csv --sha256 "$sha" --scope "CI synthetic boundary" \
+            --out /tmp/nist171a-workspace.json
       - name: Vet
         run: go vet ./...
       - name: Repository evidence scan
