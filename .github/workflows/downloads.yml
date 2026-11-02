@@ -50,8 +50,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/create_sbom.py --version v0.5.0-preview.4 --source-sha "$GITHUB_SHA" --out dist/SBOM.spdx.json
-          sha256sum dist/SBOM.spdx.json >> dist/SHA256SUMS
-          (cd dist && sha256sum SHA256SUMS > SHA256SUMS.sha256)
+          (cd dist && sha256sum SBOM.spdx.json >> SHA256SUMS && sha256sum SHA256SUMS > SHA256SUMS.sha256)
           python3 -c 'import json; x=json.load(open("dist/SBOM.spdx.json")); assert x["spdxVersion"]=="SPDX-2.3" and len(x["packages"])>=2 and all(p["SPDXID"] for p in x["packages"])'
       - name: Verify checksums and offline assessment smoke
         shell: bash
