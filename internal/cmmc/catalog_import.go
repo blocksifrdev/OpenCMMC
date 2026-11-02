@@ -84,6 +84,7 @@ func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace
 		index[c.ID] = i
 	}
 	requirementRow := map[string]bool{}
+	pendingUnlettered := map[string]string{}
 	objectives := map[string]bool{}
 	count := 0
 	for rowN, row := range rows[1:] {
@@ -115,9 +116,10 @@ func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace
 				if !strings.HasPrefix(strings.ToLower(text), "determine if ") {
 					return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("CSV row %d unexpected unlettered objective", rowN+2)
 				}
-				objectives[id] = true
-				w.Controls[ci].Objectives = append(w.Controls[ci].Objectives, ObjectiveItem{ID: id, Statement: text, Decision: "UNASSESSED"})
-				count++
+				// Some NIST requirement-header rows contain full objective text even
+				// when separate lettered objective rows follow. Only treat this
+				// header as an unlettered objective if no children are present.
+				pendingUnlettered[id] = text
 			}
 			w.Controls[ci].RequirementText = strings.TrimSpace(row[reqCol])
 			w.Controls[ci].Methods = AssessmentMethodGuidance{Examine: strings.TrimSpace(row[examineCol]), Interview: strings.TrimSpace(row[interviewCol]), Test: strings.TrimSpace(row[testCol])}
@@ -139,6 +141,10 @@ func Import171ACSV(source []byte, scope, expectedSHA string) (ObjectiveWorkspace
 	}
 	for i := range w.Controls {
 		c := &w.Controls[i]
+		if len(c.Objectives) == 0 && pendingUnlettered[c.ID] != "" {
+			c.Objectives = append(c.Objectives, ObjectiveItem{ID: c.ID, Statement: pendingUnlettered[c.ID], Decision: "UNASSESSED"})
+			count++
+		}
 		if !requirementRow[c.ID] || len(c.Objectives) == 0 {
 			return ObjectiveWorkspace{}, ImportSummary{}, fmt.Errorf("incomplete CSV: %s is missing a header or objectives", c.ID)
 		}
