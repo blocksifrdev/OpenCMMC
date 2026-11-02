@@ -151,3 +151,15 @@ Run `go test ./...` and `go vet ./...`. See [CONTRIBUTING.md](CONTRIBUTING.md). 
 ## License
 
 [Apache License 2.0](LICENSE). Copyright 2026 BlockSiFr.
+
+## Live source-bound theorem demo (experimental v0.4)
+
+Run the read-only GitHub **active ruleset declaration** proof:
+
+```bash
+go run ./cmd/freecompliance prove-github --repo blocksifrdev/freecompliance --json github-proof.json --html github-proof.html
+```
+
+This command retrieves repository identity and active branch rules from fixed GitHub GET endpoints, records SHA-256 response digests, requires fresh HTTP Date/Age metadata and complete bounded pagination before admitting evidence, and builds a finite model. It reports **MODEL_SUPPORTED** only for the narrow proposition that active rulesets contain a positive required review count and at least one required status check context, when these are observed. It **never** establishes absence of bypass actors, effective enforcement, classic branch protection rules or real-world compliance. The broad no-bypass proposition remains unproven. An unavailable or stale API source yields `UNKNOWN`, not green. See [source-bound proof limits](docs/SOURCE_BOUND_GITHUB.md).
+
+For private repositories a read-only GitHub token may be supplied in `GITHUB_TOKEN` (Metadata: read); do not pass tokens in command arguments. No write APIs or third-party dependencies are used. The CLI and report are free under Apache-2.0.
