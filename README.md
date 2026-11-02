@@ -1,5 +1,15 @@
 # FreeCompliance
 
+**Category: Proof-Driven Compliance.** Free evidence readiness plus bounded, explainable theorem evaluation.
+
+## Theorem Intelligence (experimental v0.3)
+
+```bash
+go run ./cmd/freecompliance prove --input examples/theorem/branch-controls.json --json proof.json --html proof.html
+```
+
+This synthetic demo checks every finite state consistent with the given observations and produces a modeled counterexample for an unverified bypass path. It also selects a minimum-cost **hypothetical** evidence plan from a bounded candidate pool. This is not a claim of production control effectiveness, certification, a real-world exploit, or audited compliance. See [Theorem Intelligence](docs/THEOREM_INTELLIGENCE.md) and the [Category Thesis](docs/CATEGORY_THESIS.md).
+
 **Free compliance readiness. Evidence you can inspect. No false green.**
 
 FreeCompliance is an Apache-2.0 open-source utility from BlockSiFr. It inspects a local software repository for independently reproducible security and governance signals, records SHA-256 evidence digests, and creates a structured JSON assessment plus a polished self-contained HTML evidence report. It does not ask for credentials, upload source code, or charge for its core functionality.
@@ -10,15 +20,16 @@ FreeCompliance is an Apache-2.0 open-source utility from BlockSiFr. It inspects 
 
 Requires Go 1.23+ for building from this source tree. No third-party Go modules.
 
-Unpack the included source archive, then run:
+Clone the public repository, then run:
 
 ```bash
+git clone https://github.com/blocksifrdev/freecompliance.git
 cd freecompliance
 go test ./...
 go run ./cmd/freecompliance scan --path . --json readiness.json --html readiness.html
 ```
 
-Once the public standalone repository is published, it can be cloned from `https://github.com/BlockSiFr/freecompliance`. This is a planned location, not a claim that publication has happened. Open `readiness.html` in any browser.
+Open `readiness.html` in any browser. The local scanner needs no credentials or account.
 
 Assess another local repository:
 
@@ -47,7 +58,7 @@ The optional GitHub assessor performs **GET-only** calls against the GitHub REST
 
 ```bash
 # Public repository (up to GitHub's unauthenticated rate limit):
-go run ./cmd/freecompliance github --repo BlockSiFr/freecompliance --json github.json --html github.html
+go run ./cmd/freecompliance github --repo blocksifrdev/freecompliance --json github.json --html github.html
 
 # For private repositories, use a read-only token with Contents: read and Metadata: read:
 export GITHUB_TOKEN="<token supplied securely outside this repository>"
@@ -59,20 +70,20 @@ Never put tokens in a CLI argument, issue, screenshot, GitHub Actions log, repor
 
 `VERIFIED` for `GITHUB_BRANCH_PROTECTED` means only that the API reported the flag as true. It is not evidence that *specific* required-review or CI rules work. This is intentionally narrower than a full compliance claim.
 
-## Drop-in GitHub Action (after public release)
+## Drop-in GitHub Action
 
-This repository includes a composite GitHub Action. Once a public release is tagged, any GitHub repository can use it without credentials or a subscription. First check out the target repo and install Go, then run:
+This repository includes a composite GitHub Action. First check out the target repository and install Go, then invoke the Action:
 
 ```yaml
 - name: Free repository evidence scan
-  uses: BlockSiFr/freecompliance@v0.2.0
+  uses: blocksifrdev/freecompliance@main
   with:
     fail-on-gap: 'true'
 ```
 
-The action writes a summary into the GitHub Actions job UI and exposes paths to local JSON and HTML reports as outputs. It does not auto-publish evidence or leave comments. For supply-chain hardening, replace the tag with the reviewed immutable action commit SHA when pinning it in production.
+The action writes a summary into the GitHub Actions job UI and exposes paths to local JSON and HTML reports as outputs. It does not auto-publish evidence or leave comments. The `@main` reference is intentionally a quick-start example, not a supply-chain secure pin. For production, replace `main` with a reviewed full 40-character commit SHA. An immutable `v0.2.0` tag will be documented only after it has actually been created.
 
-This `uses:` reference will work **only after the repository and release exist**.
+Do not equate a GitHub Actions workflow result with organizational compliance or auditor certification.
 
 ## What it does today
 

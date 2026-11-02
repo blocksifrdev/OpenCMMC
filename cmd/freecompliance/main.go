@@ -34,8 +34,10 @@ func run(args []string, out io.Writer) error {
 		return githubCommand(args[1:], out)
 	case "compare":
 		return compareCommand(args[1:], out)
+	case "prove":
+		return proveCommand(args[1:], out)
 	case "version", "--version", "-v":
-		fmt.Fprintln(out, "FreeCompliance v0.2.0")
+		fmt.Fprintln(out, "FreeCompliance v0.3.0-dev")
 		return nil
 	case "help", "-h", "--help":
 		return usage(out)
@@ -50,12 +52,14 @@ Usage:
   freecompliance scan --path . [--json report.json] [--html report.html] [--fail-on-gap]
   freecompliance github --repo owner/name [--json report.json] [--html report.html] [--fail-on-gap]
   freecompliance compare --before old.json --after new.json
+  freecompliance prove --input obligations.json [--json proof.json] [--html proof.html] [--fail-on-counterexample]
   freecompliance version
 
 A local scan DOES NOT certify SOC 2, CMMC, ISO 27001 or any NIST framework.
 VERIFIED means a specific check passed using local artifacts, not organizational compliance.
 Local scan needs no network, secrets, cloud credentials or telemetry.
 GitHub scan makes read-only requests and optionally uses GITHUB_TOKEN.
+The theorem command evaluates bounded caller-defined models, never certifies compliance.
 `)
 	return err
 }
