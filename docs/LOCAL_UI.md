@@ -4,7 +4,7 @@
 
 ## Start on Windows
 
-Extract the approved FreeCompliance ZIP into a local folder and double-click `START-CMMC-UI.cmd`. The command window starts a private local server. It prints a private session URL beginning with `http://127.0.0.1:8765/?access=...`. Open that URL in a browser **on the same device** and keep the command window running. Close the window or press Ctrl+C to stop. The command-line version is:
+Extract the approved FreeCompliance ZIP into a local folder and double-click `START-CMMC-UI.cmd`. The command window starts a private local server. It automatically tries to open your default browser and also prints a private session URL beginning with `http://127.0.0.1:8765/?access=...`. Open that URL in a browser **on the same device** and keep the command window running. Close the window or press Ctrl+C to stop. The command-line version is:
 
 ```powershell
 .\freecompliance.exe cmmc ui --data-dir .\private-assessment --port 8765
