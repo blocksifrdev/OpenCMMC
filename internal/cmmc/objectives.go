@@ -133,18 +133,22 @@ func ValidateObjectiveWorkspace(w ObjectiveWorkspace) error {
 		}
 		objectIDs := map[string]bool{}
 		for _, o := range c.Objectives {
-			if len(o.ID) < len(c.ID)+3 || !strings.HasPrefix(o.ID, c.ID+"[") || !strings.HasSuffix(o.ID, "]") || objectIDs[o.ID] || len(o.ID) > 64 {
+			single := o.ID == c.ID && len(c.Objectives) == 1 && strings.TrimSpace(o.Statement) != ""
+			if (!single && (len(o.ID) < len(c.ID)+3 || !strings.HasPrefix(o.ID, c.ID+"[") || !strings.HasSuffix(o.ID, "]"))) || objectIDs[o.ID] || len(o.ID) > 64 {
 				return fmt.Errorf("invalid or duplicate objective ID %q", o.ID)
 			}
-			suffix := o.ID[len(c.ID)+1 : len(o.ID)-1]
-			if suffix == "" {
-				return fmt.Errorf("empty objective ID suffix %q", o.ID)
-			}
-			for _, r := range suffix {
-				if !(r >= 'a' && r <= 'z') && !(r >= '0' && r <= '9') && r != '.' {
-					return fmt.Errorf("invalid objective ID %q", o.ID)
+			if !single {
+				suffix := o.ID[len(c.ID)+1 : len(o.ID)-1]
+				if suffix == "" {
+					return fmt.Errorf("empty objective ID suffix %q", o.ID)
+				}
+				for _, r := range suffix {
+					if !(r >= 'a' && r <= 'z') && !(r >= '0' && r <= '9') && r != '.' {
+						return fmt.Errorf("invalid objective ID %q", o.ID)
+					}
 				}
 			}
+
 			objectIDs[o.ID] = true
 			switch o.Decision {
 			case "UNASSESSED", "ASSERTED_MET", "ASSERTED_NOT_MET", "NOT_APPLICABLE":
