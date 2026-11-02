@@ -1,0 +1,5 @@
+FreeCompliance v0.5.0-preview.4
+Published from reviewed main merge e695a6f1abe8e25bbe988b775b60dd40ecf3721f with release-branch documentation only.
+Official Veterans Day service initiative: November 11, 2026. Public access remains available now.
+Release must fail if tests, network-disabled smoke, SPDX inventory checksum, signed GitHub/Sigstore build attestation or provenance verification fails.
+This release is a portable evaluation preview, not Windows Authenticode code signing, CMMC certification, government procurement approval, ATO, or SPRS submission authority.
