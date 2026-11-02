@@ -33,8 +33,8 @@ type localUI struct {
     mu sync.Mutex
 }
 type localUIState struct {
-    Mode string \`json:"mode"\`
-    Level int \`json:"level"\`
+    Mode string `json:"mode"`
+    Level int `json:"level"`
 }
 type localUIControl struct {
     ID, Description, Status string
@@ -238,7 +238,8 @@ func (u *localUI) evidence(r *http.Request) error {
     st,err:=os.Lstat(base);if err!=nil{return err}
     if !st.IsDir() || st.Mode()&os.ModeSymlink!=0{return errors.New("unsafe evidence directory")}
     temp,err:=os.CreateTemp(base,"evidence-*.bin");if err!=nil{return err}
-    defer os.Remove(temp.Name())
+    keep:=false
+    defer func(){if !keep { _=os.Remove(temp.Name()) }}()
     if err=temp.Chmod(0600);err!=nil{temp.Close();return err}
     hasher:=sha256.New()
     n,err:=io.Copy(io.MultiWriter(temp,hasher),io.LimitReader(f,maxUIEvidence+1))
@@ -254,6 +255,7 @@ func (u *localUI) evidence(r *http.Request) error {
             ws.Controls[i].Evidence=append(ws.Controls[i].Evidence,ev)
             if e=cmmc.ValidatedWorkspace(ws);e!=nil{return e}
             if e=uiWriteJSON(filepath.Join(u.root,"requirements.json"),ws);e!=nil{return e}
+            keep=true
             return nil
         }}
     }else {
@@ -264,6 +266,7 @@ func (u *localUI) evidence(r *http.Request) error {
                     ws.Controls[ci].Objectives[oi].Evidence=append(ws.Controls[ci].Objectives[oi].Evidence,cmmc.ObjectiveEvidence{Path:ev.Path,SHA256:ev.SHA256,CapturedAt:ev.CapturedAt})
                     if e=cmmc.ValidateObjectiveWorkspace(ws);e!=nil{return e}
                     if e=uiWriteJSON(filepath.Join(u.root,"objectives.json"),ws);e!=nil{return e}
+                    keep=true
                     return nil
                 }
             }
@@ -292,7 +295,7 @@ func (u *localUI) export(w http.ResponseWriter,r *http.Request) error {
     result,_,_,err:=u.assessed();if err!=nil{return err}
     b,err:=json.MarshalIndent(result,"","  ");if err!=nil{return err}
     w.Header().Set("Content-Type","application/json; charset=utf-8")
-    w.Header().Set("Content-Disposition",\`attachment; filename="cmmc-readiness.json"\`)
+    w.Header().Set("Content-Disposition",`attachment; filename="cmmc-readiness.json"`)
     _,err=w.Write(append(b,'\n'));return err
 }
 func (u *localUI) view(w http.ResponseWriter,r *http.Request) error {
@@ -350,7 +353,7 @@ func cmmcUICommand(args []string,out io.Writer) error {
 }
 
 // No external scripts, remote fonts, CDN dependencies, or browser network requests.
-var uiHTML=template.Must(template.New("ui").Parse(\`<!doctype html><html lang="en"><head><meta charset="utf-8">
+var uiHTML=template.Must(template.New("ui").Parse(`<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FreeCompliance | Offline CMMC workbench</title>
 <style>
@@ -390,8 +393,8 @@ label{display:block;margin-top:12px;font-weight:600}form{padding:15px 0;border-t
 {{range .Objectives}}
 <div class="item"><h3>{{.ID}}</h3><p>{{.Statement}}</p><p>Current reviewer decision: <strong>{{.Decision}}</strong></p>
 <form method="post" action="/decide"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="control" value="{{$.Selected}}"><input type="hidden" name="objective" value="{{.ID}}">
-<label>Assessment decision<select name="decision"><option value="UNASSESSED">UNASSESSED</option><option value="ASSERTED_MET">Reviewer asserts met</option><option value="ASSERTED_NOT_MET">Reviewer reports gap</option><option value="NOT_APPLICABLE">Applicability review required</option></select></label>
-<label>Method<select name="method"><option value="">Select method</option><option value="EXAMINE">EXAMINE</option><option value="INTERVIEW">INTERVIEW</option><option value="TEST">TEST</option></select></label>
+<label>Assessment decision<select name="decision"><option value="UNASSESSED" {{if eq .Decision "UNASSESSED"}}selected{{end}}>UNASSESSED</option><option value="ASSERTED_MET" {{if eq .Decision "ASSERTED_MET"}}selected{{end}}>Reviewer asserts met</option><option value="ASSERTED_NOT_MET" {{if eq .Decision "ASSERTED_NOT_MET"}}selected{{end}}>Reviewer reports gap</option><option value="NOT_APPLICABLE" {{if eq .Decision "NOT_APPLICABLE"}}selected{{end}}>Applicability review required</option></select></label>
+<label>Method<select name="method"><option value="">Select method</option><option value="EXAMINE" {{if eq .Method "EXAMINE"}}selected{{end}}>EXAMINE</option><option value="INTERVIEW" {{if eq .Method "INTERVIEW"}}selected{{end}}>INTERVIEW</option><option value="TEST" {{if eq .Method "TEST"}}selected{{end}}>TEST</option></select></label>
 <label>Reviewer<input name="reviewer" value="{{.Reviewer}}" maxlength="256"></label>
 <label>Reason / test observation<textarea name="rationale" maxlength="2048">{{.Rationale}}</textarea></label>
 <p><button type="submit">Save objective decision</button></p></form>
@@ -402,7 +405,7 @@ label{display:block;margin-top:12px;font-weight:600}form{padding:15px 0;border-t
 {{else}}
 {{with .Basic}}
 <form method="post" action="/decide"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="control" value="{{$.Selected}}">
-<label>Reviewer assertion<select name="decision"><option value="UNASSESSED">UNASSESSED</option><option value="IMPLEMENTED">Reviewer asserts implemented</option><option value="GAP">Reported gap</option><option value="NOT_APPLICABLE">Scope review required</option></select></label>
+<label>Reviewer assertion<select name="decision"><option value="UNASSESSED" {{if eq .Claim "UNASSESSED"}}selected{{end}}>UNASSESSED</option><option value="IMPLEMENTED" {{if eq .Claim "IMPLEMENTED"}}selected{{end}}>Reviewer asserts implemented</option><option value="GAP" {{if eq .Claim "GAP"}}selected{{end}}>Reported gap</option><option value="NOT_APPLICABLE" {{if eq .Claim "NOT_APPLICABLE"}}selected{{end}}>Scope review required</option></select></label>
 <label>Reviewer<input name="reviewer" value="{{.Reviewer}}" maxlength="256"></label>
 <label>Reason / observation<textarea name="rationale" maxlength="2048">{{.Rationale}}</textarea></label>
 <p><button type="submit">Save requirement review</button></p></form>
@@ -412,4 +415,4 @@ label{display:block;margin-top:12px;font-weight:600}form{padding:15px 0;border-t
 {{end}}
 {{end}}
 </section></div>{{end}}
-<footer class="muted">FreeCompliance by BlockSiFr | Offline-first | Not an approved assessment methodology or government certification</footer></main></body></html>\`))
+<footer class="muted">FreeCompliance by BlockSiFr | Offline-first | Not an approved assessment methodology or government certification</footer></main></body></html>`))
