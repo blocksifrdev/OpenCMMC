@@ -85,6 +85,17 @@ jobs:
           fi
           test ! -e draft-score.json
           python3 -c 'import json; a=json.load(open("demo-readiness.json")); b=json.load(open("objective-report.json")); c=json.load(open("draft-score-input.json")); assert a["summary"]["total"]==110 and a["summary"]["documented"]==0 and a["summary"]["unassessed"]==110; assert b["summary"]["total_controls"]==110 and b["summary"]["missing_objective_lists"]==110; assert len(c["adjudications"])==110'
+      - name: Verify Go workbench in a network-disabled container
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Pull the *test-only* image in staging; execute the built binary with networking disabled.
+          docker pull alpine:3.21
+          docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges \
+            --user "$(id -u):$(id -g)" \
+            -v "$PWD/dist/linux-smoke:/work" -w /work alpine:3.21 \
+            sh -ec './freecompliance cmmc objectives-init --level 2 --scope "Network-disabled synthetic enclave" --out isolated.json; ./freecompliance cmmc objectives-assess --input isolated.json --evidence-dir demo-evidence --json isolated-report.json'
+          test -s dist/linux-smoke/isolated-report.json
       - name: Create signed build provenance attestations (release branch only)
         if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0-preview.4' && contains(github.event.head_commit.message, 'publish-preview4')
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
