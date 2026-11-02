@@ -18,6 +18,9 @@ func officialShapeCSV() []byte {
 		if c.ID == "3.4.4" {
 			objective = "Determine if the security impact of changes is reviewed prior to implementation."
 		}
+		if c.ID == "3.1.22" {
+			objective = "Determine if the external system use policy is defined."
+		}
 		writer.Write([]string{c.ID, c.ID, "", "synthetic requirement statement", objective, "policy", "interview", "test"})
 		if c.ID != "3.4.4" {
 			writer.Write([]string{c.ID, c.ID + "[a]", "", "", "synthetic determination for " + c.ID, "", "", ""})
@@ -39,6 +42,9 @@ func TestImportCompleteOfficialLayoutSynthetic(t *testing.T) {
 	for _, ctrl := range w.Controls {
 		if ctrl.ID == "3.4.4" && (len(ctrl.Objectives) != 1 || ctrl.Objectives[0].ID != "3.4.4") {
 			t.Fatalf("lost official unlettered 3.4.4 objective %+v", ctrl.Objectives)
+		}
+		if ctrl.ID == "3.1.22" && (len(ctrl.Objectives) != 1 || ctrl.Objectives[0].ID != "3.1.22[a]") {
+			t.Fatalf("header wording duplicated lettered objective %+v", ctrl.Objectives)
 		}
 	}
 	if w.Controls[0].Objectives[0].ID != "3.1.1[a]" || w.Controls[0].Methods.Examine != "policy" || w.Controls[0].RequirementText == "" {
