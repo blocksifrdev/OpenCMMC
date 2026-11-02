@@ -1,177 +1,141 @@
 # FreeCompliance
 
-**Category: Proof-Driven Compliance.** Free evidence readiness plus bounded, explainable theorem evaluation.
+## Stop guessing about CMMC. Start proving your controls.
 
-## Theorem Intelligence (experimental v0.3)
+**Know what's required. See what's documented. Find what's missing.**
 
-```bash
-go run ./cmd/freecompliance prove --input examples/theorem/branch-controls.json --json proof.json --html proof.html
-```
+**FreeCompliance** is a free, open-source cybersecurity assurance toolkit for defense contractors, subcontractors, assessors, and government teams. Start a CMMC readiness workspace, organize evidence for each requirement, check whether files are intact and current, and create a report that clearly separates documented claims from gaps and unknowns.
 
-This synthetic demo checks every finite state consistent with the given observations and produces a modeled counterexample for an unverified bypass path. It also selects a minimum-cost **hypothetical** evidence plan from a bounded candidate pool. This is not a claim of production control effectiveness, certification, a real-world exploit, or audited compliance. See [Theorem Intelligence](docs/THEOREM_INTELLIGENCE.md) and the [Category Thesis](docs/CATEGORY_THESIS.md).
+**No subscription. No login. No required cloud service. Runs on an offline or air-gapped computer.**
 
-**Free compliance readiness. Evidence you can inspect. No false green.**
+> **What you get today:** An offline CMMC evidence workbench, source-code security checks, and experimental, bounded theorem evaluation. This is a readiness and evidence-integrity tool, **not an official CMMC assessment, SPRS submission, certification, or proof that a control operates effectively**.
 
-FreeCompliance is an Apache-2.0 open-source utility from BlockSiFr. It inspects a local software repository for independently reproducible security and governance signals, records SHA-256 evidence digests, and creates a structured JSON assessment plus a polished self-contained HTML evidence report. It does not ask for credentials, upload source code, or charge for its core functionality.
+### Who is this for?
 
-> Compliance requirements shouldn't be hidden behind a subscription. The work of validating that controls actually function still matters. We make the first part free.
+| You are... | FreeCompliance helps you... |
+| --- | --- |
+| A small defense contractor | Start a no-cost CMMC evidence inventory without buying a SaaS platform. |
+| A prime or subcontractor | Organize evidence within an explicitly named system or enclave. |
+| A security or compliance lead | Identify undocumented, unresolved, or missing evidence and assign follow-up reviews. |
+| An assessor or internal auditor | Review consistent, traceable files and see which conclusions require independent testing. |
+| A restricted or disconnected organization | Run local assessments without sending CUI, source code, or evidence to BlockSiFr. |
 
-## 60-second quick start
+## Get started in three steps
 
-Requires Go 1.23+ for building from this source tree. No third-party Go modules.
-
-Clone the public repository, then run:
+**Requirements:** Go 1.23+ to build from source. The core Go module has no third-party dependencies. Build the binary in an approved connected environment and transfer it under your organization's software-approval process if the target machine is air-gapped. Validate the software and transferred media before use.
 
 ```bash
 git clone https://github.com/blocksifrdev/freecompliance.git
 cd freecompliance
-go test ./...
-go run ./cmd/freecompliance scan --path . --json readiness.json --html readiness.html
+go build -o freecompliance ./cmd/freecompliance
 ```
 
-Open `readiness.html` in any browser. The local scanner needs no credentials or account.
-
-Assess another local repository:
+**1. Create a CMMC evidence workspace.** Choose Level 1 (15 items) or Level 2 (110 requirement identifiers), and name the actual system being assessed.
 
 ```bash
-go build -o freecompliance ./cmd/freecompliance
-./freecompliance scan --path ../my-app --json ../my-app-readiness.json --html ../my-app-readiness.html
+./freecompliance cmmc init --level 2 --scope "CUI enclave A" --out workspace.json
 ```
 
-Check drift from a saved baseline:
+**2. Keep evidence locally.** Create a folder and edit `workspace.json` to add reviewer assertions and references to approved evidence files. New controls start as `UNASSESSED`. FreeCompliance never automatically promotes file existence to control compliance.
+
+```bash
+mkdir -p evidence
+```
+
+**3. Check your evidence and generate an offline report.**
+
+```bash
+./freecompliance cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
+```
+
+The result shows which items are `DOCUMENTED`, `GAP`, `UNASSESSED`, `UNVERIFIABLE`, or `SCOPE_REVIEW_REQUIRED`. `DOCUMENTED` means a reviewer made a claim and the referenced files passed the available integrity and freshness checks. **It does not mean the CMMC requirement is satisfied.** Read [`docs/CMMC_AIRGAP.md`](docs/CMMC_AIRGAP.md) for how to record evidence safely and work in disconnected environments.
+
+## What is included today?
+
+| Capability | Current state | Network needed? |
+| --- | --- | --- |
+| CMMC Level 1 workspace | 15 safeguarding item identifiers and local evidence tracking | No |
+| CMMC Level 2 workspace | 110 NIST SP 800-171 Rev. 2 requirement identifiers and local evidence tracking | No |
+| Evidence integrity and freshness | SHA-256 comparison, age checks, bounded local file reading | No |
+| Offline assessment report | JSON findings; no invented compliance score | No |
+| Offline update authenticity check | Ed25519 signature check using an independently trusted public key | No |
+| Repository security readiness scan | 14 local evidence assertions with HTML and JSON output | No |
+| Bounded theorem evaluator | Experimental finite-world proof, counterexamples, and unknown outcomes | No |
+| GitHub repository and source-bound rules assessment | Read-only GitHub API collection and narrow theorem checks | **Yes**, optional |
+| Enterprise comparison benchmark | Reproducible benchmark calculator using independently adjudicated case data | No |
+
+**What is not yet included:** Complete CMMC assessment objectives and procedures, authoritative control effectiveness testing across systems, validated SPRS scoring, official government submission, C3PAO accreditation, OSCAL-certified export, or a government endorsement. The local CMMC catalog is an **identifier index**, not a replacement for the authoritative requirement text or an approved assessment methodology.
+
+## Air-gapped deployment
+
+FreeCompliance's `cmmc`, local `scan`, and local `prove` commands need **no network access, API keys, account, cloud tenant, telemetry, or LLM**. The optional `github` and `prove-github` commands **do** call GitHub and must not be used inside an air-gapped enclave.
+
+Evidence stays on storage you control. No automatic export occurs. If you choose to move an evidence report outside a protected boundary, follow your organization's CUI handling, export review, and removable-media procedures. File paths, hashes, and metadata can themselves be sensitive.
+
+To verify an offline package's detached Ed25519 signature with a pretrusted public key:
+
+```bash
+./freecompliance cmmc verify-bundle \
+  --bundle approved-update.tar \
+  --signature approved-update.sig \
+  --public-key pretrusted-key.pub
+```
+
+Verification checks the package bytes against that key. **It does not establish that the key is trusted, that the contents are safe, or that the update should be installed.** See the [air-gap deployment guide](docs/CMMC_AIRGAP.md).
+
+## What makes this different?
+
+**Collecting evidence is not the same as proving a control.** FreeCompliance is building toward **Proof-Driven Compliance**: each technical claim has an explicit scope, source evidence, proof obligation, possible counterexamples, and a visible `UNKNOWN` outcome when the evidence is insufficient.
+
+The theorem engine is experimental. It evaluates bounded models, **not every possible real-world state**. It does not yet automatically prove CMMC control effectiveness. To see a clearly labeled synthetic demonstration:
+
+```bash
+./freecompliance prove --input examples/theorem/branch-controls.json \
+  --json theorem.json --html theorem.html
+```
+
+Open `theorem.html` locally. A model counterexample is a finding **within the model**, not proof of a real exploit or a failed government assessment. Read the [theorem documentation](docs/THEOREM_INTELLIGENCE.md).
+
+## Other commands
+
+Run a local repository scan (does not assess the whole organization):
+
+```bash
+./freecompliance scan --path . --json repository.json --html repository.html
+```
+
+Compare two saved scans:
 
 ```bash
 ./freecompliance compare --before first.json --after latest.json
 ```
 
-Gate a pipeline only on *observed* gaps:
+Run a **connected, read-only** GitHub ruleset proof (not for an air gap):
 
 ```bash
-./freecompliance scan --path . --fail-on-gap
+./freecompliance prove-github --repo blocksifrdev/freecompliance \
+  --json github-proof.json --html github-proof.html
 ```
 
-`--fail-on-gap` will not fail on unknown, unobserved, or merely undocumented controls. Choose stricter gates through your organization's own policy, not by interpreting unknown as passing.
+For teams comparing the effort and reliability of assurance workflows, see the [30-day enterprise challenge](docs/ENTERPRISE_30_DAY_CHALLENGE.md) and its [measurement protocol](docs/MEASUREMENT_PROTOCOL.md). The included benchmark sample is synthetic and is **not** an independently measured comparison with Vanta, Symetri, or customers.
 
-## Inspect actual GitHub branch metadata (v0.2.0)
+## CMMC requirements and important boundaries
 
-The optional GitHub assessor performs **GET-only** calls against the GitHub REST API. The local scan never makes network requests. The GitHub assessor retrieves repository visibility, lifecycle metadata, and the default branch's `protected` flag. It does **not** conclude that review approvals or required checks are enforced.
+- CMMC Level 1 references the 15 basic safeguarding requirements in FAR 52.204-21. Level 2 references the 110 security requirements in NIST SP 800-171 Revision 2, subject to applicable contracts and current government direction.
+- The Department of War announced in July 2026 that CMMC Phase II rollout requirements were suspended while Phase I self-assessment requirements remained. **Check current official guidance and your contract** before making compliance or procurement decisions.
+- The actual assessment scope, inherited controls, external service providers, independent assessor decisions, any permitted POA&M, and required SPRS submissions remain outside this tool's authority.
+- A cryptographic file hash demonstrates an integrity comparison, not the truth of a document or successful control operation. A digital signature validates bytes against a key, not government approval.
 
-```bash
-# Public repository (up to GitHub's unauthenticated rate limit):
-go run ./cmd/freecompliance github --repo blocksifrdev/freecompliance --json github.json --html github.html
+Official references: [DoD CMMC program](https://business.defense.gov/cmmc/), [CMMC Phase II announcement](https://business.defense.gov/Engage/News/Newsfeed-Repository/Article/4542563/forging-the-arsenal-of-freedom-department-of-war-suspends-cmmc-phase-ii-require/), [FAR 52.204-21](https://www.acquisition.gov/far/52.204-21), [NIST SP 800-171](https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final), and [OSCAL](https://pages.nist.gov/OSCAL/).
 
-# For private repositories, use a read-only token with Contents: read and Metadata: read:
-export GITHUB_TOKEN="<token supplied securely outside this repository>"
-go run ./cmd/freecompliance github --repo YOUR-ORG/YOUR-REPO --fail-on-gap
-unset GITHUB_TOKEN
-```
+**FreeCompliance is independent open-source software. It is not a DoD/Department of War product, an authorized certification body, or an official government compliance determination.**
 
-Never put tokens in a CLI argument, issue, screenshot, GitHub Actions log, report, or committed file. The JSON and HTML reports include response **hashes** and endpoint paths but never the credential. For API failures, the command produces an error rather than a false green. If a branch query is unavailable after successfully retrieving repository metadata, branch protection is marked `ATTESTATION_NEEDED`.
+## Free forever and open to contributors
 
-`VERIFIED` for `GITHUB_BRANCH_PROTECTED` means only that the API reported the flag as true. It is not evidence that *specific* required-review or CI rules work. This is intentionally narrower than a full compliance claim.
+The core assessment, offline evidence processing, theorem work, and export formats are Apache-2.0 open source. No BlockSiFr subscription is required. [BlockSiFr Control](https://blocksifr.com) is an optional separate commercial platform for consequence-aware runtime authority and execution control, not a dependency of FreeCompliance.
 
-## Drop-in GitHub Action
+- [Contribute](CONTRIBUTING.md) | [Security policy](SECURITY.md) | [Threat model](docs/THREAT_MODEL.md) | [Release guidance](docs/RELEASE.md)
+- Build and test: `go test ./...` and `go vet ./...`
+- License: [Apache 2.0](LICENSE). Copyright 2026 BlockSiFr.
 
-This repository includes a composite GitHub Action. First check out the target repository and install Go, then invoke the Action:
-
-```yaml
-- name: Free repository evidence scan
-  uses: blocksifrdev/freecompliance@main
-  with:
-    fail-on-gap: 'true'
-```
-
-The action writes a summary into the GitHub Actions job UI and exposes paths to local JSON and HTML reports as outputs. It does not auto-publish evidence or leave comments. The `@main` reference is intentionally a quick-start example, not a supply-chain secure pin. For production, replace `main` with a reviewed full 40-character commit SHA. An immutable `v0.2.0` tag will be documented only after it has actually been created.
-
-Do not equate a GitHub Actions workflow result with organizational compliance or auditor certification.
-
-## What it does today
-
-- Finds a declared vulnerability reporting channel (`SECURITY.md`) and code ownership (`CODEOWNERS`).
-- Finds Dependabot configuration, workflow declarations, automated test sources, lockfiles, and incident response documents.
-- Identifies **external GitHub Actions references that aren't pinned to full immutable commit SHAs**.
-- Flags **explicit `permissions: write-all`** in workflow YAML.
-- Identifies declared code scanning and SBOM files.
-- Treats branch protection, production IAM and control effectiveness as **ATTESTATION_NEEDED** until a suitable evidence source is connected.
-- Produces 14 local evidence claims and 5 optional GitHub metadata assertions with a status, observation, recommended next step, and NIST CSF 2.0 *informative* alignment annotation.
-- Generates offline HTML and machine-readable JSON with content SHA-256 digests. `compare` shows changed finding statuses.
-
-This is a **repository-scope** assessment, not an environment or organization-wide scan. Artifact presence is evidence of existence, not proof of implementation or effectiveness.
-
-## Status semantics
-
-| Status | Meaning |
-|---|---|
-| `VERIFIED` | The specific stated scanner assertion has direct observed local evidence |
-| `PARTIAL` | Some evidence exists, but the broader claim still needs verification |
-| `ATTESTATION_NEEDED` | The offline scan cannot determine the claim |
-| `MISSING` | An expected local artifact wasn't found |
-| `GAP` | A specific undesirable condition was observed |
-| `INHERITED` | Reserved for future externally validated inherited-control evidence; not currently emitted |
-
-No “compliance percentage” appears, because a repository-only count would falsely imply an auditable whole-organization score. The counts are **scanner assertions**, not regulatory coverage.
-
-## Trust and privacy model
-
-- Local, read-only scanning by default. No cloud service, model API, analytics, telemetry, or credential collection.
-- Report output contains **paths, sizes and file digests**, not raw file contents.
-- Hidden `.git`, dependency caches, vendored directories and common build outputs are skipped.
-- Evidence only accepts regular files up to 1 MiB; symlinks are not followed.
-- Reports created by the CLI use mode `0600` on Unix-like filesystems. If you publish a report, you choose to disclose those paths and hashes.
-- The report records SHA-256 digests for integrity comparison, **not a digital signature, trusted timestamp, or proof that any control executed**.
-- The source is inspectable and portable. There is no SaaS lock-in.
-
-## Standards and legal boundaries
-
-The initial framework tags point to relevant **NIST Cybersecurity Framework 2.0** subcategories as informative references. They do not reproduce third-party protected control texts. See [NIST CSF 2.0](https://www.nist.gov/cyberframework) and [OSCAL](https://pages.nist.gov/OSCAL/).
-
-**This utility does not certify or establish compliance with SOC 2, CMMC, ISO 27001, HIPAA, FedRAMP, PCI DSS or any other regime.** An external audit, assessor, legal interpretation, contract requirement or government submission may still be necessary. “VERIFIED” is **never** equivalent to passing an entire requirement.
-
-## Community roadmap
-
-The open-source roadmap, with no planned paywall on core assessment or export:
-
-1. Extend the read-only GitHub integration to independently verify required status checks, review rules, bypass rights and code scanning results, using narrowly scoped permissions.
-2. User-defined control policy and truthful `NOT_APPLICABLE`/scope exclusions with reviewer identity.
-3. OSCAL profile imports, assessment results, POA&M export and community-maintained versioned mappings.
-4. Reproducible control tests (including negative-path verification) with independently signed evidence receipts.
-5. AWS, Azure, GCP, Kubernetes and identity-provider evidence adapters with explicit permission boundaries.
-6. Public auditor and assessor handoff packages with redaction controls and continuous drift review.
-
-BlockSiFr Control remains a **separate optional enterprise product** for runtime authority, consequential-action enforcement and signed execution receipts. FreeCompliance will never require purchasing it.
-
-## Release and project governance
-
-See [docs/RELEASE.md](docs/RELEASE.md) for phone-first publication, immutable release tags, checksum generation, and operational steps. Read the [threat model](docs/THREAT_MODEL.md) before deploying into sensitive repositories.
-
-## Contributing
-
-Run `go test ./...` and `go vet ./...`. See [CONTRIBUTING.md](CONTRIBUTING.md). Community mappings must include source version, rationale, scope, license check and tests. Do not add credentials, secrets or proprietary framework text to the repository.
-
-## License
-
-[Apache License 2.0](LICENSE). Copyright 2026 BlockSiFr.
-
-## Live source-bound theorem demo (experimental v0.4)
-
-Run the read-only GitHub **active ruleset declaration** proof:
-
-```bash
-go run ./cmd/freecompliance prove-github --repo blocksifrdev/freecompliance --json github-proof.json --html github-proof.html
-```
-
-This command retrieves repository identity and active branch rules from fixed GitHub GET endpoints, records SHA-256 response digests, requires fresh HTTP Date/Age metadata and complete bounded pagination before admitting evidence, and builds a finite model. It reports **MODEL_SUPPORTED** only for the narrow proposition that active rulesets contain a positive required review count and at least one required status check context, when these are observed. It **never** establishes absence of bypass actors, effective enforcement, classic branch protection rules or real-world compliance. The broad no-bypass proposition remains unproven. An unavailable or stale API source yields `UNKNOWN`, not green. See [source-bound proof limits](docs/SOURCE_BOUND_GITHUB.md).
-
-For private repositories a read-only GitHub token may be supplied in `GITHUB_TOKEN` (Metadata: read); do not pass tokens in command arguments. No write APIs or third-party dependencies are used. The CLI and report are free under Apache-2.0.
-
-## Enterprise Proof Challenge and comparative measurement
-
-FreeCompliance is designed to work alongside an existing GRC platform, not to invent claims about competitor capabilities. See the [30-Day Enterprise Proof Challenge](docs/ENTERPRISE_30_DAY_CHALLENGE.md), [independent measurement protocol](docs/MEASUREMENT_PROTOCOL.md), [Vanta and Symetri competitive positioning](docs/COMPETITIVE_CHALLENGE.md), and [customer one-pager](docs/ENTERPRISE_ONE_PAGER.md).
-
-To summarize independently adjudicated, customer-entered evidence and review effort across matched technical cases:
-
-```bash
-go run ./cmd/pilotbench --input examples/pilot/synthetic_benchmark.csv
-```
-
-The bundled CSV is **synthetic**, not a real comparison with Vanta, Symetri or any customer. The scorer cannot validate uploaded evidence or infer real-world product efficacy. No benchmark results should be claimed without independently reviewed source packets and transparent denominators.
+**Make compliance evidence accessible. Make uncertainty visible. Keep control of your data.**
