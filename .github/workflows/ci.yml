@@ -24,6 +24,10 @@ jobs:
           go run ./cmd/freecompliance cmmc objectives-import \
             --csv /tmp/nist171a.csv --sha256 "$sha" --scope "CI synthetic boundary" \
             --out /tmp/nist171a-workspace.json
+      - name: Race and concurrency regression tests
+        run: go test -race ./internal/cmmc ./cmd/freecompliance
+      - name: Software composition inventory tests
+        run: python3 -m unittest discover -s scripts -p 'test_create_sbom.py' -v
       - name: Vet
         run: go vet ./...
       - name: Repository evidence scan
