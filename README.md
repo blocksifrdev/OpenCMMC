@@ -1,5 +1,9 @@
 # FreeCompliance
 
+**Veterans Day 2026 service initiative | Free for the Defense Industrial Base, permanently.**
+
+This project honors U.S. military service and is inspired by the founder's father, a lieutenant colonel in the U.S. Army. Our contribution is practical: open-source cybersecurity readiness that small defense suppliers, assessors, and government teams can run without a subscription or mandatory cloud connection. [Read the Veterans Day dedication, current scope, and release commitments](docs/VETERANS_DAY_2026.md).
+
 ## Stop guessing about CMMC. Start proving your controls.
 
 **Know what's required. See what's documented. Find what's missing.**
