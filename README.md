@@ -4,9 +4,9 @@
 
 **Windows and Linux portable preview packages:** [GitHub Releases](https://github.com/blocksifrdev/freecompliance/releases) | [Download and offline installation guide](docs/DOWNLOADS.md)
 
-**Download now:** [Windows x64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-windows-amd64.zip) | [Windows ARM64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-windows-arm64.zip) | [Linux x64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-linux-amd64.tar.gz) | [Linux ARM64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/freecompliance-v0.5.0-preview.1-linux-arm64.tar.gz) | [SHA256SUMS](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.1/SHA256SUMS)
+**Download now:** [Windows x64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.2/freecompliance-v0.5.0-preview.2-windows-amd64.zip) | [Windows ARM64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.2/freecompliance-v0.5.0-preview.2-windows-arm64.zip) | [Linux x64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.2/freecompliance-v0.5.0-preview.2-linux-amd64.tar.gz) | [Linux ARM64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.2/freecompliance-v0.5.0-preview.2-linux-arm64.tar.gz) | [SHA256SUMS](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.2/SHA256SUMS)
 
-No Go compiler is required to run the packaged executable. The Windows ZIP includes a double-click **offline demo launcher**. **The v0.5.0-preview.1 binaries predate the newly merged CMMC objective importer and draft scoring code.** For those commands, build the latest reviewed source from `main` until a new release is verified. Neither build is an independently validated SPRS scoring system, CMMC certification, or graphical installer. Follow your organization's software approval and CUI handling rules.
+No Go compiler is required to run the packaged executable. The Windows ZIP includes a double-click **offline demo launcher**. **The v0.5.0-preview.2 binaries include the offline CMMC objective CSV importer and draft scoring commands.** CSV ingestion is not independent PDF reconciliation, and draft scoring is not an official SPRS score. Neither build is an independently validated SPRS scoring system, CMMC certification, or graphical installer. Follow your organization's software approval and CUI handling rules.
 
 > **AVAILABLE NOW | OFFICIAL VETERANS DAY LAUNCH: NOVEMBER 11, 2026**
 >
@@ -88,6 +88,8 @@ The result shows which items are `DOCUMENTED`, `GAP`, `UNASSESSED`, `UNVERIFIABL
 | CMMC Level 1 workspace | 15 safeguarding item identifiers and local evidence tracking | No |
 | CMMC Level 2 workspace | 110 NIST SP 800-171 Rev. 2 requirement identifiers and local evidence tracking | No |
 | Evidence integrity and freshness | SHA-256 comparison, age checks, bounded local file reading | No |
+| Offline NIST objective import | Verified-source CSV importer, 110 requirements and objective workbench | No |
+| Draft Level 2 score worksheet | Requires 110 human adjudications; not validated SPRS output | No |
 | Offline assessment report | JSON findings; no invented compliance score | No |
 | Offline update authenticity check | Ed25519 signature check using an independently trusted public key | No |
 | Repository security readiness scan | 14 local evidence assertions with HTML and JSON output | No |
@@ -95,7 +97,7 @@ The result shows which items are `DOCUMENTED`, `GAP`, `UNASSESSED`, `UNVERIFIABL
 | GitHub repository and source-bound rules assessment | Read-only GitHub API collection and narrow theorem checks | **Yes**, optional |
 | Enterprise comparison benchmark | Reproducible benchmark calculator using independently adjudicated case data | No |
 
-**What is not yet included:** Complete CMMC assessment objectives and procedures, authoritative control effectiveness testing across systems, validated SPRS scoring, official government submission, C3PAO accreditation, OSCAL-certified export, or a government endorsement. The local CMMC catalog is an **identifier index**, not a replacement for the authoritative requirement text or an approved assessment methodology.
+**Still not delivered:** Independently reconciled, authoritative CMMC procedures and methods; independently validated control-effectiveness tests across customer systems; assessor-validated SPRS scoring; authorized government submission; C3PAO accreditation; independently schema-validated OSCAL assessment-result export; or government endorsement. The original CMMC identifier index remains an index, while the **optional offline NIST CSV importer** generates richer objective workspaces. Neither is a substitute for the authoritative normative PDF or an approved assessment methodology.
 
 ## Objective-level CMMC review (experimental)
 
