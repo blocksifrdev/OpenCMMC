@@ -30,9 +30,16 @@ type ObjectiveItem struct {
 	Rationale string              `json:"rationale,omitempty"`
 	Evidence  []ObjectiveEvidence `json:"evidence,omitempty"`
 }
+type AssessmentMethodGuidance struct {
+	Examine   string `json:"examine,omitempty"`
+	Interview string `json:"interview,omitempty"`
+	Test      string `json:"test,omitempty"`
+}
 type ObjectiveControl struct {
-	ID         string          `json:"id"`
-	Objectives []ObjectiveItem `json:"objectives"`
+	RequirementText string                   `json:"requirement_text,omitempty"`
+	Methods         AssessmentMethodGuidance `json:"methods,omitempty"`
+	ID              string                   `json:"id"`
+	Objectives      []ObjectiveItem          `json:"objectives"`
 }
 type ObjectiveWorkspace struct {
 	SchemaVersion   string             `json:"schema_version"`
@@ -118,6 +125,9 @@ func ValidateObjectiveWorkspace(w ObjectiveWorkspace) error {
 			return fmt.Errorf("missing, unknown or duplicate control %q", c.ID)
 		}
 		seen[c.ID] = true
+		if len(c.RequirementText) > 4096 || len(c.Methods.Examine) > 16384 || len(c.Methods.Interview) > 16384 || len(c.Methods.Test) > 16384 {
+			return fmt.Errorf("oversized requirement or methods for %s", c.ID)
+		}
 		if len(c.Objectives) > 64 {
 			return fmt.Errorf("too many objectives for %q", c.ID)
 		}
