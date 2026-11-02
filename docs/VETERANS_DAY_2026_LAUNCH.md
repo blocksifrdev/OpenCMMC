@@ -1,6 +1,8 @@
 # Veterans Day 2026 | Launch kit
 
-**Planned public announcement:** Wednesday, November 11, 2026
+**Public early access announced:** Monday, November 2, 2026  
+**Official Veterans Day launch:** Wednesday, November 11, 2026  
+**Available to use now:** https://github.com/blocksifrdev/freecompliance
 
 ## Campaign identity
 
@@ -16,11 +18,27 @@
 
 **Audience:** Defense Industrial Base contractors, assessors, small business assistance programs, and government technical teams.
 
-## Founder announcement (ready to adapt and post on November 11)
+## Early-access announcement (November 2, 2026)
+
+**FreeCompliance is available now. Our official Veterans Day launch is November 11.**
+
+As the son of a U.S. Army lieutenant colonel, I wanted BlockSiFr to honor military service with something lasting and useful to the defense community.
+
+Today, we are opening FreeCompliance for anyone to use, test, and improve. It is free, open source, and designed to work offline: an initial CMMC evidence workbench to help contractors identify requirements, document what they have, and see what still needs review.
+
+No subscription. No login. No mandatory cloud service.
+
+This is a readiness utility, not CMMC certification or a government-endorsed program. Full objective-by-objective verification and official scoring remain engineering milestones.
+
+**Access it today:** https://github.com/blocksifrdev/freecompliance
+
+**Official launch:** Veterans Day, November 11, 2026.
+
+## Veterans Day founder announcement (scheduled for November 11, not yet posted)
 
 This Veterans Day, I am honoring my father's service as a lieutenant colonel in the U.S. Army in a way that reflects what I have spent my career building.
 
-We are making FreeCompliance available as a permanent, open-source contribution to the defense community.
+We have already made FreeCompliance publicly available as a permanent, open-source contribution to the defense community. Today we formally launch the Veterans Day service initiative.
 
 Small defense contractors should not need a large compliance budget just to organize CMMC evidence, understand what remains undocumented, or prepare for a review. And organizations working in disconnected environments should not have to upload sensitive evidence to a commercial cloud to get started.
 
@@ -52,7 +70,7 @@ Start here: https://github.com/blocksifrdev/freecompliance
 - [ ] Publish synthetic proof demo without CUI, real secrets, or customer names.
 - [ ] Ask at least three independent DIB practitioners to trial the offline walkthrough.
 - [ ] State no government endorsement, authorization, accredited assessment, SPRS submission, or verified enterprise adoption.
-- [ ] Publish the founder dedication on November 11 after completing the release checks.
+- [ ] Publish the official Veterans Day founder message on November 11, after completing the release checks. Public access is already open.
 
 ## Performance indicators
 
