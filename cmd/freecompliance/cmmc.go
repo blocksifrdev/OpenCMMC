@@ -14,9 +14,11 @@ import (
 
 func cmmcCommand(args []string, out io.Writer) error {
 	if len(args) == 0 {
-		return errors.New("usage: freecompliance cmmc init|assess|verify-bundle")
+		return errors.New("usage: freecompliance cmmc init|assess|verify-bundle|objectives-init|objectives-assess")
 	}
 	switch args[0] {
+	case "objectives-init", "objectives-assess":
+		return cmmcObjectivesCommand(args, out)
 	case "init":
 		fs := flag.NewFlagSet("cmmc init", flag.ContinueOnError)
 		fs.SetOutput(io.Discard)
