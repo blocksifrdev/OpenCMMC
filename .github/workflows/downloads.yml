@@ -82,7 +82,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
   publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0-preview.3' && contains(github.event.head_commit.message, 'release: publish Preview 3')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/release/v0.5.0-preview.3' && contains(github.event.head_commit.message, 'publish-preview3')
     needs: package
     runs-on: ubuntu-latest
     permissions:
