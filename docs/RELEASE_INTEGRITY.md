@@ -2,9 +2,9 @@
 
 ## Current status
 
-The published [Preview 3](https://github.com/blocksifrdev/freecompliance/releases/tag/v0.5.0-preview.3) has SHA-256 integrity manifests, reproducible Go archive packaging, a public source commit and passing CI. It has **no verified publisher provenance attestation, Windows Authenticode signature, or independently approved offline trust anchor**. Do not claim otherwise.
+The published [Preview 4](https://github.com/blocksifrdev/freecompliance/releases/tag/v0.5.0-preview.4) contains four platform archives, SHA-256 integrity manifests, an SPDX 2.3 Go module inventory, and GitHub/Sigstore **build-provenance attestations**. The [release CI run #41532097431](https://github.com/blocksifrdev/freecompliance/actions/runs/41532097431) completed successfully, including on-runner verification of release attestation subjects before publication. Independent customers must repeat verification against their own trust policy.
 
-A future **Preview 4** pipeline has been prepared to generate [GitHub artifact provenance attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations) and an **SPDX 2.3 Go module inventory**. These are release gates and must pass before advertising those capabilities. The Go module inventory includes the module, all listed Go modules, and a toolchain entry. It **does not** inventory operating systems, firmware, loaded external applications, or identify all vulnerabilities.
+Preview 4 **does not** have Windows Authenticode signing, an independently provisioned offline root-of-trust, a government ATO, or third-party CMMC accreditation. The Go module inventory includes the project module, listed Go modules, and toolchain metadata. It **does not** inventory operating systems, firmware, loaded external applications, or identify all vulnerabilities. Older [Preview 3](https://github.com/blocksifrdev/freecompliance/releases/tag/v0.5.0-preview.3) did not carry these signed provenance attestations.
 
 ## Before importing software into a restricted environment
 
