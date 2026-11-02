@@ -68,7 +68,9 @@ func TestUILocalLevel1ReviewAndExport(t *testing.T){
 }
 func TestUIEvidenceUploadStoredLocally(t *testing.T){
     u:=testUI(t)
-    if err:=u.create(httptest.NewRequest("POST","http://127.0.0.1:8765/create",strings.NewReader(url.Values{"level":{"1"},"scope":{"Synthetic demo"}}.Encode())));err!=nil{t.Fatal(err)}
+    createReq:=httptest.NewRequest("POST","http://127.0.0.1:8765/create",strings.NewReader(url.Values{"level":{"1"},"scope":{"Synthetic demo"}}.Encode()))
+    createReq.Header.Set("Content-Type","application/x-www-form-urlencoded")
+    if err:=u.create(createReq);err!=nil{t.Fatal(err)}
     ws,err:=u.readBasic();if err!=nil{t.Fatal(err)}
     id:=ws.Controls[0].ID
     var body bytes.Buffer
