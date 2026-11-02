@@ -63,7 +63,10 @@ Usage:
   freecompliance cmmc init --level 2 --scope "enclave-1" --out workspace.json
   freecompliance cmmc assess --input workspace.json --evidence-dir ./evidence --json readiness.json
   freecompliance cmmc objectives-init --level 2 --scope "enclave-1" --out objectives.json
+  freecompliance cmmc objectives-import --csv nist-171a.csv --sha256 EXPECTED_SHA --scope "enclave-1" --out objectives.json
   freecompliance cmmc objectives-assess --input objectives.json --evidence-dir evidence --json objective-report.json
+  freecompliance cmmc score-template --scope "enclave-1" --out score-input.json
+  freecompliance cmmc score-draft --input score-reviewed.json --json score-draft.json
   freecompliance cmmc verify-bundle --bundle update.tar --signature update.sig --public-key trusted.pub
   freecompliance version
 
