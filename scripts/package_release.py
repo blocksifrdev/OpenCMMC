@@ -72,6 +72,7 @@ def build(version, out_dir):
                  archive_file('README.md', (ROOT / 'README.md').read_bytes()),
                  archive_file('CMMC_AIRGAP.md', (ROOT / 'docs/CMMC_AIRGAP.md').read_bytes()),
                  archive_file('CMMC_OBJECTIVE_WORKBENCH.md', (ROOT / 'docs/CMMC_OBJECTIVE_WORKBENCH.md').read_bytes()),
+                 archive_file('CMMC_ASSESSMENT_NEXT.md', (ROOT / 'docs/CMMC_ASSESSMENT_NEXT.md').read_bytes()),
                  archive_file('INSTALL-OFFLINE.txt', (ROOT / 'docs/DOWNLOADS.md').read_bytes())]
         if goos == 'windows':
             files.append(archive_file('START-CMMC-DEMO.cmd', (ROOT / 'scripts/START-CMMC-DEMO.cmd').read_bytes()))
