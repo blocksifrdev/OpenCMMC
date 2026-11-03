@@ -1,10 +1,10 @@
-# FreeCompliance
+# OpenCMMC
 
-## Download FreeCompliance
+## Download OpenCMMC
 
-**Windows and Linux portable preview packages:** [GitHub Releases](https://github.com/blocksifrdev/freecompliance/releases) | [Download and offline installation guide](docs/DOWNLOADS.md)
+**Windows and Linux portable preview packages:** [GitHub Releases](https://github.com/blocksifrdev/OpenCMMC/releases) | [Download and offline installation guide](docs/DOWNLOADS.md)
 
-**Download now:** [Windows x64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-windows-amd64.zip) | [Windows ARM64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-windows-arm64.zip) | [Linux x64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-linux-amd64.tar.gz) | [Linux ARM64](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-linux-arm64.tar.gz) | [SHA256SUMS](https://github.com/blocksifrdev/freecompliance/releases/download/v0.5.0-preview.4/SHA256SUMS)
+**Download now:** [Windows x64](https://github.com/blocksifrdev/OpenCMMC/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-windows-amd64.zip) | [Windows ARM64](https://github.com/blocksifrdev/OpenCMMC/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-windows-arm64.zip) | [Linux x64](https://github.com/blocksifrdev/OpenCMMC/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-linux-amd64.tar.gz) | [Linux ARM64](https://github.com/blocksifrdev/OpenCMMC/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-linux-arm64.tar.gz) | [SHA256SUMS](https://github.com/blocksifrdev/OpenCMMC/releases/download/v0.5.0-preview.4/SHA256SUMS)
 
 **No coding or JSON editing needed to start.** Download the package for your computer and verify its checksum. Extract it, then double-click `START-CMMC-UI.cmd` on Windows or run `./start-cmmc-ui.sh` on Linux. The launcher attempts to open the **local browser workbench** automatically. Select your CMMC level, add evidence, review findings, and export an internal-readiness report. [Illustrated workflow and security guide](docs/LOCAL_UI.md).
 
@@ -16,7 +16,7 @@ No Go compiler, account, internet connection or subscription is required at runt
 >
 > **[Get started in the browser](docs/LOCAL_UI.md)** | **[Read the November 2 early-access announcement](docs/AVAILABLE_NOW_2026_11_02.md)** | **[Veterans Day service commitment](docs/VETERANS_DAY_2026.md)**
 
-FreeCompliance is **publicly accessible today, November 2, 2026**. Our formal Veterans Day launch is **Wednesday, November 11, 2026**. Early access is for use, testing, and community feedback, not a claim of completed CMMC assessment or government approval.
+OpenCMMC is **publicly accessible today, November 2, 2026**. Our formal Veterans Day launch is **Wednesday, November 11, 2026**. Early access is for use, testing, and community feedback, not a claim of completed CMMC assessment or government approval.
 
 This initiative honors U.S. military service and is inspired by the founder's father, a lieutenant colonel in the U.S. Army. The core project is and will remain free and open source.
 
@@ -24,7 +24,7 @@ This initiative honors U.S. military service and is inspired by the founder's fa
 
 **Know what's required. See what's documented. Find what's missing.**
 
-**FreeCompliance** is a free, open-source cybersecurity assurance toolkit for defense contractors, subcontractors, assessors, and government teams. Start a CMMC readiness workspace, organize evidence for each requirement, check whether files are intact and current, and create a report that clearly separates documented claims from gaps and unknowns.
+**OpenCMMC** is a free, open-source cybersecurity assurance toolkit for defense contractors, subcontractors, assessors, and government teams. Start a CMMC readiness workspace, organize evidence for each requirement, check whether files are intact and current, and create a report that clearly separates documented claims from gaps and unknowns.
 
 **No subscription. No login. No required cloud service. Runs on an offline or air-gapped computer.**
 
@@ -32,7 +32,7 @@ This initiative honors U.S. military service and is inspired by the founder's fa
 
 ### Who is this for?
 
-| You are... | FreeCompliance helps you... |
+| You are... | OpenCMMC helps you... |
 | --- | --- |
 | A small defense contractor | Start a no-cost CMMC evidence inventory without buying a SaaS platform. |
 | A prime or subcontractor | Organize evidence within an explicitly named system or enclave. |
@@ -58,8 +58,8 @@ A separate `cmmc score-template` command creates a draft 110-item worksheet. The
 **Requirements:** Go 1.23+ to build from source. The core Go module has no third-party dependencies. Build the binary in an approved connected environment and transfer it under your organization's software-approval process if the target machine is air-gapped. Validate the software and transferred media before use.
 
 ```bash
-git clone https://github.com/blocksifrdev/freecompliance.git
-cd freecompliance
+git clone https://github.com/blocksifrdev/OpenCMMC.git
+cd OpenCMMC
 go build -o freecompliance ./cmd/freecompliance
 ```
 
@@ -69,7 +69,7 @@ go build -o freecompliance ./cmd/freecompliance
 ./freecompliance cmmc init --level 2 --scope "CUI enclave A" --out workspace.json
 ```
 
-**2. Keep evidence locally.** Create a folder and edit `workspace.json` to add reviewer assertions and references to approved evidence files. New controls start as `UNASSESSED`. FreeCompliance never automatically promotes file existence to control compliance.
+**2. Keep evidence locally.** Create a folder and edit `workspace.json` to add reviewer assertions and references to approved evidence files. New controls start as `UNASSESSED`. OpenCMMC never automatically promotes file existence to control compliance.
 
 ```bash
 mkdir -p evidence
@@ -116,7 +116,7 @@ mkdir -p evidence
 
 ## Air-gapped deployment
 
-FreeCompliance's `cmmc`, local `scan`, and local `prove` commands need **no network access, API keys, account, cloud tenant, telemetry, or LLM**. The optional `github` and `prove-github` commands **do** call GitHub and must not be used inside an air-gapped enclave.
+OpenCMMC's `cmmc`, local `scan`, and local `prove` commands need **no network access, API keys, account, cloud tenant, telemetry, or LLM**. The optional `github` and `prove-github` commands **do** call GitHub and must not be used inside an air-gapped enclave.
 
 Evidence stays on storage you control. No automatic export occurs. If you choose to move an evidence report outside a protected boundary, follow your organization's CUI handling, export review, and removable-media procedures. File paths, hashes, and metadata can themselves be sensitive.
 
@@ -133,7 +133,7 @@ Verification checks the package bytes against that key. **It does not establish 
 
 ## What makes this different?
 
-**Collecting evidence is not the same as proving a control.** FreeCompliance is building toward **Proof-Driven Compliance**: each technical claim has an explicit scope, source evidence, proof obligation, possible counterexamples, and a visible `UNKNOWN` outcome when the evidence is insufficient.
+**Collecting evidence is not the same as proving a control.** OpenCMMC is building toward **Proof-Driven Compliance**: each technical claim has an explicit scope, source evidence, proof obligation, possible counterexamples, and a visible `UNKNOWN` outcome when the evidence is insufficient.
 
 The theorem engine is experimental. It evaluates bounded models, **not every possible real-world state**. It does not yet automatically prove CMMC control effectiveness. To see a clearly labeled synthetic demonstration:
 
@@ -176,11 +176,11 @@ For teams comparing the effort and reliability of assurance workflows, see the [
 
 Official references: [DoD CMMC program](https://business.defense.gov/cmmc/), [CMMC Phase II announcement](https://business.defense.gov/Engage/News/Newsfeed-Repository/Article/4542563/forging-the-arsenal-of-freedom-department-of-war-suspends-cmmc-phase-ii-require/), [FAR 52.204-21](https://www.acquisition.gov/far/52.204-21), [NIST SP 800-171](https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final), and [OSCAL](https://pages.nist.gov/OSCAL/).
 
-**FreeCompliance is independent open-source software. It is not a DoD/Department of War product, an authorized certification body, or an official government compliance determination.**
+**OpenCMMC is independent open-source software. It is not a DoD/Department of War product, an authorized certification body, or an official government compliance determination.**
 
 ## Free forever and open to contributors
 
-The core assessment, offline evidence processing, theorem work, and export formats are Apache-2.0 open source. No BlockSiFr subscription is required. [BlockSiFr Control](https://blocksifr.com) is an optional separate commercial platform for consequence-aware runtime authority and execution control, not a dependency of FreeCompliance.
+The core assessment, offline evidence processing, theorem work, and export formats are Apache-2.0 open source. No BlockSiFr subscription is required. [BlockSiFr Control](https://blocksifr.com) is an optional separate commercial platform for consequence-aware runtime authority and execution control, not a dependency of OpenCMMC.
 
 - [Contribute](CONTRIBUTING.md) | [Security policy](SECURITY.md) | [Threat model](docs/THREAT_MODEL.md) | [Release guidance](docs/RELEASE.md)
 - Build and test: `go test ./...` and `go vet ./...`

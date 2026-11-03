@@ -1,6 +1,6 @@
 # Theorem Intelligence: Proof-Driven Compliance (experimental v0.3)
 
-**Product principle:** Compliance is a set of scoped propositions. Evidence must support each proposition; uncertainty is not a pass. Open source readiness is free. An auditor or a regulator, not FreeCompliance, determines certification and official findings.
+**Product principle:** Compliance is a set of scoped propositions. Evidence must support each proposition; uncertainty is not a pass. Open source readiness is free. An auditor or a regulator, not OpenCMMC, determines certification and official findings.
 
 ## Current working capability
 
