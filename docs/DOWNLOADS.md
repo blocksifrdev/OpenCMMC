@@ -1,6 +1,6 @@
-# FreeCompliance portable downloads
+# OpenCMMC portable downloads
 
-**Public preview v0.5.0-preview.4:** [GitHub Releases](https://github.com/blocksifrdev/freecompliance/releases).
+**Public preview v0.5.0-preview.4:** [GitHub Releases](https://github.com/blocksifrdev/OpenCMMC/releases).
 
 This download is a **portable Go executable with a self-contained local browser interface**, not a native MSI or EXE installer. Use START-CMMC-UI.cmd on Windows or start-cmmc-ui.sh on Linux to open the graphical workflow without editing JSON. The CLI is also included. Preview 4 includes the offline NIST SP 800-171A supplemental CSV objective importer and the **draft-only** Level 2 score worksheet. See [CMMC assessment and scoring instructions](CMMC_ASSESSMENT_NEXT.md). Windows users can double-click the browser UI launcher; the synthetic demo launcher is also included. No Go compiler, subscription, login, or internet is needed for the packaged offline tools. The browser UI is available now; a native signed installer remains a separate milestone.
 
@@ -32,7 +32,7 @@ The browser launcher creates a private assessment directory when you choose your
 
 **Browser interface:** See [LOCAL_UI.md](LOCAL_UI.md) for the exact workflow, token and CSRF protections, privacy boundaries, and limits. The local UI is not approved multi-user authentication or encrypted-at-rest storage.
 
-**Scope limits:** FreeCompliance provides offline readiness and evidence-integrity workspaces, a separately sourced NIST CSV objective importer, draft-only user-entered scoring, and experimental bounded theorem evaluation. It does not supply a **PDF-reconciled and independently reviewed** CMMC objective methodology, independently validated SPRS scoring, official submission, accredited CMMC assessments, or government endorsement.
+**Scope limits:** OpenCMMC provides offline readiness and evidence-integrity workspaces, a separately sourced NIST CSV objective importer, draft-only user-entered scoring, and experimental bounded theorem evaluation. It does not supply a **PDF-reconciled and independently reviewed** CMMC objective methodology, independently validated SPRS scoring, official submission, accredited CMMC assessments, or government endorsement.
 
 Windows SmartScreen or Defender may flag an unsigned preview executable. Do **not** bypass security controls. Obtain approval from your IT or security team. Report issues with sanitized, non-sensitive samples only.
 
