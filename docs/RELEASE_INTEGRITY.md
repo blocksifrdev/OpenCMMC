@@ -2,9 +2,9 @@
 
 ## Current status
 
-The published [Preview 4](https://github.com/blocksifrdev/freecompliance/releases/tag/v0.5.0-preview.4) contains four platform archives, SHA-256 integrity manifests, an SPDX 2.3 Go module inventory, and GitHub/Sigstore **build-provenance attestations**. The [release CI run #41532097431](https://github.com/blocksifrdev/freecompliance/actions/runs/41532097431) completed successfully, including on-runner verification of release attestation subjects before publication. Independent customers must repeat verification against their own trust policy.
+The published [Preview 4](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v0.5.0-preview.4) contains four platform archives, SHA-256 integrity manifests, an SPDX 2.3 Go module inventory, and GitHub/Sigstore **build-provenance attestations**. The [release CI run #41532097431](https://github.com/blocksifrdev/OpenCMMC/actions/runs/41532097431) completed successfully, including on-runner verification of release attestation subjects before publication. Independent customers must repeat verification against their own trust policy.
 
-Preview 4 **does not** have Windows Authenticode signing, an independently provisioned offline root-of-trust, a government ATO, or third-party CMMC accreditation. The Go module inventory includes the project module, listed Go modules, and toolchain metadata. It **does not** inventory operating systems, firmware, loaded external applications, or identify all vulnerabilities. Older [Preview 3](https://github.com/blocksifrdev/freecompliance/releases/tag/v0.5.0-preview.3) did not carry these signed provenance attestations.
+Preview 4 **does not** have Windows Authenticode signing, an independently provisioned offline root-of-trust, a government ATO, or third-party CMMC accreditation. The Go module inventory includes the project module, listed Go modules, and toolchain metadata. It **does not** inventory operating systems, firmware, loaded external applications, or identify all vulnerabilities. Older [Preview 3](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v0.5.0-preview.3) did not carry these signed provenance attestations.
 
 ## Before importing software into a restricted environment
 
