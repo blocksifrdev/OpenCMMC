@@ -49,6 +49,36 @@ func TestUILoopbackAuthenticationAndCSRF(t *testing.T){
     if r.Code!=http.StatusForbidden{t.Fatalf("host rebinding accepted: %d",r.Code)}
     if localUIHostOK("0.0.0.0:8765","8765")||localUIHostOK("127.0.0.1:8766","8765"){t.Fatal("unsafe binding accepted")}
 }
+func TestUIStaleFormTokenRecoveryWithoutStateChange(t *testing.T){
+    u:=testUI(t)
+    stale:=uiRequest(t,u,"POST","/create",url.Values{
+        "scope":{"Synthetic ARM64 assessment"},
+        "level":{"1"},
+        "csrf":{"a-token-from-an-old-tab"},
+    },true,"http://127.0.0.1:8765")
+    if stale.Code!=http.StatusConflict {
+        t.Fatalf("expired form should prompt refresh: %d %s",stale.Code,stale.Body.String())
+    }
+    if !strings.Contains(stale.Body.String(),"Reload the current workbench") {
+        t.Fatal("expired form is missing recovery link")
+    }
+    if _,err:=os.Stat(filepath.Join(u.root,"state.json"));!os.IsNotExist(err) {
+        t.Fatalf("stale request must not create a workspace: %v",err)
+    }
+    refreshed:=uiRequest(t,u,"GET","/",nil,true,"")
+    if refreshed.Code!=http.StatusOK || !strings.Contains(refreshed.Body.String(),u.secret) {
+        t.Fatal("reloaded page must supply the current form token")
+    }
+    accepted:=uiRequest(t,u,"POST","/create",url.Values{
+        "scope":{"Synthetic ARM64 assessment"},
+        "level":{"1"},
+        "csrf":{u.secret},
+    },true,"http://127.0.0.1:8765")
+    if accepted.Code!=http.StatusSeeOther {
+        t.Fatalf("fresh form should succeed: %d %s",accepted.Code,accepted.Body.String())
+    }
+}
+
 func TestUILocalLevel1ReviewAndExport(t *testing.T){
     u:=testUI(t)
     create:=uiRequest(t,u,"POST","/create",url.Values{"scope":{"Synthetic level 1 test"},"level":{"1"},"csrf":{u.secret}},true,"http://127.0.0.1:8765")
