@@ -142,7 +142,24 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
     if !u.authorized(r){http.Error(w,"Open the private local URL shown by freecompliance cmmc ui",http.StatusForbidden);return}
     if r.Method=="POST" {
         r.Body=http.MaxBytesReader(w,r.Body,maxUICSV+(2<<20))
-        if !u.csrfOK(r){http.Error(w,"invalid form token or request origin",http.StatusForbidden);return}
+        if !u.csrfOK(r){
+        // A browser tab left open across a process restart can hold an old
+        // form token while the browser already has the replacement session
+        // cookie. Never execute such a POST: offer a safe, one-click refresh.
+        origin:=r.Header.Get("Origin")
+        contentType:=r.Header.Get("Content-Type")
+        sameOrigin:=origin=="" || origin=="http://"+r.Host
+        supportedForm:=strings.HasPrefix(contentType,"application/x-www-form-urlencoded") ||
+            strings.HasPrefix(contentType,"multipart/form-data")
+        if u.authorized(r) && sameOrigin && supportedForm {
+            w.Header().Set("Content-Type","text/html; charset=utf-8")
+            w.WriteHeader(http.StatusConflict)
+            _,_ = io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>OpenCMMC session refresh</title></head><body><main><h1>Refresh your assessment session</h1><p>This form is no longer current. This often happens when a browser tab stays open after the OpenCMMC application is restarted. No assessment changes were saved.</p><p><a href="/">Reload the current workbench and retry</a></p><p>If reloading does not help, close older tabs and open the newly printed private URL from your OpenCMMC command window. Keep that URL private.</p></main></body></html>`)
+            return
+        }
+        http.Error(w,"invalid form token or request origin",http.StatusForbidden)
+        return
+    }
     }
     u.mu.Lock()
     defer u.mu.Unlock()
