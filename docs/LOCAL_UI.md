@@ -28,6 +28,17 @@ Open the printed private URL on the **same Linux computer**.
 
 **Available package:** The current [Preview 4 Windows/Linux downloads](https://github.com/blocksifrdev/freecompliance/releases/tag/v0.5.0-preview.4) contain this browser UI. Earlier Preview 2 archives do not.
 
+## Windows ARM64: assessment creation or form-token error
+
+If the local browser displays `invalid form token or request origin` after you click **Create assessment**, do not disable browser security or CSRF protections. Each application start generates a new private session token. An older tab can still display a form containing the previous token; the newer session cookie will then make the POST fail.
+
+1. Close the older workbench tabs. Keep the app's command window open.
+2. In the command window, copy and open the **new** `http://127.0.0.1:8765/?access=...` URL on the same Windows ARM64 device. Avoid bookmarks and `localhost` aliases. Do not share the private URL.
+3. If a previously open page displays the **Refresh your assessment session** recovery screen, click **Reload the current workbench and retry**. The rejected form has not been applied.
+4. If the private URL also fails, stop the app and restart `START-CMMC-UI.cmd`. Confirm a single process owns port 8765 and inspect endpoint protection or browser extensions for local-request rewriting.
+
+If POST requests still fail from a brand-new tab, record the HTTP status and whether the message says **loopback host required**, **Open the private local URL**, or **invalid form token or request origin**. Report browser name/version and Windows ARM64 version, but never send the private access URL, browser cookies, real customer assessment data, or evidence files.
+
 ## Complete customer workflow available in this preview
 
 1. Create a **Level 1** requirement-level workspace (15 safeguarding identifiers), or a **Level 2** objective-level workspace (110 requirement identifiers). A new Level 2 workspace starts with **zero objectives**, and therefore cannot be presented as passed or complete.
