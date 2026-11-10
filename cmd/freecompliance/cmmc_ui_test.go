@@ -40,7 +40,7 @@ func TestUILoopbackAuthenticationAndCSRF(t *testing.T){
     if r:=uiRequest(t,u,"GET","/",nil,false,"");r.Code!=http.StatusForbidden{t.Fatalf("unauthenticated request: %d",r.Code)}
     if r:=uiRequest(t,u,"GET","/?access=bad",nil,false,"");r.Code!=http.StatusForbidden{t.Fatalf("bad token: %d",r.Code)}
     if r:=uiRequest(t,u,"GET","/?access="+u.secret,nil,false,"");r.Code!=http.StatusSeeOther||len(r.Result().Cookies())==0{t.Fatalf("login failed: %d",r.Code)}
-    if r:=uiRequest(t,u,"POST","/create",url.Values{"scope":{"Demo"},"level":{"1"},"csrf":{"bad"}},true,"");r.Code!=http.StatusForbidden{t.Fatalf("bad csrf: %d",r.Code)}
+    if r:=uiRequest(t,u,"POST","/create",url.Values{"scope":{"Demo"},"level":{"1"},"csrf":{"bad"}},true,"");r.Code!=http.StatusConflict{t.Fatalf("bad csrf must not execute and must prompt refresh: %d",r.Code)}
     if r:=uiRequest(t,u,"POST","/create",url.Values{"scope":{"Demo"},"level":{"1"},"csrf":{u.secret}},true,"https://evil.example");r.Code!=http.StatusForbidden{t.Fatalf("cross-origin request: %d",r.Code)}
     r:=httptest.NewRecorder()
     badHost:=httptest.NewRequest("GET","http://evil.example:8765/",nil)
