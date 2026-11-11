@@ -4,7 +4,7 @@
 
 Built by BlockSiFr for defense contractors and security teams. No subscription, account, or cloud service required for the local workbench.
 
-**Latest download:** [OpenCMMC v1.0.0-rc.3](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.3), for the November 11, 2026 release. This is a **release candidate**, not a finished or certified CMMC assessment product.
+**Latest download:** [OpenCMMC v1.0.0-rc.4](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.4), an OpenCMMC release candidate. This is a **release candidate**, not a finished or certified CMMC assessment product.
 
 ## Get started
 
@@ -12,10 +12,10 @@ Built by BlockSiFr for defense contractors and security teams. No subscription, 
 
 | Your computer | Download |
 | --- | --- |
-| Windows 11 ARM64 | [Windows ARM64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.3/opencmmc-v1.0.0-rc.3-windows-arm64.zip) |
-| Windows x64 (Intel or AMD) | [Windows x64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.3/opencmmc-v1.0.0-rc.3-windows-amd64.zip) |
-| Linux ARM64 | [Linux ARM64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.3/opencmmc-v1.0.0-rc.3-linux-arm64.tar.gz) |
-| Linux x64 | [Linux x64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.3/opencmmc-v1.0.0-rc.3-linux-amd64.tar.gz) |
+| Windows 11 ARM64 | [Windows ARM64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/opencmmc-v1.0.0-rc.4-windows-arm64.zip) |
+| Windows x64 (Intel or AMD) | [Windows x64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/opencmmc-v1.0.0-rc.4-windows-amd64.zip) |
+| Linux ARM64 | [Linux ARM64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/opencmmc-v1.0.0-rc.4-linux-arm64.tar.gz) |
+| Linux x64 | [Linux x64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/opencmmc-v1.0.0-rc.4-linux-amd64.tar.gz) |
 
 [Check your download's SHA-256 fingerprint](docs/INSTALL_V1.md) before running it. Your organization's software-approval rules still apply.
 
