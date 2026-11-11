@@ -1,3 +1,3 @@
-module github.com/blocksifrdev/opencmmc
+module github.com/blocksifrdev/OpenCMMC
 
 go 1.23

@@ -12,7 +12,7 @@ import (
     "strings"
     "testing"
 
-    "github.com/blocksifrdev/opencmmc/internal/cmmc"
+    "github.com/blocksifrdev/OpenCMMC/internal/cmmc"
 )
 
 func testUI(t *testing.T) *localUI {

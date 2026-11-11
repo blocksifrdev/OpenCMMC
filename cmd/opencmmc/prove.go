@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/blocksifrdev/opencmmc/internal/theorem"
+	"github.com/blocksifrdev/OpenCMMC/internal/theorem"
 )
 
 func proveCommand(args []string, out io.Writer) error {

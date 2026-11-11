@@ -25,7 +25,7 @@ import (
     "sync"
     "time"
 
-    "github.com/blocksifrdev/opencmmc/internal/cmmc"
+    "github.com/blocksifrdev/OpenCMMC/internal/cmmc"
 )
 
 const maxUIEvidence = 10 << 20
