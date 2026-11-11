@@ -1,10 +1,10 @@
-# FreeCompliance local browser workbench (engineering preview)
+# OpenCMMC local browser workbench (engineering preview)
 
 **Purpose:** Run a CMMC readiness workflow with clicks and forms instead of editing JSON by hand. The entire interface is served by the installed Go executable on **127.0.0.1 only**, using standard-library Go. It requires **no account, internet connection, cloud API, JavaScript, CDN, external font or telemetry**.
 
 ## Start on Windows
 
-Extract the approved FreeCompliance ZIP into a local folder and double-click `START-CMMC-UI.cmd`. The command window starts a private local server. It automatically tries to open your default browser and also prints a private session URL beginning with `http://127.0.0.1:8765/?access=...`. Open that URL in a browser **on the same device** and keep the command window running. Close the window or press Ctrl+C to stop. The command-line version is:
+Extract the approved historical FreeCompliance preview ZIP into a local folder and double-click `START-CMMC-UI.cmd`. The command window starts a private local server. It automatically tries to open your default browser and also prints a private session URL beginning with `http://127.0.0.1:8765/?access=...`. Open that URL in a browser **on the same device** and keep the command window running. Close the window or press Ctrl+C to stop. The command-line version is:
 
 ```powershell
 .\freecompliance.exe cmmc ui --data-dir .\private-assessment --port 8765
@@ -26,7 +26,7 @@ Or:
 
 Open the printed private URL on the **same Linux computer**.
 
-**Available package:** The current [Preview 4 Windows/Linux downloads](https://github.com/blocksifrdev/freecompliance/releases/tag/v0.5.0-preview.4) contain this browser UI. Earlier Preview 2 archives do not.
+**Available package:** The current [Preview 4 Windows/Linux downloads](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v0.5.0-preview.4) contain this browser UI. Earlier Preview 2 archives do not.
 
 ## Windows ARM64: assessment creation or form-token error
 
@@ -64,4 +64,4 @@ If POST requests still fail from a brand-new tab, record the HTTP status and whe
 
 The GUI is **an offline readiness workbench**, not a complete independent assessment methodology. It does not independently verify all NIST PDF procedures, provide proven cross-system control effectiveness, official SPRS submission, C3PAO accreditation, OSCAL-certified export, government endorsement, or any government ATO.
 
-The background CLI's draft scoring remains outside the graphical UI until independent verification and product security acceptance. FreeCompliance is always free and Apache-2.0 licensed.
+The background CLI's draft scoring remains outside the graphical UI until independent verification and product security acceptance. OpenCMMC is always free and Apache-2.0 licensed.
