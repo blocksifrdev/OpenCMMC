@@ -62,7 +62,7 @@ jobs:
           mkdir linux-smoke
           tar -xzf freecompliance-v0.5.0-preview.4-linux-amd64.tar.gz -C linux-smoke
           cd linux-smoke
-          ./freecompliance version | grep -Fx 'FreeCompliance v0.5.0-preview.4'
+          ./freecompliance version | grep -Fx 'OpenCMMC v0.5.0-preview.4'
           ./start-cmmc-demo.sh
           test -s LOCAL_UI.md
           test -s start-cmmc-ui.sh

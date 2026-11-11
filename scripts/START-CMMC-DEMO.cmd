@@ -1,13 +1,18 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-echo FreeCompliance offline demonstration. Use synthetic evidence only, no CUI.
+echo OpenCMMC offline demonstration. Use synthetic evidence only, no CUI.
+if exist ".\opencmmc.exe" (
+  set "CMMC_EXE=.\opencmmc.exe"
+) else (
+  set "CMMC_EXE=.\freecompliance.exe"
+)
 if not exist "demo-evidence" mkdir "demo-evidence"
 if not exist "demo-workspace.json" (
-  ".\freecompliance.exe" cmmc init --level 2 --scope "Local demo - no CUI" --out "demo-workspace.json"
+  "%CMMC_EXE%" cmmc init --level 2 --scope "Local demo - no CUI" --out "demo-workspace.json"
   if errorlevel 1 goto failed
 )
-".\freecompliance.exe" cmmc assess --input "demo-workspace.json" --evidence-dir "demo-evidence" --json "demo-readiness.json"
+"%CMMC_EXE%" cmmc assess --input "demo-workspace.json" --evidence-dir "demo-evidence" --json "demo-readiness.json"
 if errorlevel 1 goto failed
 echo Report: demo-readiness.json (not a certification or SPRS score)
 pause
