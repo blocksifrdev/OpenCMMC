@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blocksifrdev/freecompliance/internal/scan"
+	"github.com/blocksifrdev/OpenCMMC/internal/scan"
 )
 
 const maxBody = 2 << 20

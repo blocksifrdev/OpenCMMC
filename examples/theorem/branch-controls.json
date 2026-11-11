@@ -1,5 +1,5 @@
 {
-  "schema_version": "freecompliance.theorem.v1",
+  "schema_version": "opencmmc.theorem.v1",
   "scope": "SYNTHETIC_EXAMPLE_NOT_A_LIVE_REPOSITORY",
   "as_of": "2026-11-02T12:00:00Z",
   "variables": {

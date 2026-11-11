@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/blocksifrdev/freecompliance/internal/scan"
+	"github.com/blocksifrdev/OpenCMMC/internal/scan"
 )
 
 func fake(t *testing.T, branchResponse string, branchCode int) *httptest.Server {
