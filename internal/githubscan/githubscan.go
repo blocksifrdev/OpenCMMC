@@ -60,7 +60,7 @@ func (c Client) fetch(ctx context.Context, path string, dest any) (scan.Evidence
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
 	req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
-	req.Header.Set("User-Agent", "BlockSiFr-FreeCompliance/0.2")
+	req.Header.Set("User-Agent", "BlockSiFr-OpenCMMC/0.2")
 	if c.Token != "" {
 		req.Header.Set("Authorization", "Bearer "+c.Token)
 	}
@@ -114,7 +114,7 @@ func (c Client) Assess(ctx context.Context, name string) (scan.Report, error) {
 	}
 	var br branch
 	branchEv, branchErr := c.fetch(ctx, path+"/branches/"+url.PathEscape(meta.DefaultBranch), &br)
-	r := scan.Report{SchemaVersion: "1.0", Tool: "BlockSiFr FreeCompliance", GeneratedAt: time.Now().UTC().Format(time.RFC3339), Scope: "GITHUB_REPOSITORY:" + meta.FullName, ScopeNotice: "This read-only scan examines repository metadata and a default branch protected flag. It does not establish required reviews, CI checks, bypass restrictions, security effectiveness or framework compliance.", FrameworkNotice: "API response hashes are integrity references, not signed audit attestations. Framework coverage is not determined."}
+	r := scan.Report{SchemaVersion: "1.0", Tool: "BlockSiFr OpenCMMC", GeneratedAt: time.Now().UTC().Format(time.RFC3339), Scope: "GITHUB_REPOSITORY:" + meta.FullName, ScopeNotice: "This read-only scan examines repository metadata and a default branch protected flag. It does not establish required reviews, CI checks, bypass restrictions, security effectiveness or framework compliance.", FrameworkNotice: "API response hashes are integrity references, not signed audit attestations. Framework coverage is not determined."}
 	visibility := "public"
 	if meta.Private {
 		visibility = "private"

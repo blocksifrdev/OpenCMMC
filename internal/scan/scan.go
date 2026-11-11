@@ -122,7 +122,7 @@ func Scan(root string) (Report, error) {
 	sort.Strings(t.tests)
 	now := time.Now().UTC().Format(time.RFC3339)
 	r := Report{
-		SchemaVersion: "1.0", Tool: "BlockSiFr FreeCompliance", GeneratedAt: now, Scope: "LOCAL_REPOSITORY",
+		SchemaVersion: "1.0", Tool: "BlockSiFr OpenCMMC", GeneratedAt: now, Scope: "LOCAL_REPOSITORY",
 		ScopeNotice:     "This scan inspects local repository artifacts and GitHub Actions declarations only. It does not check deployed configuration, IAM, branch protection, whether CI ran successfully, or organizational controls. VERIFIED means a specific scanner assertion has supporting local evidence, not that a framework control is satisfied.",
 		FrameworkNotice: "Framework references are informative alignment annotations, not control-by-control determinations, attestations, audit opinions, or certifications.",
 		Findings:        []Finding{},

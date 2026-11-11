@@ -1,4 +1,4 @@
-name: FreeCompliance
+name: OpenCMMC
 branding:
   icon: shield
   color: blue
@@ -18,34 +18,34 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Build FreeCompliance
+    - name: Build OpenCMMC
       shell: bash
       run: |
         set -euo pipefail
         cd "$GITHUB_ACTION_PATH"
-        go build -o "$RUNNER_TEMP/freecompliance-cli" ./cmd/freecompliance
+        go build -o "$RUNNER_TEMP/opencmmc-cli" ./cmd/freecompliance
     - name: Assess checked-out repository
       id: assess
       shell: bash
       env:
-        FC_FAIL_ON_GAP: ${{ inputs.fail-on-gap }}
+        OC_FAIL_ON_GAP: ${{ inputs.fail-on-gap }}
       run: |
         set -euo pipefail
-        mkdir -p "$RUNNER_TEMP/freecompliance-reports"
+        mkdir -p "$RUNNER_TEMP/opencmmc-reports"
         extra=()
-        if [[ "$FC_FAIL_ON_GAP" == 'true' ]]; then extra+=(--fail-on-gap); fi
+        if [[ "$OC_FAIL_ON_GAP" == 'true' ]]; then extra+=(--fail-on-gap); fi
         set +e
-        "$RUNNER_TEMP/freecompliance-cli" scan --path "$GITHUB_WORKSPACE" \
-          --json "$RUNNER_TEMP/freecompliance-reports/report.json" \
-          --html "$RUNNER_TEMP/freecompliance-reports/report.html" \
-          "${extra[@]}" | tee "$RUNNER_TEMP/freecompliance-reports/summary.txt"
+        "$RUNNER_TEMP/opencmmc-cli" scan --path "$GITHUB_WORKSPACE" \
+          --json "$RUNNER_TEMP/opencmmc-reports/report.json" \
+          --html "$RUNNER_TEMP/opencmmc-reports/report.html" \
+          "${extra[@]}" | tee "$RUNNER_TEMP/opencmmc-reports/summary.txt"
         status=${PIPESTATUS[0]}
         set -e
         {
-          printf '%s\n' '## FreeCompliance evidence readiness' '' '```text'
-          cat "$RUNNER_TEMP/freecompliance-reports/summary.txt"
+          printf '%s\n' '## OpenCMMC evidence readiness' '' '```text'
+          cat "$RUNNER_TEMP/opencmmc-reports/summary.txt"
           printf '%s\n' '```' '' 'Repository signals only. No framework certification or audit opinion is implied.'
         } >> "$GITHUB_STEP_SUMMARY"
-        echo "json_path=$RUNNER_TEMP/freecompliance-reports/report.json" >> "$GITHUB_OUTPUT"
-        echo "html_path=$RUNNER_TEMP/freecompliance-reports/report.html" >> "$GITHUB_OUTPUT"
+        echo "json_path=$RUNNER_TEMP/opencmmc-reports/report.json" >> "$GITHUB_OUTPUT"
+        echo "html_path=$RUNNER_TEMP/opencmmc-reports/report.html" >> "$GITHUB_OUTPUT"
         exit "$status"
