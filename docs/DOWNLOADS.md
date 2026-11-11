@@ -1,6 +1,8 @@
-# FreeCompliance portable downloads
+# OpenCMMC downloads (historically named preview binaries)
 
-**Public preview v0.5.0-preview.4:** [GitHub Releases](https://github.com/blocksifrdev/freecompliance/releases).
+**Public preview v0.5.0-preview.4:** [GitHub Releases](https://github.com/blocksifrdev/OpenCMMC/releases).
+
+**Compatibility note:** The published v0.5.0-preview.4 downloads and commands still bear the legacy `freecompliance` name. New v1 candidate packages use `opencmmc` and include a backward-compatible executable alias. The candidate is not a publicly verified general-availability release.
 
 This download is a **portable Go executable with a self-contained local browser interface**, not a native MSI or EXE installer. Use START-CMMC-UI.cmd on Windows or start-cmmc-ui.sh on Linux to open the graphical workflow without editing JSON. The CLI is also included. Preview 4 includes the offline NIST SP 800-171A supplemental CSV objective importer and the **draft-only** Level 2 score worksheet. See [CMMC assessment and scoring instructions](CMMC_ASSESSMENT_NEXT.md). Windows users can double-click the browser UI launcher; the synthetic demo launcher is also included. No Go compiler, subscription, login, or internet is needed for the packaged offline tools. The browser UI is available now; a native signed installer remains a separate milestone.
 

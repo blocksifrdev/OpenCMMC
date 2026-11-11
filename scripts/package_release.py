@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reproducible FreeCompliance Go archive packaging, using only the Python stdlib.
+"""Reproducible OpenCMMC and legacy-compatible Go archive packaging, using only the Python stdlib.
 
 Cross-builds the offline CLI. Does not assert that it has a graphical interface or a signed publisher identity.
 """
@@ -59,15 +59,18 @@ def build(version, out_dir):
     out_dir.mkdir(parents=True, exist_ok=True)
     outputs = []
     for goos, goarch in PLATFORMS:
-        name = f'freecompliance-{version}-{goos}-{goarch}'
-        exe_name = 'freecompliance.exe' if goos == 'windows' else 'freecompliance'
+        # Historic v0 package identifiers and filenames remain stable.
+        prefix = 'freecompliance' if version.startswith('v0.') else 'opencmmc'
+        name = f'{prefix}-{version}-{goos}-{goarch}'
+        exe_name = f'{prefix}.exe' if goos == 'windows' else prefix
         stage = out_dir / f'.{name}.binary'
         env = dict(os.environ, CGO_ENABLED='0', GOOS=goos, GOARCH=goarch, GOTOOLCHAIN='local')
         cmd = ['go', 'build', '-trimpath', '-buildvcs=false',
                '-ldflags', f'-s -w -buildid= -X main.releaseVersion={version}',
                '-o', str(stage), './cmd/freecompliance']
         subprocess.run(cmd, cwd=ROOT, env=env, check=True)
-        files = [archive_file(exe_name, stage.read_bytes(), 0o755),
+        binary = stage.read_bytes()
+        files = [archive_file(exe_name, binary, 0o755),
                  archive_file('LICENSE', (ROOT / 'LICENSE').read_bytes()),
                  archive_file('README.md', (ROOT / 'README.md').read_bytes()),
                  archive_file('CMMC_AIRGAP.md', (ROOT / 'docs/CMMC_AIRGAP.md').read_bytes()),
@@ -75,6 +78,10 @@ def build(version, out_dir):
                  archive_file('CMMC_ASSESSMENT_NEXT.md', (ROOT / 'docs/CMMC_ASSESSMENT_NEXT.md').read_bytes()),
                  archive_file('LOCAL_UI.md', (ROOT / 'docs/LOCAL_UI.md').read_bytes()),
                  archive_file('INSTALL-OFFLINE.txt', (ROOT / 'docs/DOWNLOADS.md').read_bytes())]
+        # A byte-identical legacy CLI alias supports existing local scripts.
+        if prefix == 'opencmmc':
+            alias = 'freecompliance.exe' if goos == 'windows' else 'freecompliance'
+            files.append(archive_file(alias, binary, 0o755))
         if goos == 'windows':
             files.append(archive_file('START-CMMC-DEMO.cmd', (ROOT / 'scripts/START-CMMC-DEMO.cmd').read_bytes()))
             files.append(archive_file('START-CMMC-UI.cmd', (ROOT / 'scripts/START-CMMC-UI.cmd').read_bytes()))

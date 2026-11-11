@@ -139,7 +139,7 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
         http.SetCookie(w,&http.Cookie{Name:"fc_session",Value:u.secret,Path:"/",HttpOnly:true,SameSite:http.SameSiteStrictMode})
         http.Redirect(w,r,"/",http.StatusSeeOther);return
     }
-    if !u.authorized(r){http.Error(w,"Open the private local URL shown by freecompliance cmmc ui",http.StatusForbidden);return}
+    if !u.authorized(r){http.Error(w,"Open the private local URL shown by opencmmc cmmc ui",http.StatusForbidden);return}
     if r.Method=="POST" {
         r.Body=http.MaxBytesReader(w,r.Body,maxUICSV+(2<<20))
         if !u.csrfOK(r){
@@ -173,7 +173,7 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
     case r.Method=="GET" && r.URL.Path=="/export": err=u.export(w,r)
     default: http.NotFound(w,r);return
     }
-    if err!=nil {http.Error(w,"FreeCompliance: "+err.Error(),http.StatusBadRequest);return}
+    if err!=nil {http.Error(w,"OpenCMMC: "+err.Error(),http.StatusBadRequest);return}
     if r.Method=="POST" {
         dest:="/"
         if control:=r.FormValue("control");control!="" {dest="/?control="+url.QueryEscape(control)}
@@ -385,7 +385,7 @@ func cmmcUICommand(args []string,out io.Writer) error {
     defer ln.Close()
     handler:=&localUI{root:root,port:strconv.Itoa(*port),secret:token}
     server:=&http.Server{Handler:handler,ReadHeaderTimeout:5*time.Second,ReadTimeout:45*time.Second,WriteTimeout:60*time.Second,IdleTimeout:40*time.Second,MaxHeaderBytes:8192}
-    fmt.Fprintln(out,"FreeCompliance LOCAL ONLY | no cloud, telemetry, certification or government submission.")
+    fmt.Fprintln(out,"OpenCMMC LOCAL ONLY | no cloud, telemetry, certification or government submission.")
     privateURL:=fmt.Sprintf("http://127.0.0.1:%d/?access=%s",*port,token)
     fmt.Fprintln(out,"Open this private URL on the same computer:",privateURL)
     fmt.Fprintln(out,"Keep the URL private. Press Ctrl+C to stop. Evidence remains in",root)
@@ -400,7 +400,7 @@ func cmmcUICommand(args []string,out io.Writer) error {
 // No external scripts, remote fonts, CDN dependencies, or browser network requests.
 var uiHTML=template.Must(template.New("ui").Parse(`<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FreeCompliance | Offline CMMC workbench</title>
+<title>OpenCMMC | Offline CMMC workbench</title>
 <style>
 :root{font:16px system-ui,sans-serif;color:#1e2c3c;background:#f5f7fb}*{box-sizing:border-box}
 body{margin:0}.top{background:#102440;color:white;padding:22px 30px}.top h1{margin:4px 0;font-size:24px}
@@ -412,7 +412,7 @@ textarea{min-height:72px}.muted{color:#506075;font-size:14px}.grid{display:grid;
 label{display:block;margin-top:12px;font-weight:600}form{padding:15px 0;border-top:1px solid #e1e7ef}
 .item{padding:16px;border:1px solid #e2e7ee;border-radius:9px;margin:12px 0}small{color:#4d5c6e}
 @media(max-width:740px){.grid{grid-template-columns:1fr}.sidebar{max-height:250px}}
-</style></head><body><header class="top"><div>BLOCKSIFR / OPEN SOURCE</div><h1>FreeCompliance</h1><div>Local CMMC evidence workbench | No subscription, no cloud</div></header>
+</style></head><body><header class="top"><div>BLOCKSIFR / OPEN SOURCE</div><h1>OpenCMMC</h1><div>Local CMMC evidence workbench | No subscription, no cloud</div></header>
 <main><div class="intro"><strong>Readiness, not certification.</strong> Reviewer decisions and matching hashes do not establish security control effectiveness. No SPRS submission, C3PAO accreditation or government endorsement. Keep CUI inside an approved boundary.</div>
 {{if not .HasWorkspace}}
 <section class="panel"><h2>Create an offline assessment</h2><p>Choose your baseline and name the actual system or enclave boundary. Your data will stay on this device.</p>
@@ -460,4 +460,4 @@ label{display:block;margin-top:12px;font-weight:600}form{padding:15px 0;border-t
 {{end}}
 {{end}}
 </section></div>{{end}}
-<footer class="muted">FreeCompliance by BlockSiFr | Offline-first | Not an approved assessment methodology or government certification</footer></main></body></html>`))
+<footer class="muted">OpenCMMC by BlockSiFr | Offline-first | Not an approved assessment methodology or government certification</footer></main></body></html>`))

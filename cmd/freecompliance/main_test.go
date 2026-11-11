@@ -34,7 +34,7 @@ func TestScanAndCompare(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(data), "FreeCompliance") {
+	if !strings.Contains(string(data), "OpenCMMC") {
 		t.Fatal("html missing brand")
 	}
 }

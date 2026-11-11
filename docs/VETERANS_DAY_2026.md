@@ -1,10 +1,10 @@
-# Veterans Day 2026 | A FreeCompliance Service Commitment
+# Veterans Day 2026 | A OpenCMMC Service Commitment
 
 **November 11, 2026**
 
 ## Built in gratitude. Given in service.
 
-This Veterans Day, FreeCompliance by BlockSiFr honors the men and women who have served in the United States Armed Forces. The initiative is personal to our founder, the son of a U.S. Army lieutenant colonel.
+This Veterans Day, OpenCMMC by BlockSiFr honors the men and women who have served in the United States Armed Forces. The initiative is personal to our founder, the son of a U.S. Army lieutenant colonel.
 
 We are giving back by making essential defense cybersecurity readiness tools free, open source, and usable on disconnected systems. This is a permanent commitment, not a time-limited coupon or a promise of government adoption.
 
@@ -21,7 +21,7 @@ We are giving back by making essential defense cybersecurity readiness tools fre
 
 ## What you can use now
 
-FreeCompliance is Apache 2.0 licensed and can run its core CMMC workbench without a cloud service, account, telemetry, or paid subscription:
+OpenCMMC is Apache 2.0 licensed and can run its core CMMC workbench without a cloud service, account, telemetry, or paid subscription:
 
 | Function | Actual capability |
 | --- | --- |
@@ -40,13 +40,13 @@ The identifier catalogs are **not** the complete CMMC assessment procedures. A f
 Build from reviewed source in an approved environment:
 
 ```bash
-git clone https://github.com/blocksifrdev/freecompliance.git
-cd freecompliance
+git clone https://github.com/blocksifrdev/OpenCMMC.git
+cd OpenCMMC
 go test ./...
-go build -o freecompliance ./cmd/freecompliance
-./freecompliance cmmc init --level 2 --scope "Approved CUI enclave" --out workspace.json
+go build -o opencmmc ./cmd/freecompliance
+./opencmmc cmmc init --level 2 --scope "Approved CUI enclave" --out workspace.json
 mkdir -p evidence
-./freecompliance cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
+./opencmmc cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
 ```
 
 For an air-gapped environment, build and transfer only through your organization's approved software and removable-media processes. The source checkout requires a connected staging environment; the installed core binary does not. See [air-gapped deployment](CMMC_AIRGAP.md).

@@ -1,31 +1,30 @@
-# FreeCompliance publication and release operations
+# OpenCMMC release operations
 
-Canonical public repository: https://github.com/blocksifrdev/freecompliance
+Canonical repository: https://github.com/blocksifrdev/OpenCMMC
 
-## First publication
+The source Go module `github.com/blocksifrdev/freecompliance` and `cmd/freecompliance` package path intentionally remain compatible. New release binaries are named `opencmmc`, and include a legacy executable alias. The historical v0.5 preview artifacts are never renamed.
 
-The initial source code is intentionally published under the maintainer account. It is a separate open-source project and does not include private BlockSiFr Control code. Release tags, binaries and GitHub Releases are distinct from repository publication and should never be implied to exist before verification.
+## Current status
 
-## Verify from a fresh checkout
+The most recently published release is `v0.5.0-preview.4`. A green CI run is not full product general availability. Candidate version `v1.0.0-rc.1` is built and checked by the `opencmmc-release-candidate.yml` workflow, which does not publish a release.
+
+## Validate fresh source
 
 ```bash
-git clone https://github.com/blocksifrdev/freecompliance.git
-cd freecompliance
+git clone https://github.com/blocksifrdev/OpenCMMC.git
+cd OpenCMMC
 go test ./...
-go test -race ./...
+go test -race ./internal/cmmc ./cmd/freecompliance
 go vet ./...
-go build -trimpath -o freecompliance ./cmd/freecompliance
-./freecompliance version
-./freecompliance scan --path . --json readiness.json --html readiness.html --fail-on-gap
-sha256sum freecompliance
+python3 -m unittest discover -s scripts -p 'test_*.py' -v
+go build -trimpath -o opencmmc ./cmd/freecompliance
+./opencmmc version
+python3 scripts/package_release.py --version v1.0.0-rc.1 --out dist
+(cd dist && sha256sum -c SHA256SUMS)
 ```
 
-Verify the public CI run after the initial commit. Do not merge or tag a subsequent release until CI has passed.
+Native Windows ARM64, Windows x64, Linux ARM64 and Linux x64 smoke tests must pass before the package can be described as verified on those architectures.
 
-## Tag and publish
+## Promotion
 
-When ready, create immutable or signed tag `v0.2.0` pointing to the reviewed source commit. Publish a GitHub Release with `docs/RELEASE_NOTES_v0.2.0.md`, verified binary checksums and provenance if distributing binaries. Prefer pinned commit SHA in any GitHub Action consumers. A checksum by itself is not publisher authentication.
-
-## Important scope
-
-This version provides repository-local evidence discovery and optional read-only GitHub metadata assessment. It does not provide OSCAL exports, cloud IAM assessment, regulatory certification or auditor opinions. The repository contains no customer reports or private production evidence.
+Never automatically promote to `v1.0.0`. Complete the independent CMMC, operational, security, upgrade, publishing and legal release gates documented in [the gate register](RELEASE_GATES_2026-11-11.md). Neither a readiness report nor a software release confers CMMC certification, official SPRS submission, C3PAO accreditation or government endorsement.

@@ -21,7 +21,7 @@ var releaseVersion = "v0.4.0-dev"
 
 func main() {
 	if err := run(os.Args[1:], os.Stdout); err != nil {
-		fmt.Fprintln(os.Stderr, "freecompliance:", err)
+		fmt.Fprintln(os.Stderr, "opencmmc:", err)
 		os.Exit(1)
 	}
 }
@@ -43,33 +43,33 @@ func run(args []string, out io.Writer) error {
 	case "cmmc":
 		return cmmcCommand(args[1:], out)
 	case "version", "--version", "-v":
-		fmt.Fprintf(out, "FreeCompliance %s\n", releaseVersion)
+		fmt.Fprintf(out, "OpenCMMC %s\n", releaseVersion)
 		return nil
 	case "help", "-h", "--help":
 		return usage(out)
 	default:
-		return fmt.Errorf("unknown command %q; use 'freecompliance help'", args[0])
+		return fmt.Errorf("unknown command %q; use 'opencmmc help'", args[0])
 	}
 }
 func usage(w io.Writer) error {
-	_, err := fmt.Fprint(w, `FreeCompliance by BlockSiFr | free, local, evidence-first readiness
+	_, err := fmt.Fprint(w, `OpenCMMC by BlockSiFr | free, local, evidence-first readiness
 
 Usage:
-  freecompliance scan --path . [--json report.json] [--html report.html] [--fail-on-gap]
-  freecompliance github --repo owner/name [--json report.json] [--html report.html] [--fail-on-gap]
-  freecompliance compare --before old.json --after new.json
-  freecompliance prove --input obligations.json [--json proof.json] [--html proof.html] [--fail-on-counterexample]
-  freecompliance prove-github --repo owner/name [--json github-proof.json] [--html github-proof.html] [--fail-on-unproven]
-  freecompliance cmmc ui --data-dir ./private-assessment --port 8765
-  freecompliance cmmc init --level 2 --scope "enclave-1" --out workspace.json
-  freecompliance cmmc assess --input workspace.json --evidence-dir ./evidence --json readiness.json
-  freecompliance cmmc objectives-init --level 2 --scope "enclave-1" --out objectives.json
-  freecompliance cmmc objectives-import --csv nist-171a.csv --sha256 EXPECTED_SHA --scope "enclave-1" --out objectives.json
-  freecompliance cmmc objectives-assess --input objectives.json --evidence-dir evidence --json objective-report.json
-  freecompliance cmmc score-template --scope "enclave-1" --out score-input.json
-  freecompliance cmmc score-draft --input score-reviewed.json --json score-draft.json
-  freecompliance cmmc verify-bundle --bundle update.tar --signature update.sig --public-key trusted.pub
-  freecompliance version
+  opencmmc scan --path . [--json report.json] [--html report.html] [--fail-on-gap]
+  opencmmc github --repo owner/name [--json report.json] [--html report.html] [--fail-on-gap]
+  opencmmc compare --before old.json --after new.json
+  opencmmc prove --input obligations.json [--json proof.json] [--html proof.html] [--fail-on-counterexample]
+  opencmmc prove-github --repo owner/name [--json github-proof.json] [--html github-proof.html] [--fail-on-unproven]
+  opencmmc cmmc ui --data-dir ./private-assessment --port 8765
+  opencmmc cmmc init --level 2 --scope "enclave-1" --out workspace.json
+  opencmmc cmmc assess --input workspace.json --evidence-dir ./evidence --json readiness.json
+  opencmmc cmmc objectives-init --level 2 --scope "enclave-1" --out objectives.json
+  opencmmc cmmc objectives-import --csv nist-171a.csv --sha256 EXPECTED_SHA --scope "enclave-1" --out objectives.json
+  opencmmc cmmc objectives-assess --input objectives.json --evidence-dir evidence --json objective-report.json
+  opencmmc cmmc score-template --scope "enclave-1" --out score-input.json
+  opencmmc cmmc score-draft --input score-reviewed.json --json score-draft.json
+  opencmmc cmmc verify-bundle --bundle update.tar --signature update.sig --public-key trusted.pub
+  opencmmc version
 
 A local scan DOES NOT certify SOC 2, CMMC, ISO 27001 or any NIST framework.
 VERIFIED means a specific check passed using local artifacts, not organizational compliance.
@@ -111,7 +111,7 @@ func scanCommand(args []string, out io.Writer) error {
 			return er
 		}
 	}
-	fmt.Fprintf(out, "FreeCompliance | repository evidence readiness\nVerified: %d | Partial: %d | Missing: %d | Gaps: %d | Attestation needed: %d | Total: %d\n\n", r.Summary.Verified, r.Summary.Partial, r.Summary.Missing, r.Summary.Gap, r.Summary.AttestationNeeded, r.Summary.Total)
+	fmt.Fprintf(out, "OpenCMMC | repository evidence readiness\nVerified: %d | Partial: %d | Missing: %d | Gaps: %d | Attestation needed: %d | Total: %d\n\n", r.Summary.Verified, r.Summary.Partial, r.Summary.Missing, r.Summary.Gap, r.Summary.AttestationNeeded, r.Summary.Total)
 	for _, f := range r.Findings {
 		fmt.Fprintf(out, "%-21s %-25s %s\n", f.Status, f.ID, f.Observation)
 	}
@@ -158,7 +158,7 @@ func githubCommand(args []string, out io.Writer) error {
 			return err
 		}
 	}
-	fmt.Fprintf(out, "FreeCompliance | read-only GitHub metadata\nScope: %s\nVerified: %d | Gaps: %d | Needs attestation: %d\n", r.Scope, r.Summary.Verified, r.Summary.Gap, r.Summary.AttestationNeeded)
+	fmt.Fprintf(out, "OpenCMMC | read-only GitHub metadata\nScope: %s\nVerified: %d | Gaps: %d | Needs attestation: %d\n", r.Scope, r.Summary.Verified, r.Summary.Gap, r.Summary.AttestationNeeded)
 	for _, f := range r.Findings {
 		fmt.Fprintf(out, "%-21s %-27s %s\n", f.Status, f.ID, f.Observation)
 	}
@@ -273,15 +273,15 @@ func compareCommand(args []string, out io.Writer) error {
 
 const htmlTemplate = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FreeCompliance | Evidence status</title>
+<title>OpenCMMC | Evidence status</title>
 <style>
 :root{color-scheme:light dark;font-family:system-ui,-apple-system,sans-serif;font-size:16px}*{box-sizing:border-box}body{max-width:1080px;margin:0 auto;padding:38px 20px;background:#f8fafc;color:#152332}header{padding:30px;border-radius:18px;background:#101e33;color:#eef4ff}h1{font-size:2.2rem;margin:0 0 10px}.muted{opacity:.78}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:24px 0}.stat{background:white;border-radius:12px;padding:19px;border:1px solid #dce4eb}.stat strong{display:block;font-size:2.0rem}.stat span{color:#526070;font-size:.85rem}.findings{display:grid;gap:12px}.finding{background:white;border:1px solid #dce4eb;border-radius:12px;padding:20px}.finding h2{font-size:1.12rem;margin:10px 0}.status{display:inline-block;padding:4px 10px;font-size:.75rem;font-weight:700;border-radius:100px;letter-spacing:.04em;background:#e8eff6;color:#273b54}.status.VERIFIED{background:#d8f5e3;color:#166534}.status.GAP{background:#ffe0dc;color:#972a1a}.status.MISSING{background:#fff2cd;color:#815500}.status.ATTESTATION_NEEDED{background:#e7eafe;color:#39468b}.status.PARTIAL{background:#e0f2fd;color:#164e70}.row{font-size:.88rem;color:#4a5865}.evidence{padding:10px;background:#f1f5f9;border-radius:8px;overflow-wrap:anywhere}.small{font-size:.78rem}footer{padding:26px 0;color:#556575}code{font-size:.85rem} @media(prefers-color-scheme:dark){body{background:#0c1523;color:#edf3fb}.stat,.finding{background:#182638;border-color:#2c405b}.stat span,.row,footer{color:#bccadb}.evidence{background:#24384f}} </style>
 </head><body>
-<header><div class="muted">BLOCKSIFR / OPEN SOURCE</div><h1>FreeCompliance</h1><div>Evidence readiness for a local software repository</div><p class="muted">Generated {{.GeneratedAt}} | Scope: {{.Scope}}</p></header>
+<header><div class="muted">BLOCKSIFR / OPEN SOURCE</div><h1>OpenCMMC</h1><div>Evidence readiness for a local software repository</div><p class="muted">Generated {{.GeneratedAt}} | Scope: {{.Scope}}</p></header>
 <section class="stats"><div class="stat"><strong>{{.Summary.Verified}}</strong><span>VERIFIED ASSERTIONS</span></div><div class="stat"><strong>{{.Summary.Partial}}</strong><span>PARTIAL</span></div><div class="stat"><strong>{{.Summary.Gap}}</strong><span>OBSERVED GAPS</span></div><div class="stat"><strong>{{.Summary.Missing}}</strong><span>MISSING ARTIFACTS</span></div><div class="stat"><strong>{{.Summary.AttestationNeeded}}</strong><span>NEEDS ATTESTATION</span></div></section>
 <p><strong>Meaning:</strong> {{.ScopeNotice}}</p>
 <main class="findings">{{range .Findings}}<article class="finding"><span class="status {{.Status}}">{{.Status}}</span><h2>{{.Title}}</h2><div class="row">{{.ID}} | {{range .FrameworkRefs}}{{.}} {{end}}</div><p><strong>Assertion:</strong> {{.Claim}}</p><p>{{.Observation}}</p><p><strong>Next action:</strong> {{.NextAction}}</p>{{range .Evidence}}<div class="evidence small">FILE: <code>{{.Path}}</code><br>SHA-256: <code>{{.SHA256}}</code><br>Size: {{.Bytes}} bytes</div>{{end}}</article>{{end}}</main>
-<footer>{{.FrameworkNotice}}<p>FreeCompliance is a free assessment aid. Its findings are not legal advice, official attestations, or compliance certifications.</p></footer>
+<footer>{{.FrameworkNotice}}<p>OpenCMMC is a free assessment aid. Its findings are not legal advice, official attestations, or compliance certifications.</p></footer>
 </body></html>`
 
 func renderHTML(dest string, r scan.Report) error {

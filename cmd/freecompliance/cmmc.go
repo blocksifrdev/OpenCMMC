@@ -14,7 +14,7 @@ import (
 
 func cmmcCommand(args []string, out io.Writer) error {
 	if len(args) == 0 {
-		return errors.New("usage: freecompliance cmmc init|assess|verify-bundle|objectives-init|objectives-import|objectives-assess|score-template|score-draft|ui")
+		return errors.New("usage: opencmmc cmmc init|assess|verify-bundle|objectives-init|objectives-import|objectives-assess|score-template|score-draft|ui")
 	}
 	switch args[0] {
 	case "ui":
