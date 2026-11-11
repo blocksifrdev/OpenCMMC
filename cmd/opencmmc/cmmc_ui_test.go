@@ -144,7 +144,7 @@ func TestUIEmptyObjectiveCatalogCannotPass(t *testing.T){
 func TestUIBrowserBootstrapRecoveryOnChromeOS(t *testing.T) {
     u:=testUI(t)
     first:=uiRequest(t,u,"GET","/",nil,false,"")
-    if first.Code!=http.StatusUnauthorized {
+    if first.Code!=http.StatusForbidden {
         t.Fatalf("missing session should explain recovery, got %d",first.Code)
     }
     for _,hint:=range []string{"Reconnect OpenCMMC","private URL","127.0.0.1","start-cmmc-ui.sh"} {
