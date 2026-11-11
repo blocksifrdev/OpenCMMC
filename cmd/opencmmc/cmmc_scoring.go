@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/blocksifrdev/freecompliance/internal/cmmc"
+	"github.com/blocksifrdev/opencmmc/internal/cmmc"
 )
 
 func cmmcScoringCommand(args []string, out io.Writer) error {

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/blocksifrdev/freecompliance/internal/cmmc"
+	"github.com/blocksifrdev/opencmmc/internal/cmmc"
 )
 
 func TestObjectiveCLIWorkflow(t *testing.T) {

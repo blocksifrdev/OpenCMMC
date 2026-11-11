@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/blocksifrdev/freecompliance/internal/theorem"
+	"github.com/blocksifrdev/opencmmc/internal/theorem"
 )
 
 func proveCommand(args []string, out io.Writer) error {
@@ -111,7 +111,7 @@ func renderProof(path string, r theorem.Report) error {
 	}
 	const page = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Theorem Intelligence</title><style>
  :root{font:16px/1.5 system-ui,sans-serif;color:#15263b;background:#f5f7fa}*{box-sizing:border-box}body{max-width:960px;margin:auto;padding:32px 18px}header{background:#12223b;color:white;padding:32px;border-radius:18px}h1{margin:0;font-size:2rem}h2{font-size:1.15rem;margin:0}main{display:grid;gap:16px;margin:20px 0}.card{background:white;border:1px solid #dce3eb;border-radius:14px;padding:22px}.status{display:inline-block;font-weight:700;font-size:.78rem;border-radius:50px;padding:5px 10px;background:#e4eaf5}.MODEL_SUPPORTED{background:#ccebd6;color:#15552b}.MODEL_COUNTEREXAMPLE{background:#ffdfd9;color:#81291d}.UNKNOWN{background:#fff2c6;color:#664e00}code{overflow-wrap:anywhere}small,.muted{color:#55647a}header .muted{color:#cad5e5}.warn{border-left:4px solid #b76c1f;padding:10px;background:#fffaed}dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px}dt{font-weight:600}dd{margin:0}footer{font-size:.86rem}</style></head><body>
- <header><p>BLOCKSIFR / FREECOMPLIANCE</p><h1>Theorem Intelligence</h1><p>Bounded claim verification, modeled counterexamples and evidence planning.</p><p class="muted">Scope: {{.Scope}} | As of: {{.AsOf}}</p></header>
+ <header><p>BLOCKSIFR / OPENCMMC</p><h1>Theorem Intelligence</h1><p>Bounded claim verification, modeled counterexamples and evidence planning.</p><p class="muted">Scope: {{.Scope}} | As of: {{.AsOf}}</p></header>
  <main><section class="card"><h2>Finite model boundary</h2><p>{{.PossibleStates}} possible worlds, {{.ConsistentStates}} evidence-consistent worlds, {{.AdmittedEvidence}} admitted observations, {{len .IgnoredEvidence}} ignored.</p><p><small>Model fingerprint: <code>{{.ModelSHA256}}</code></small></p><div class="warn">{{.Disclaimer}}</div></section>
  {{range .Claims}}<section class="card"><p><span class="status {{.Status}}">{{.Status}}</span></p><h2>{{.ID}}</h2><p>{{.Description}}</p>{{if .FrameworkRef}}<p><small>Framework annotation: {{.FrameworkRef}}</small></p>{{end}}<p>{{.Explanation}}</p><p><strong>Models satisfying claim:</strong> {{.SatisfyingStates}} | <strong>Counterexample models:</strong> {{.CounterexampleStates}}</p>{{if .Witness}}<h3>Modeled counterexample</h3><dl>{{range .Witness}}<dt>{{.Key}}</dt><dd>{{.Value}}</dd>{{end}}</dl>{{end}}{{if .EvidencePlan}}<h3>Minimum-cost candidate evidence (hypothetical)</h3><p>Cost: {{.EvidencePlan.TotalCost}}. Candidate IDs: {{range .EvidencePlan.CandidateIDs}}<code>{{.}}</code> {{end}}</p><p><small>Must be independently obtained and verified. Exact only within the supplied bounded candidate pool.</small></p>{{end}}</section>{{end}}
  </main><footer>OpenCMMC is not a certification body. Model coverage, evidence source truth, and validity require independent validation.</footer></body></html>`

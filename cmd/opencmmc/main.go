@@ -13,8 +13,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/blocksifrdev/freecompliance/internal/githubscan"
-	"github.com/blocksifrdev/freecompliance/internal/scan"
+	"github.com/blocksifrdev/opencmmc/internal/githubscan"
+	"github.com/blocksifrdev/opencmmc/internal/scan"
 )
 
 var releaseVersion = "v0.4.0-dev"
