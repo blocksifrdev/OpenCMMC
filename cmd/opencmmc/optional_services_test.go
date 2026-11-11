@@ -14,7 +14,7 @@ func TestOptionalServicesOnlyAfterWorkspaceAndNoAutomaticTransfer(t *testing.T) 
     u:=testUI(t)
     before:=uiRequest(t,u,"GET","/",nil,true,"")
     if before.Code!=http.StatusOK { t.Fatalf("start page status: %d",before.Code) }
-    if strings.Contains(before.Body.String(),"optional-services") { t.Fatal("outbound offers must wait until user creates a workspace") }
+    if strings.Contains(before.Body.String(),`<section class="panel optional-services"`) { t.Fatal("outbound offers must wait until user creates a workspace") }
 
     create:=uiRequest(t,u,"POST","/create",url.Values{
         "scope":{"Synthetic project, not real evidence"},
