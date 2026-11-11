@@ -1,10 +1,10 @@
 # Theorem Intelligence: Proof-Driven Compliance (experimental v0.3)
 
-**Product principle:** Compliance is a set of scoped propositions. Evidence must support each proposition; uncertainty is not a pass. Open source readiness is free. An auditor or a regulator, not FreeCompliance, determines certification and official findings.
+**Product principle:** Compliance is a set of scoped propositions. Evidence must support each proposition; uncertainty is not a pass. Open source readiness is free. An auditor or a regulator, not OpenCMMC, determines certification and official findings.
 
 ## Current working capability
 
-`freecompliance prove` accepts a caller-supplied finite model of discrete variables, timestamped observations, conjunctions of technical obligations, and hypothetical candidate evidence. A deterministic Go evaluator enumerates every state within the declared domain (hard cap 4,096 worlds), excludes inadmissible evidence, and checks whether **every evidence-consistent modeled state** satisfies each obligation. It can show a counterexample assignment and choose a minimum-cost candidate evidence set through exhaustive search of **at most 12** candidate inputs.
+`opencmmc prove` accepts a caller-supplied finite model of discrete variables, timestamped observations, conjunctions of technical obligations, and hypothetical candidate evidence. A deterministic Go evaluator enumerates every state within the declared domain (hard cap 4,096 worlds), excludes inadmissible evidence, and checks whether **every evidence-consistent modeled state** satisfies each obligation. It can show a counterexample assignment and choose a minimum-cost candidate evidence set through exhaustive search of **at most 12** candidate inputs.
 
 A claimed `VERIFIED` evidence record is admitted only when it contains a source reference and an explicit validity window containing the assessment time. **The engine does not authenticate that source**, validate a real GitHub ruleset, or independently confirm that the finite model covers real-world behavior. No scans, deployments, privileged API calls or automation are triggered by the proof command. Model hashes are not signatures.
 
@@ -12,7 +12,7 @@ A claimed `VERIFIED` evidence record is admitted only when it contains a source 
 
 ```sh
 go test ./...
-go run ./cmd/freecompliance prove --input examples/theorem/branch-controls.json \
+go run ./cmd/opencmmc prove --input examples/theorem/branch-controls.json \
   --json theorem.json --html theorem.html
 ```
 
@@ -21,7 +21,7 @@ The synthetic configuration claims review and checks are required. It does not e
 For explicit CI policy gating:
 
 ```sh
-go run ./cmd/freecompliance prove --input examples/theorem/branch-controls.json --fail-on-counterexample
+go run ./cmd/opencmmc prove --input examples/theorem/branch-controls.json --fail-on-counterexample
 ```
 
 This intentionally exits nonzero. A modeled counterexample is not a confirmed policy violation or exploit.

@@ -2,11 +2,11 @@
 
 Canonical repository: https://github.com/blocksifrdev/OpenCMMC
 
-The source Go module `github.com/blocksifrdev/freecompliance` and `cmd/freecompliance` package path intentionally remain compatible. New release binaries are named `opencmmc`, and include a legacy executable alias. The historical v0.5 preview artifacts are never renamed.
+The canonical Go module is `github.com/blocksifrdev/OpenCMMC`, the executable source is `cmd/opencmmc`, and distributed binaries are named `opencmmc`. Previously published releases remain unchanged in GitHub history.
 
 ## Current status
 
-The **latest published prerelease** is [`v1.0.0-rc.1`](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.1), published November 11, 2026, following successful native smoke tests across four architectures. Historical `v0.5.0-preview.4` remains available. The `opencmmc-release-candidate.yml` workflow publishes a prerelease only from the dedicated `release/v1.0.0-rc.1` branch after all test jobs pass. Neither candidate publication nor green CI establishes feature-complete `v1.0.0` GA.
+The **current planned OpenCMMC-only prerelease** is [`v1.0.0-rc.2`](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.2), subject to successful native smoke tests across four architectures and publication. Historical `v0.5.0-preview.4` remains available. The `opencmmc-release-candidate.yml` workflow can publish a prerelease only from the dedicated `release/v1.0.0-rc.2` branch after all test jobs pass. Neither candidate publication nor green CI establishes feature-complete `v1.0.0` GA.
 
 ## Validate fresh source
 
@@ -14,12 +14,12 @@ The **latest published prerelease** is [`v1.0.0-rc.1`](https://github.com/blocks
 git clone https://github.com/blocksifrdev/OpenCMMC.git
 cd OpenCMMC
 go test ./...
-go test -race ./internal/cmmc ./cmd/freecompliance
+go test -race ./internal/cmmc ./cmd/opencmmc
 go vet ./...
 python3 -m unittest discover -s scripts -p 'test_*.py' -v
-go build -trimpath -o opencmmc ./cmd/freecompliance
+go build -trimpath -o opencmmc ./cmd/opencmmc
 ./opencmmc version
-python3 scripts/package_release.py --version v1.0.0-rc.1 --out dist
+python3 scripts/package_release.py --version v1.0.0-rc.2 --out dist
 (cd dist && sha256sum -c SHA256SUMS)
 ```
 

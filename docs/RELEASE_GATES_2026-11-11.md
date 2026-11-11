@@ -15,7 +15,7 @@
 | Integrity | Checksums, origin provenance and approval | PASS SHA-256/SPDX in [run #43064896487](https://github.com/blocksifrdev/OpenCMMC/actions/runs/43064896487); independent publisher identity pending |
 | Publication | Approved GA tag, release and postpublish smoke | PASS prerelease published; GA not complete |
 
-The historical Go module import path, persistent `freecompliance.*` schema identifiers and `fc_session` cookie are preserved for backward compatibility. The outward product name is OpenCMMC.
+The active Go module, schema identifiers, command names, and package filenames use OpenCMMC. Readers still accept earlier version-1 workspace structures by matching their validated schema suffix and checking the full assessment content. Previously published release artifacts and Git history are immutable.
 
 Do not claim government endorsement, certification, C3PAO accreditation, validated SPRS scoring or official submissions. Do not publish a general-availability claim until its advertised capabilities have been independently verified.
 

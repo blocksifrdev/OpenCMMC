@@ -1,6 +1,6 @@
 # v0.4 experimental source-bound theorem evidence
 
-FreeCompliance's `prove-github` command performs a **narrow model-relative assessment** of the GitHub *active ruleset declarations* that GitHub returns for a repository's default branch.
+OpenCMMC's `prove-github` command performs a **narrow model-relative assessment** of the GitHub *active ruleset declarations* that GitHub returns for a repository's default branch.
 
 ## Contract and provenance
 
@@ -36,7 +36,7 @@ If required GitHub metadata cannot be obtained completely and freshly, the outpu
 go test ./...
 go test -race ./...
 go vet ./...
-go run ./cmd/freecompliance prove-github --repo blocksifrdev/freecompliance --json github-proof.json --html github-proof.html
+go run ./cmd/opencmmc prove-github --repo blocksifrdev/opencmmc --json github-proof.json --html github-proof.html
 ```
 
 See adversarial mock tests in `internal/sourceproof/github_test.go` for permission denial, stale data, malformed responses, complete-empty rules, pagination uncertainty, prohibited redirects and `bypass=possible` preservation.

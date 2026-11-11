@@ -43,7 +43,7 @@ Build from reviewed source in an approved environment:
 git clone https://github.com/blocksifrdev/OpenCMMC.git
 cd OpenCMMC
 go test ./...
-go build -o opencmmc ./cmd/freecompliance
+go build -o opencmmc ./cmd/opencmmc
 ./opencmmc cmmc init --level 2 --scope "Approved CUI enclave" --out workspace.json
 mkdir -p evidence
 ./opencmmc cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json

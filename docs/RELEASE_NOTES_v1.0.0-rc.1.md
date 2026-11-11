@@ -10,7 +10,7 @@ On Veterans Day 2026, BlockSiFr is publishing the OpenCMMC-branded candidate of 
 - Offline Level 1 and Level 2 readiness workspaces, local evidence references and SHA-256 integrity checks.
 - Separately sourced NIST SP 800-171A CSV assessment-objective ingestion and draft-only scoring utilities.
 - Portable Windows ARM64, Windows x64, Linux ARM64, and Linux x64 packages.
-- Backward-compatible `freecompliance` executable aliases for earlier launch scripts.
+- This initial rename-stage candidate contained transitional command aliases. Future OpenCMMC packages use one executable name.
 - SHA-256 manifests and SPDX Go module inventory.
 
 ## Validation basis
