@@ -6,7 +6,7 @@ The source Go module `github.com/blocksifrdev/freecompliance` and `cmd/freecompl
 
 ## Current status
 
-The most recently published release is `v0.5.0-preview.4`. A green CI run is not full product general availability. Candidate version `v1.0.0-rc.1` is built and checked by the `opencmmc-release-candidate.yml` workflow, which does not publish a release.
+The **latest published prerelease** is [`v1.0.0-rc.1`](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.1), published November 11, 2026, following successful native smoke tests across four architectures. Historical `v0.5.0-preview.4` remains available. The `opencmmc-release-candidate.yml` workflow publishes a prerelease only from the dedicated `release/v1.0.0-rc.1` branch after all test jobs pass. Neither candidate publication nor green CI establishes feature-complete `v1.0.0` GA.
 
 ## Validate fresh source
 
