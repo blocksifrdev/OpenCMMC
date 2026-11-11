@@ -19,7 +19,7 @@ on:
 permissions:
   contents: read
 env:
-  RELEASE_VERSION: ${ github.event.inputs.version || 'v1.0.0-rc.1' }
+  RELEASE_VERSION: ${{ github.event.inputs.version || 'v1.0.0-rc.1' }}
 
 jobs:
   package:
@@ -66,7 +66,7 @@ jobs:
             arch: arm64
           - runner: windows-latest
             arch: amd64
-    runs-on: ${ matrix.runner }
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -83,7 +83,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          Expand-Archive -Path "dist/opencmmc-$env:RELEASE_VERSION-windows-${ matrix.arch }.zip" -DestinationPath smoke
+          Expand-Archive -Path "dist/opencmmc-$env:RELEASE_VERSION-windows-${{ matrix.arch }}.zip" -DestinationPath smoke
           Push-Location smoke
           $ver = & .\opencmmc.exe version
           if ($LASTEXITCODE -ne 0 -or $ver -notmatch '^OpenCMMC v1\.') { throw "Version failed: $ver" }
@@ -105,7 +105,7 @@ jobs:
             arch: amd64
           - runner: ubuntu-24.04-arm
             arch: arm64
-    runs-on: ${ matrix.runner }
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 20
     steps:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -117,7 +117,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir smoke
-          tar -xzf "dist/opencmmc-$RELEASE_VERSION-linux-${ matrix.arch }.tar.gz" -C smoke
+          tar -xzf "dist/opencmmc-$RELEASE_VERSION-linux-${{ matrix.arch }}.tar.gz" -C smoke
           cd smoke
           ./opencmmc version | grep -Fx "OpenCMMC $RELEASE_VERSION"
           ./freecompliance version | grep -Fx "OpenCMMC $RELEASE_VERSION"
