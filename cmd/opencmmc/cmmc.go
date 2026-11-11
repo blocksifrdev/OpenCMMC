@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/blocksifrdev/freecompliance/internal/cmmc"
+	"github.com/blocksifrdev/OpenCMMC/internal/cmmc"
 )
 
 func cmmcCommand(args []string, out io.Writer) error {

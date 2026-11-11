@@ -25,7 +25,7 @@ import (
     "sync"
     "time"
 
-    "github.com/blocksifrdev/freecompliance/internal/cmmc"
+    "github.com/blocksifrdev/OpenCMMC/internal/cmmc"
 )
 
 const maxUIEvidence = 10 << 20
@@ -74,7 +74,7 @@ func uiWriteJSON(path string, v any) error {
     if st,e:=os.Lstat(path);e==nil {
         if !st.Mode().IsRegular(){return errors.New("refusing to replace nonregular workspace")}
     } else if !os.IsNotExist(e){return e}
-    temp,err:=os.CreateTemp(filepath.Dir(path),".freecompliance-*.tmp")
+    temp,err:=os.CreateTemp(filepath.Dir(path),".opencmmc-*.tmp")
     if err!=nil{return err}
     defer os.Remove(temp.Name())
     if err=temp.Chmod(0600);err!=nil{temp.Close();return err}
@@ -115,7 +115,7 @@ func localUIHostOK(host,port string) bool {
     return err==nil && h=="127.0.0.1" && (port=="" || p==port)
 }
 func (u *localUI) authorized(r *http.Request) bool {
-    c,err:=r.Cookie("fc_session")
+    c,err:=r.Cookie("oc_session")
     return err==nil && subtle.ConstantTimeCompare([]byte(c.Value),[]byte(u.secret))==1
 }
 func (u *localUI) csrfOK(r *http.Request) bool {
@@ -136,7 +136,7 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
         if subtle.ConstantTimeCompare([]byte(r.URL.Query().Get("access")),[]byte(u.secret))!=1 {
             http.Error(w,"invalid access token",http.StatusForbidden);return
         }
-        http.SetCookie(w,&http.Cookie{Name:"fc_session",Value:u.secret,Path:"/",HttpOnly:true,SameSite:http.SameSiteStrictMode})
+        http.SetCookie(w,&http.Cookie{Name:"oc_session",Value:u.secret,Path:"/",HttpOnly:true,SameSite:http.SameSiteStrictMode})
         http.Redirect(w,r,"/",http.StatusSeeOther);return
     }
     if !u.authorized(r){http.Error(w,"Open the private local URL shown by opencmmc cmmc ui",http.StatusForbidden);return}
@@ -373,7 +373,7 @@ func openLocalBrowser(target string) error {
 func cmmcUICommand(args []string,out io.Writer) error {
     fs:=flag.NewFlagSet("cmmc ui",flag.ContinueOnError)
     fs.SetOutput(io.Discard)
-    dir:=fs.String("data-dir","./freecompliance-workspace","private local assessment directory")
+    dir:=fs.String("data-dir","./opencmmc-workspace","private local assessment directory")
     port:=fs.Int("port",8765,"127.0.0.1-only port (1024..65535)")
     autoOpen:=fs.Bool("open-browser",false,"open the private loopback URL in the default browser")
     if err:=fs.Parse(args);err!=nil{return err}

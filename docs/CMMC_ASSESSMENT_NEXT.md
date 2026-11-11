@@ -23,9 +23,9 @@ https://csrc.nist.gov/files/pubs/sp/800/171/a/final/docs/sp800-171a-assessment-p
 Inspect the file, establish and record an expected SHA-256 from the acquired original, and transfer the approved CSV to the offline workstation. Then:
 
 ```sh
-./freecompliance cmmc objectives-import --csv sp800-171a-assessment-procedures.csv --sha256 <EXPECTED_LOWERCASE_SHA256> --scope "Approved CUI enclave" --out objectives.json
+./opencmmc cmmc objectives-import --csv sp800-171a-assessment-procedures.csv --sha256 <EXPECTED_LOWERCASE_SHA256> --scope "Approved CUI enclave" --out objectives.json
 mkdir -p evidence
-./freecompliance cmmc objectives-assess --input objectives.json --evidence-dir evidence --json objective-report.json
+./opencmmc cmmc objectives-assess --input objectives.json --evidence-dir evidence --json objective-report.json
 ```
 
 The importer requires recognizable requirement and objective columns and rejects malformed records, cross-control objective IDs, duplicate objective IDs, any missing requirement among the 110, or a checksum mismatch. It preserves the imported objective statements. It does **not** independently verify that the CSV matches the authoritative PDF. If the official CSV format is not recognized, the importer fails closed rather than guessing. The expected digest must be independently obtained; calculating the digest from an untrusted substitute does not establish source authenticity.
@@ -35,13 +35,13 @@ A source import and 110 populated requirements are **structural completeness**, 
 ## 2. Create a draft scoring worksheet
 
 ```sh
-./freecompliance cmmc score-template --scope "Approved CUI enclave" --out score-input.json
+./opencmmc cmmc score-template --scope "Approved CUI enclave" --out score-input.json
 ```
 
 All 110 findings start **UNASSESSED**. A human reviewer must enter every finding and reviewer/rationale, confirm that an up-to-date SSP exists, and resolve exceptions before running:
 
 ```sh
-./freecompliance cmmc score-draft --input score-reviewed.json --json draft-score.json
+./opencmmc cmmc score-draft --input score-reviewed.json --json draft-score.json
 ```
 
 This command applies the enumerated 1/3/5-point categories in 32 CFR 170.24(c)(2). The exceptions are: `3.5.3` with `PARTIAL` and `partial_case: REMOTE_AND_PRIVILEGED_MFA`, and `3.13.11` with `PARTIAL` and `partial_case: ENCRYPTED_NOT_FIPS_VALIDATED`. It rejects partial credit for any other requirement, missing reviewers, missing SSP confirmation, missing controls, and unsupported baselines.

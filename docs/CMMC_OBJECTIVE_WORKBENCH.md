@@ -17,9 +17,9 @@ The 2018 NIST SP 800-171A publication is marked withdrawn by NIST because Rev. 3
 Build with Go 1.23+ in a customer-approved environment. For an air gap, transfer using an approved, validated software process.
 
 ```sh
-./freecompliance cmmc objectives-init --level 2 --scope "CUI enclave A" --out objectives.json
+./opencmmc cmmc objectives-init --level 2 --scope "CUI enclave A" --out objectives.json
 mkdir -p evidence
-./freecompliance cmmc objectives-assess --input objectives.json --evidence-dir evidence --json objective-report.json
+./opencmmc cmmc objectives-assess --input objectives.json --evidence-dir evidence --json objective-report.json
 ```
 
 The first command generates a 110-control skeleton with **empty** objective lists. A reviewer must populate each control's objective list using the appropriate authoritative procedure source and retain a source/version record. The tool intentionally does not invent objectives to make a checklist look complete.

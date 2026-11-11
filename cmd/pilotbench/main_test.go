@@ -8,7 +8,7 @@ import (
 const header = "case_id,system,minutes,expected,observed,reviewed,reference\n"
 
 func TestPairedBenchmark(t *testing.T) {
-	src := header + "c1,FreeCompliance,12,COUNTEREXAMPLE,COUNTEREXAMPLE,true,review-1\n" + "c1,Baseline,20,COUNTEREXAMPLE,SUPPORTED,true,review-1\n" + "c2,FreeCompliance,10,SUPPORTED,UNKNOWN,true,review-2\n" + "c2,Baseline,25,SUPPORTED,SUPPORTED,true,review-2\n"
+	src := header + "c1,OpenCMMC,12,COUNTEREXAMPLE,COUNTEREXAMPLE,true,review-1\n" + "c1,Baseline,20,COUNTEREXAMPLE,SUPPORTED,true,review-1\n" + "c2,OpenCMMC,10,SUPPORTED,UNKNOWN,true,review-2\n" + "c2,Baseline,25,SUPPORTED,SUPPORTED,true,review-2\n"
 	rows, err := parse(strings.NewReader(src))
 	if err != nil {
 		t.Fatal(err)

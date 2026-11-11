@@ -11,8 +11,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/blocksifrdev/freecompliance/internal/sourceproof"
-	"github.com/blocksifrdev/freecompliance/internal/theorem"
+	"github.com/blocksifrdev/OpenCMMC/internal/sourceproof"
+	"github.com/blocksifrdev/OpenCMMC/internal/theorem"
 )
 
 func proveGithubCommand(args []string, out io.Writer) error {

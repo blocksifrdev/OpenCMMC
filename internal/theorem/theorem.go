@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	Schema              = "freecompliance.theorem.v1"
+	Schema              = "opencmmc.theorem.v1"
 	ModelSupported      = "MODEL_SUPPORTED"
 	ModelCounterexample = "MODEL_COUNTEREXAMPLE"
 	Unknown             = "UNKNOWN"
@@ -93,7 +93,7 @@ type Report struct {
 type state map[string]string
 
 func Validate(r Request) error {
-	if r.SchemaVersion != Schema {
+	if !compatibleTheoremSchema(r.SchemaVersion) {
 		return fmt.Errorf("schema_version must be %q", Schema)
 	}
 	if strings.TrimSpace(r.Scope) == "" || len(r.Scope) > 256 {

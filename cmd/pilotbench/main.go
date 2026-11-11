@@ -172,7 +172,7 @@ func summarize(records []Record) Output {
 		names = append(names, n)
 	}
 	sort.Strings(names)
-	o := Output{Schema: "freecompliance.pilotbench.v1", Notice: "Operator-entered measurements, not independently verified by this tool. Rates concern only adjudicated technical cases. Not a compliance certification or a product-efficacy claim.", AllSystemsPaired: true}
+	o := Output{Schema: "opencmmc.pilotbench.v1", Notice: "Operator-entered measurements, not independently verified by this tool. Rates concern only adjudicated technical cases. Not a compliance certification or a product-efficacy claim.", AllSystemsPaired: true}
 	for _, n := range names {
 		s := bySystem[n]
 		if s.VerifiedNegativeCases > 0 {

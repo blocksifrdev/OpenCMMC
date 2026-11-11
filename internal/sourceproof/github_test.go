@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blocksifrdev/freecompliance/internal/theorem"
+	"github.com/blocksifrdev/OpenCMMC/internal/theorem"
 )
 
 var fixed = time.Date(2026, 11, 2, 16, 0, 0, 0, time.UTC)

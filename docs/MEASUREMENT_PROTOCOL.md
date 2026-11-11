@@ -1,6 +1,6 @@
 # Independent Comparison Measurement Protocol v1
 
-This protocol supports a controlled comparison of FreeCompliance, a manual baseline, and optionally Vanta or Symetri systems the customer is authorized to use. It is not a certification, published vendor benchmark, or accuracy guarantee.
+This protocol supports a controlled comparison of OpenCMMC, a manual baseline, and optionally Vanta or Symetri systems the customer is authorized to use. It is not a certification, published vendor benchmark, or accuracy guarantee.
 
 ## Pre-registration
 
@@ -44,7 +44,7 @@ The provided sample is **synthetic and illustrative**, never a Vanta or Symetri 
 
 ## Adjudication independence
 
-The reviewer must inspect the exact underlying evidence and validate the claimed scope rather than accept any vendor's green status at face value. Preserve the raw vendor output in the restricted packet; include the mapping between vendor-specific statuses and the three technical states. Assessor disputes are unresolved, not silently resolved in FreeCompliance's favor.
+The reviewer must inspect the exact underlying evidence and validate the claimed scope rather than accept any vendor's green status at face value. Preserve the raw vendor output in the restricted packet; include the mapping between vendor-specific statuses and the three technical states. Assessor disputes are unresolved, not silently resolved in OpenCMMC's favor.
 
 ## Privacy and publication
 

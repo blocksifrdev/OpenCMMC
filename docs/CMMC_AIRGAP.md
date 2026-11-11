@@ -1,20 +1,20 @@
 # CMMC offline and air-gapped quick start
 
-FreeCompliance is an open-source **evidence readiness** workbench. It is not an official CMMC assessment, an SPRS scoring or submission tool, an approved CUI handling system, or a substitute for a qualified assessor.
+OpenCMMC is an open-source **evidence readiness** workbench. It is not an official CMMC assessment, an SPRS scoring or submission tool, an approved CUI handling system, or a substitute for a qualified assessor.
 
 ## One-time preparation
 
 1. Identify the actual system or enclave scope and responsible owners. Keep system security plans, customer data, and CUI within your approved boundary.
-2. In an approved build/staging environment, obtain the public source from `https://github.com/blocksifrdev/freecompliance`, inspect it, run `go test ./...` and `go vet ./...`, and build the binary with `go build -o freecompliance ./cmd/freecompliance`.
+2. In an approved build/staging environment, obtain the public source from `https://github.com/blocksifrdev/OpenCMMC`, inspect it, run `go test ./...` and `go vet ./...`, and build the binary with `go build -o opencmmc ./cmd/opencmmc`.
 3. Inspect and approve the binary under your organization's software supply-chain procedures. Transfer only through authorized media and processes; verify bytes and provenance on the destination. Do not presume a signed bundle is trustworthy unless its public key was provisioned and verified out of band.
 4. No runtime network connection is needed for the `cmmc`, `scan`, `compare`, or `prove` commands. The `github` and `prove-github` commands require internet and are not appropriate for a truly air-gapped installation.
 
 ## Run completely offline
 
 ```bash
-./freecompliance cmmc init --level 2 --scope "Approved CUI enclave" --out workspace.json
+./opencmmc cmmc init --level 2 --scope "Approved CUI enclave" --out workspace.json
 mkdir -p evidence
-./freecompliance cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
+./opencmmc cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
 ```
 
 The initialized workspace contains **110 requirement identifiers** from NIST SP 800-171 Revision 2. For Level 1 use `--level 1` to initialize **15 FAR 52.204-21 safeguarding item identifiers**. All start `UNASSESSED`. The catalog intentionally does not reproduce licensed or authoritative control content, assessment objectives, or make applicability judgments.

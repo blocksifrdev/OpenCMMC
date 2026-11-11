@@ -1,6 +1,6 @@
 # Why Proof-Driven Compliance is a distinct buying decision
 
-**BlockSiFr FreeCompliance** is an Apache-2.0 proof-driven compliance utility. It is **not** a replacement for all governance, audit, risk and compliance management workflows. The open-source wedge is narrower and more falsifiable: evaluate whether admissible source evidence supports a precisely scoped technical claim, find modeled counterexamples, and disclose uncertainty.
+**BlockSiFr OpenCMMC** is an Apache-2.0 proof-driven compliance utility. It is **not** a replacement for all governance, audit, risk and compliance management workflows. The open-source wedge is narrower and more falsifiable: evaluate whether admissible source evidence supports a precisely scoped technical claim, find modeled counterexamples, and disclose uncertainty.
 
 ## What the other vendors actually offer
 
@@ -9,7 +9,7 @@
 
 Do **not** say these products only collect documents or cannot validate controls. Do **not** claim that either has no proof/logic capability without a controlled evaluation. Public product descriptions do not establish absence of features.
 
-## What FreeCompliance can challenge
+## What OpenCMMC can challenge
 
 | Buyer question | Evaluation method | Current maturity |
 |---|---|---|
@@ -18,7 +18,7 @@ Do **not** say these products only collect documents or cannot validate controls
 | Do active GitHub rule declarations support a narrow claim? | Read-only, source-bound ruleset evaluator | v0.4 source-bound feature |
 | Can a passing configuration hide a bypass? | Controlled negative-path fixture and source review | Model-relative; production proof not established |
 | Can we compare value against an incumbent fairly? | Adjudicated paired-case time and accuracy protocol | Pilot measurement kit |
-| Can consequential actions be stopped at runtime? | Separate BlockSiFr Control authority integration | Not in FreeCompliance |
+| Can consequential actions be stopped at runtime? | Separate BlockSiFr Control authority integration | Not in OpenCMMC |
 
 ## Buying wedge
 
@@ -26,9 +26,9 @@ Give us one **consequential action that must never execute incorrectly**. Choose
 
 ## Three competitive plays
 
-1. **Coexist first.** Export Vanta or Symetri evidence through approved customer workflows, or use the underlying GitHub/cloud sources directly. FreeCompliance is a second-look control-claim verifier, not necessarily a rip-and-replace purchase.
+1. **Coexist first.** Export Vanta or Symetri evidence through approved customer workflows, or use the underlying GitHub/cloud sources directly. OpenCMMC is a second-look control-claim verifier, not necessarily a rip-and-replace purchase.
 2. **Prove independent value.** Run the 30-day benchmark with a customer adjudicator. Show exact claims, counterexamples, stale-source invalidation, missing evidence and human time. Publish no winning percentages until real measurements exist.
-3. **Convert only for runtime control.** FreeCompliance remains free. Enterprise BlockSiFr Control is optional for protected actions, runtime authorization, policy decisions and execution receipts. Do not label local hash digests as signed receipts.
+3. **Convert only for runtime control.** OpenCMMC remains free. Enterprise BlockSiFr Control is optional for protected actions, runtime authorization, policy decisions and execution receipts. Do not label local hash digests as signed receipts.
 
 ## Positioning
 

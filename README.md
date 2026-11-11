@@ -4,7 +4,7 @@
 
 Built by BlockSiFr for defense contractors and security teams. No subscription, account, or cloud service required for the local workbench.
 
-**Latest download:** [OpenCMMC v1.0.0-rc.1](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.1), released on Veterans Day, November 11, 2026. This is a **release candidate**, not a finished or certified CMMC assessment product.
+**Latest download:** [OpenCMMC v1.0.0-rc.2](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.2), released on Veterans Day, November 11, 2026. This is a **release candidate**, not a finished or certified CMMC assessment product.
 
 ## Get started
 
@@ -12,10 +12,10 @@ Built by BlockSiFr for defense contractors and security teams. No subscription, 
 
 | Your computer | Download |
 | --- | --- |
-| Windows 11 ARM64 | [Windows ARM64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/opencmmc-v1.0.0-rc.1-windows-arm64.zip) |
-| Windows x64 (Intel or AMD) | [Windows x64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/opencmmc-v1.0.0-rc.1-windows-amd64.zip) |
-| Linux ARM64 | [Linux ARM64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/opencmmc-v1.0.0-rc.1-linux-arm64.tar.gz) |
-| Linux x64 | [Linux x64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/opencmmc-v1.0.0-rc.1-linux-amd64.tar.gz) |
+| Windows 11 ARM64 | [Windows ARM64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.2/opencmmc-v1.0.0-rc.2-windows-arm64.zip) |
+| Windows x64 (Intel or AMD) | [Windows x64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.2/opencmmc-v1.0.0-rc.2-windows-amd64.zip) |
+| Linux ARM64 | [Linux ARM64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.2/opencmmc-v1.0.0-rc.2-linux-arm64.tar.gz) |
+| Linux x64 | [Linux x64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.2/opencmmc-v1.0.0-rc.2-linux-amd64.tar.gz) |
 
 [Check your download's SHA-256 fingerprint](docs/INSTALL_V1.md) before running it. Your organization's software-approval rules still apply.
 
@@ -50,7 +50,7 @@ For current CMMC obligations, consult [official DoD CMMC guidance](https://busin
 
 ## Project and support
 
-Older previews used the `freecompliance` command. The current release uses `opencmmc` and includes the old command as a compatibility alias.
+New OpenCMMC releases use the `opencmmc` command and distribution filenames exclusively.
 
 [Contribute](CONTRIBUTING.md) · [Report a security issue](SECURITY.md) · [Air-gapped use](docs/CMMC_AIRGAP.md) · [Previous releases](https://github.com/blocksifrdev/OpenCMMC/releases)
 

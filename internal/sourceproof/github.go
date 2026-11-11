@@ -17,8 +17,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blocksifrdev/freecompliance/internal/githubscan"
-	"github.com/blocksifrdev/freecompliance/internal/theorem"
+	"github.com/blocksifrdev/OpenCMMC/internal/githubscan"
+	"github.com/blocksifrdev/OpenCMMC/internal/theorem"
 )
 
 const maxResponse = 2 << 20
@@ -176,7 +176,7 @@ func (c Client) Assess(ctx context.Context, name string) (Result, error) {
 		return Result{}, err
 	}
 	now := c.now()
-	out := Result{SchemaVersion: "freecompliance.sourceproof.v1", Repository: name, Sources: []Source{}, Warnings: []string{}, Limitations: "Evaluates active GitHub ruleset declarations only, not classic branch protection, bypass actor rights, actual GitHub enforcement or production deployment. MODEL_SUPPORTED is model-relative and does not certify an organization."}
+	out := Result{SchemaVersion: "opencmmc.sourceproof.v1", Repository: name, Sources: []Source{}, Warnings: []string{}, Limitations: "Evaluates active GitHub ruleset declarations only, not classic branch protection, bypass actor rights, actual GitHub enforcement or production deployment. MODEL_SUPPORTED is model-relative and does not certify an organization."}
 	prefix := "/repos/" + url.PathEscape(owner) + "/" + url.PathEscape(repo)
 	var meta metadata
 	source, err := c.get(ctx, prefix, &meta)

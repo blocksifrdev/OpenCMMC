@@ -4,10 +4,10 @@ from create_sbom import make_document, modules_from_json
 
 class TestSBOM(unittest.TestCase):
     def test_modules_stream(self):
-        data='{"Path":"github.com/blocksifrdev/freecompliance","Main":true}\n{"Path":"example.com/lib","Version":"v1.0.0"}'
+        data='{"Path":"github.com/blocksifrdev/OpenCMMC","Main":true}\n{"Path":"example.com/lib","Version":"v1.0.0"}'
         self.assertEqual(len(modules_from_json(data)),2)
     def test_inventory_and_relationships(self):
-        modules=[{'Path':'github.com/blocksifrdev/freecompliance','Main':True},
+        modules=[{'Path':'github.com/blocksifrdev/OpenCMMC','Main':True},
                  {'Path':'example.com/lib','Version':'v1.0.0'}]
         doc=make_document(modules,'v0.5.0-preview.4','a'*40,'go1.23','2026-11-02T00:00:00Z')
         self.assertEqual(doc['spdxVersion'],'SPDX-2.3')

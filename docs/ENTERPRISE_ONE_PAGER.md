@@ -1,8 +1,8 @@
-# Enterprise Proof Challenge | BlockSiFr FreeCompliance
+# Enterprise Proof Challenge | BlockSiFr OpenCMMC
 
 ## Your compliance tool says the control passed. Does the evidence actually prove it?
 
-Modern security teams automate collection and monitoring. But a passing control indicator does not necessarily establish that every relevant technical pathway is protected. FreeCompliance adds a free, open-source verification layer that tests **precise claims** against admitted evidence, searches bounded models for counterexamples and refuses unsupported assurances.
+Modern security teams automate collection and monitoring. But a passing control indicator does not necessarily establish that every relevant technical pathway is protected. OpenCMMC adds a free, open-source verification layer that tests **precise claims** against admitted evidence, searches bounded models for counterexamples and refuses unsupported assurances.
 
 ### One workflow. One critical claim. Thirty days.
 

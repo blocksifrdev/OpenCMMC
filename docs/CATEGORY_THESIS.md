@@ -10,6 +10,6 @@
 
 **Category measurement:** Time to reviewed evidence; percent of mapped obligations with model-supported, model-counterexample or unknown status; independently verified counterexample rate; false assurance rate; average evidence acquisition cost; number of obligations invalidated by a source or model change; independently replicated test outcomes.
 
-**Revenue boundary:** Compliance readiness and bounded proof are free. BlockSiFr Control remains a separately purchased option for consequential-action authorization, runtime enforcement, connected multi-tenant enterprise operations, and signed execution receipts. FreeCompliance must never require BlockSiFr Control.
+**Revenue boundary:** Compliance readiness and bounded proof are free. BlockSiFr Control remains a separately purchased option for consequential-action authorization, runtime enforcement, connected multi-tenant enterprise operations, and signed execution receipts. OpenCMMC must never require BlockSiFr Control.
 
 **Defensibility:** The open-source standard can become a portable evidence and obligation contract, while proprietary execution control and consequence response remain distinct. Adoption and meaningful proof-quality benchmarks, not slogans, determine market leadership.

@@ -1,6 +1,6 @@
-# Contributing to FreeCompliance
+# Contributing to OpenCMMC
 
-FreeCompliance should become useful to anyone with a repository, not just customers of BlockSiFr.
+OpenCMMC should become useful to anyone with a repository, not just customers of BlockSiFr.
 
 ## Principles
 
@@ -16,7 +16,7 @@ FreeCompliance should become useful to anyone with a repository, not just custom
 ```bash
 go test ./...
 go vet ./...
-go run ./cmd/freecompliance scan --path . --json /tmp/freecompliance.json --html /tmp/freecompliance.html
+go run ./cmd/opencmmc scan --path . --json /tmp/opencmmc.json --html /tmp/opencmmc.html
 ```
 
 ## Submitting a rule
