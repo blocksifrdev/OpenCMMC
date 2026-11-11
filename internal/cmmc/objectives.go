@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-const ObjectiveSchema = "freecompliance.cmmc.objectives.v1"
-const ObjectiveReportSchema = "freecompliance.cmmc.objective-findings.v1"
+const ObjectiveSchema = "opencmmc.cmmc.objectives.v1"
+const ObjectiveReportSchema = "opencmmc.cmmc.objective-findings.v1"
 
 type ObjectiveEvidence struct {
 	Path       string `json:"path"`
@@ -103,7 +103,7 @@ func ValidateObjectiveWorkspace(w ObjectiveWorkspace) error {
 	if err != nil {
 		return err
 	}
-	if w.SchemaVersion != ObjectiveSchema || w.Baseline != exp.Baseline {
+	if !compatibleCMMCSchema(w.SchemaVersion, ObjectiveSchema) || w.Baseline != exp.Baseline {
 		return errors.New("unsupported objective schema or baseline")
 	}
 	if strings.TrimSpace(w.ProcedureSource) == "" || len(w.ProcedureSource) > 1024 {

@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	Schema                 = "freecompliance.cmmc.workspace.v1"
-	ReportSchema           = "freecompliance.cmmc.readiness.v1"
+	Schema                 = "opencmmc.cmmc.workspace.v1"
+	ReportSchema           = "opencmmc.cmmc.readiness.v1"
 	Level1                 = 1
 	Level2                 = 2
 	MaxEvidenceBytes int64 = 50 << 20
@@ -137,7 +137,7 @@ func ValidatedWorkspace(w Workspace) error {
 	if err != nil {
 		return err
 	}
-	if w.SchemaVersion != Schema || w.Baseline != expected.Baseline {
+	if !compatibleCMMCSchema(w.SchemaVersion, Schema) || w.Baseline != expected.Baseline {
 		return errors.New("unsupported or changed workspace baseline/schema")
 	}
 	if len(w.Controls) != len(expected.Controls) {
