@@ -50,7 +50,7 @@ For current CMMC obligations, consult [official DoD CMMC guidance](https://busin
 
 ## Optional next steps
 
-After a local assessment, OpenCMMC offers three **optional** ways to go further: [CortexTrace](https://exchange.blocksifr.com/solutions/software-delivery-governance) for AI coding-session governance, [BlockSiFr Control](https://www.blocksifr.com/control) for runtime authority and protected actions, and [BLAKE](https://www.blocksifr.com/) for deeper vulnerability discovery. These are separate services, **not required for the free readiness workflow**. Opening a link never uploads your assessment or starts a scan. [Privacy and service boundaries](docs/OPTIONAL_SERVICES.md).
+After a local assessment, OpenCMMC offers three **optional** ways to go further: [CortexTrace](https://exchange.blocksifr.com/solutions/software-delivery-governance) for AI coding-session governance, [BlockSiFr Control](https://www.blocksifr.com/control) for runtime authority and protected actions, and [BLAKE](https://www.blocksifr.com/) for deeper vulnerability discovery. These are separate services, **not required for the free readiness workflow**. Each service also has a **Prepare a private request** option that lets you explicitly download a minimal, non-sensitive local planning file. Nothing is uploaded and no service is activated. [How the private handoff works](docs/SERVICE_HANDOFF.md).
 
 ## Project and support
 

@@ -22,9 +22,9 @@ No coding or editing JSON is needed for these browser steps. Command-line scorin
 
 ## Optional next steps (only after you create an assessment)
 
-The bottom of the workbench offers **CortexTrace** for AI coding-session change review, **BlockSiFr Control** for runtime enforcement, and **BLAKE** for deeper vulnerability discovery. These are separate services. You decide whether to follow each link; it opens an external website and requires internet access. No evidence, scope, report, filenames, cookies or CUI are sent by the workbench. The links do not automatically launch a coding session, policy enforcement or a scan. The free workflow remains available offline.
+The bottom of the workbench offers **CortexTrace** for AI coding-session change review, **BlockSiFr Control** for runtime enforcement, and **BLAKE** for deeper vulnerability discovery. These are separate services. **Prepare a private request** opens a local confirmation screen and downloads a JSON planning file only after you agree. The file contains no evidence, scope, report, file paths, findings, cookies or CUI. A separate information link opens an external website only if you click; that action needs internet access. Neither step launches a coding session, policy enforcement or a scan. The free workflow stays available offline.
 
-[How the optional service paths work](OPTIONAL_SERVICES.md)
+[How to prepare a private service request](SERVICE_HANDOFF.md) · [Optional services](OPTIONAL_SERVICES.md)
 
 ## If the browser rejects a form
 
