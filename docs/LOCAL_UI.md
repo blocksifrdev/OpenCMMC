@@ -1,67 +1,40 @@
-# OpenCMMC local browser workbench (engineering preview)
+# Use the OpenCMMC browser workbench
 
-**Purpose:** Run a CMMC readiness workflow with clicks and forms instead of editing JSON by hand. The entire interface is served by the installed Go executable on **127.0.0.1 only**, using standard-library Go. It requires **no account, internet connection, cloud API, JavaScript, CDN, external font or telemetry**.
+OpenCMMC runs **on your computer**. The browser screen is served locally at `127.0.0.1`; it does not require a cloud account or send evidence to BlockSiFr.
 
-## Start on Windows
+## Open it
 
-Extract the approved historical FreeCompliance preview ZIP into a local folder and double-click `START-CMMC-UI.cmd`. The command window starts a private local server. It automatically tries to open your default browser and also prints a private session URL beginning with `http://127.0.0.1:8765/?access=...`. Open that URL in a browser **on the same device** and keep the command window running. Close the window or press Ctrl+C to stop. The command-line version is:
+- **Windows:** Extract the ZIP and double-click `START-CMMC-UI.cmd`.
+- **Linux:** Extract the TAR.GZ and run `./start-cmmc-ui.sh`.
 
-```powershell
-.\freecompliance.exe cmmc ui --data-dir .\private-assessment --port 8765
-```
+The browser usually opens for you. Otherwise, open the **private URL printed in the command window** using a browser **on the same computer**. Keep that window open. Do **not** share or bookmark the private URL.
 
-## Start on Linux
+[Download](DOWNLOADS.md) · [Installation and file verification](INSTALL_V1.md)
 
-Extract the approved TAR archive, then:
+## Make your first assessment
 
-```sh
-./start-cmmc-ui.sh
-```
+1. Choose **Level 1** (15 requirement identifiers) or **Level 2** (110 requirement identifiers). Name the system you're reviewing.
+2. For **Level 2 objective-level** review, obtain the official NIST SP 800-171A supplemental CSV through an approved source, verify its SHA-256 fingerprint, and import it in the workbench. A new workspace does **not** include complete objectives or pass by default.
+3. Choose a requirement, record the reviewer decision and explanation, and attach approved local evidence. Maximum file size: **10 MiB each**.
+4. Review the status and export the **JSON report**. This is an internal readiness record, **not** official CMMC certification or an SPRS submission.
 
-Or:
+No coding or editing JSON is needed for these browser steps. Command-line scoring remains **draft-only**; it is not part of the browser workbench.
 
-```sh
-./freecompliance cmmc ui --data-dir ./private-assessment --port 8765
-```
+## If the browser rejects a form
 
-Open the printed private URL on the **same Linux computer**.
+An older tab may have an expired session token after the app restarts.
 
-**Available package:** The current [Preview 4 Windows/Linux downloads](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v0.5.0-preview.4) contain this browser UI. Earlier Preview 2 archives do not.
+1. Close older OpenCMMC browser tabs.
+2. Open the **new private URL** from the currently running command window.
+3. If a **Refresh your assessment session** page appears, use its reload option and retry. The rejected form was not saved.
 
-## Windows ARM64: assessment creation or form-token error
+If it still fails, restart the launcher, confirm only one app is using port 8765, and report the browser/Windows version and error message. **Never share the private URL, cookies, or real assessment evidence. Do not disable CSRF protection.**
 
-If the local browser displays `invalid form token or request origin` after you click **Create assessment**, do not disable browser security or CSRF protections. Each application start generates a new private session token. An older tab can still display a form containing the previous token; the newer session cookie will then make the POST fail.
+## Protect your information
 
-1. Close the older workbench tabs. Keep the app's command window open.
-2. In the command window, copy and open the **new** `http://127.0.0.1:8765/?access=...` URL on the same Windows ARM64 device. Avoid bookmarks and `localhost` aliases. Do not share the private URL.
-3. If a previously open page displays the **Refresh your assessment session** recovery screen, click **Reload the current workbench and retry**. The rejected form has not been applied.
-4. If the private URL also fails, stop the app and restart `START-CMMC-UI.cmd`. Confirm a single process owns port 8765 and inspect endpoint protection or browser extensions for local-request rewriting.
+- Evidence stays in a local private folder but is **not encrypted at rest by OpenCMMC**. Use approved device/storage encryption.
+- The session URL is a secret. The workbench is **not** a multi-user authentication system or an approved CUI security boundary.
+- A file hash checks integrity; it cannot establish that a security requirement has been met.
+- Use synthetic evidence until your organization approves the software, storage, and handling of any controlled data.
 
-If POST requests still fail from a brand-new tab, record the HTTP status and whether the message says **loopback host required**, **Open the private local URL**, or **invalid form token or request origin**. Report browser name/version and Windows ARM64 version, but never send the private access URL, browser cookies, real customer assessment data, or evidence files.
-
-## Complete customer workflow available in this preview
-
-1. Create a **Level 1** requirement-level workspace (15 safeguarding identifiers), or a **Level 2** objective-level workspace (110 requirement identifiers). A new Level 2 workspace starts with **zero objectives**, and therefore cannot be presented as passed or complete.
-2. For Level 2, obtain the official June 2018 NIST SP 800-171A supplemental CSV in an approved staging environment. Independently establish a trusted SHA-256; import it using the browser file picker and digest field. This structural import does **not** independently reconcile the CSV to the normative NIST PDF.
-3. Browse requirements without manual JSON editing. For each item, record a reviewer name, method (where applicable), assessment decision, and rationale. This remains a **reviewer assertion** until independently tested.
-4. Attach approved local evidence files of up to 10 MiB each. The app stores files in its private `evidence/` directory, records SHA-256 and capture time, and does not read files outside the controlled assessment directory. Files are **copied locally** by the user's own browser to the local loopback process. No remote server receives uploads.
-5. Inspect conservative computed statuses for each requirement. All unresolved or missing evidence remains unproven. The UI intentionally does not present a compliance percentage.
-6. Download a JSON report of the evaluated findings for **approved internal review**. Export is initiated by the user. It is not an SPRS submission or an OSCAL conformance claim.
-
-## Data protection and threat model
-
-- Binds exclusively to IPv4 loopback `127.0.0.1`. Arbitrary bind addresses are not configurable.
-- Requires a random one-session 256-bit access token, set as an HttpOnly SameSite=Strict browser cookie, plus a matching anti-CSRF form token.
-- Rejects unexpected Host headers and cross-origin POSTs; sends `Cache-Control: no-store`, a restrictive CSP, `X-Frame-Options: DENY`, and `Referrer-Policy: no-referrer`.
-- No JavaScript, outbound HTTP, remote image, font, or code dependency.
-- Evidence is never served back over an evidence-download endpoint. Export is a user-initiated JSON report and can contain reviewer names, source paths and evidence hashes.
-- Storage folders are mode `0700`, workspaces and evidence files are `0600` on compatible Unix systems; the app refuses symlink workspace files and symlink evidence directories. File access and copying are subject to the OS user's privileges.
-- The private browser URL is a local session secret. Do not share it in logs, screenshots, support requests, or messages. Any malicious process running under the same local user may have access to sensitive files or session material; this is **not** a multi-user authentication or CUI-approved security boundary.
-- Evidence files are copied into a local directory **without application-level encryption at rest**. Use an already approved encrypted device, filesystem, enclave, and backup mechanism where appropriate.
-- Before connecting sensitive systems, obtain organization-specific CUI handling approval, IT authorization, system boundary review, and appropriately qualified assessment review.
-
-## Deliberate limits
-
-The GUI is **an offline readiness workbench**, not a complete independent assessment methodology. It does not independently verify all NIST PDF procedures, provide proven cross-system control effectiveness, official SPRS submission, C3PAO accreditation, OSCAL-certified export, government endorsement, or any government ATO.
-
-The background CLI's draft scoring remains outside the graphical UI until independent verification and product security acceptance. OpenCMMC is always free and Apache-2.0 licensed.
+[Air-gapped/CUI guidance](CMMC_AIRGAP.md) · [Technical threat model](THREAT_MODEL.md) · [Current limitations](RELEASE_GATES_2026-11-11.md)

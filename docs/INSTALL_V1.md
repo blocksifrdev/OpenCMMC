@@ -1,37 +1,41 @@
-# OpenCMMC v1.0 Release Candidate: Portable Offline Installation
+# Install OpenCMMC
 
-These instructions apply to `opencmmc-v1.0.0-rc.1` archives, **not** the previously released `freecompliance-v0.5` packages.
+These instructions cover **[v1.0.0-rc.1](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.1)**, a public release candidate. No coding, account, subscription, or internet connection is needed **after** obtaining the package.
 
-## Verify before execution
+## 1. Download and verify
 
-Download the matching `opencmmc-v1.0.0-rc.1` ZIP or TAR.GZ from the project GitHub prerelease, plus `SHA256SUMS`. Validate the cryptographic checksum and review the published commit and CI workflow. SHA-256 integrity is not a publisher signature. Windows binaries are not claimed to be Authenticode-signed. Follow your organization's software-control and removable-media requirements.
+[Choose your Windows or Linux download](DOWNLOADS.md). Get the matching archive and the [SHA256SUMS file](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/SHA256SUMS).
 
-## Windows ARM64 or x64
+A SHA-256 checksum is a **file fingerprint**. Compare the fingerprint of your download with the line for that exact file in `SHA256SUMS`:
 
-Extract `opencmmc-v1.0.0-rc.1-windows-arm64.zip` on Windows ARM64 or `opencmmc-v1.0.0-rc.1-windows-amd64.zip` on Windows x64. Double-click `START-CMMC-UI.cmd` to open the private local browser UI. Or use PowerShell in the extracted folder:
+- **Windows PowerShell (example for ARM64):** `Get-FileHash .\opencmmc-v1.0.0-rc.1-windows-arm64.zip -Algorithm SHA256`
+- **Linux terminal (example for x64):** `sha256sum opencmmc-v1.0.0-rc.1-linux-amd64.tar.gz`
 
-```powershell
-.\opencmmc.exe version
-.\opencmmc.exe cmmc ui --data-dir .\private-assessment --port 8765
-```
+Run the command in the folder containing your download. The two results must match. A checksum does **not** establish publisher identity; follow your organization's software-approval process. Windows packages are not claimed to be Authenticode-signed.
 
-The browser must run on the **same machine** and use the private URL printed by the program. Do not share the private URL or bypass browser security controls.
+## 2. Open the app
 
-## Linux ARM64 or x64
+**Windows:** Extract the ZIP, open the extracted folder, and double-click `START-CMMC-UI.cmd`.
 
-Extract the matching TAR.GZ and run:
+**Linux:** Extract the TAR.GZ, open a terminal in the extracted folder, and run:
 
 ```sh
-./opencmmc version
 ./start-cmmc-ui.sh
 ```
 
-The local workbench needs no cloud access, subscription, external script or outbound telemetry. The legacy `freecompliance` executable remains included as a compatible command alias.
+Leave the terminal/command window open. Open the **private local URL it prints** in a browser on **the same computer** if the browser does not open automatically. Do not copy that URL to another device or share it.
 
-## Assessment scope and limitations
+## 3. Review and export
 
-This is an offline evidence-readiness workbench, not a complete official assessment or certified CMMC platform. The supplied Level 2 requirement workspace uses 110 identifiers and requires a separately verified official objective source for objective-level review. Reports and reviewer assertions do **not** establish control effectiveness, independently validated scores or an official SPRS submission. Advanced organizational identity, SSP/POA&M generation, authorized C3PAO assessment and official submission are not claimed. Use synthetic test evidence unless data-handling and CUI use are explicitly approved by your organization.
+1. Create an assessment and choose **Level 1** or **Level 2**.
+2. Select a requirement, add reviewer notes and approved evidence (up to **10 MiB per file**).
+3. For Level 2 **objective-by-objective** review, import a separately verified official NIST SP 800-171A CSV. The default workspace is not a complete objective assessment.
+4. Export your **JSON readiness report** for internal review.
 
-If a stale browser tab causes HTTP 409 after an application restart, reopen the new private local URL. Do not disable CSRF protection.
+**If you see a form-token or session error:** Close old app tabs and open the **new private URL** printed after the latest launch. Never disable the browser's security controls.
 
-OpenCMMC is free and Apache-2.0 licensed. See README.md, CMMC_AIRGAP.md, LOCAL_UI.md and SECURITY.md for detailed scope.
+## Know the limits
+
+This is a local readiness workbench, **not** certified CMMC software, an accredited assessment, verified SPRS scoring, or government submission. Local evidence is **not encrypted by the app**; use an approved device and obtain permission before introducing CUI. It is not a multi-user enterprise system.
+
+[Browser walkthrough](LOCAL_UI.md) · [Air-gapped/CUI guidance](CMMC_AIRGAP.md) · [Security policy](../SECURITY.md)
