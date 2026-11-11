@@ -1,6 +1,6 @@
 # Enterprise and Government evaluation readiness: evidence gates
 
-**Current assessment as of November 2, 2026:** **8/10 internal technical evaluation gates verified** against release Preview 4 and CI run [41532097431](https://github.com/blocksifrdev/freecompliance/actions/runs/41532097431). This is a software-engineering evaluation rubric, **not** an 8/10 federal/government production approval or CMMC compliance score. The two independent-assessment gates remain open. See [P0 issue #24](https://github.com/blocksifrdev/freecompliance/issues/24).
+**Current assessment as of November 2, 2026:** **8/10 internal technical evaluation gates verified** against release Preview 4 and CI run [41532097431](https://github.com/blocksifrdev/OpenCMMC/actions/runs/41532097431). This is a software-engineering evaluation rubric, **not** an 8/10 federal/government production approval or CMMC compliance score. The two independent-assessment gates remain open. See [P0 issue #24](https://github.com/blocksifrdev/OpenCMMC/issues/24).
 
 | # | Gate | Acceptance evidence | Verified status (Preview 4) |
 | --- | --- | --- | --- |
@@ -11,7 +11,7 @@
 | 5 | Evidence fail-closed semantics | Missing objective/evidence remains unresolved; incomplete score rejected | CI-verified |
 | 6 | Engineering regression gates | Tests, race detection, vet and release CI green | CI-verified |
 | 7 | Publisher provenance | Actual release archives bound to signed GitHub/Sigstore build attestations and successful verification | Verified for Preview 4, run 41532097431 |
-| 8 | Machine-readable composition inventory | Version/commit-linked SPDX Go-module inventory released and checksum-checked | Verified in Preview 4 release; [CI run 41532097431](https://github.com/blocksifrdev/freecompliance/actions/runs/41532097431). Not a complete operating-system or vulnerability inventory |
+| 8 | Machine-readable composition inventory | Version/commit-linked SPDX Go-module inventory released and checksum-checked | Verified in Preview 4 release; [CI run 41532097431](https://github.com/blocksifrdev/OpenCMMC/actions/runs/41532097431). Not a complete operating-system or vulnerability inventory |
 | 9 | Independent adversarial deployment/security evaluation | Signed independent test report, findings remediated and rerun in isolated VM | Not verified |
 | 10 | Qualified independent CMMC assessment review | NIST normative PDF objectives and CMMC scoring independently reconciled, with reviewer attribution | Not verified |
 
@@ -29,8 +29,8 @@
 
 ## Truthful market language
 
-Acceptable: "FreeCompliance is free, open source, offline-first CMMC readiness software, with downloadable Windows/Linux browser workbench and an evidence review workflow."
+Acceptable: "OpenCMMC is free, open source, offline-first CMMC readiness software, with downloadable Windows/Linux browser workbench and an evidence review workflow."
 
 Not acceptable: "Government-approved", "CMMC certified", "8/10 government compliance", "official SPRS ready", "secure enough for CUI", "NIST certified", or "the software tests every control automatically".
 
-Links: [GitHub release](https://github.com/blocksifrdev/freecompliance/releases) | [Release verification](RELEASE_INTEGRITY.md) | [Security policy](../SECURITY.md) | [NIST assessment source importer](CMMC_ASSESSMENT_NEXT.md).
+Links: [GitHub release](https://github.com/blocksifrdev/OpenCMMC/releases) | [Release verification](RELEASE_INTEGRITY.md) | [Security policy](../SECURITY.md) | [NIST assessment source importer](CMMC_ASSESSMENT_NEXT.md).

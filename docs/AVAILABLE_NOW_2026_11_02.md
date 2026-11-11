@@ -1,4 +1,4 @@
-# FreeCompliance is available now
+# OpenCMMC is available now
 
 **Published: November 2, 2026**  
 **Official launch: Veterans Day, November 11, 2026**
@@ -7,7 +7,7 @@
 
 **Know what's required. See what's documented. Find what's missing.**
 
-FreeCompliance by BlockSiFr is publicly available today, ahead of our formal Veterans Day launch.
+OpenCMMC by BlockSiFr is publicly available today, ahead of our formal Veterans Day launch.
 
 We are making a permanent, free and open-source CMMC readiness foundation available to the Defense Industrial Base: small defense businesses, prime contractors, subcontractors, security and compliance teams, assessors, and government technical reviewers.
 
@@ -28,16 +28,16 @@ The project is dedicated in gratitude for military service and inspired by the f
 
 ### Get started now
 
-Source: https://github.com/blocksifrdev/freecompliance
+Source: https://github.com/blocksifrdev/OpenCMMC
 
 ```bash
-git clone https://github.com/blocksifrdev/freecompliance.git
-cd freecompliance
+git clone https://github.com/blocksifrdev/OpenCMMC.git
+cd opencmmc
 go test ./...
-go build -o freecompliance ./cmd/freecompliance
-./freecompliance cmmc init --level 2 --scope "Demo enclave" --out workspace.json
+go build -o opencmmc ./cmd/opencmmc
+./opencmmc cmmc init --level 2 --scope "Demo enclave" --out workspace.json
 mkdir -p evidence
-./freecompliance cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
+./opencmmc cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
 ```
 
 The source checkout requires network access, but the built core CLI runs offline. In air-gapped environments, approve and transfer software through your organization's authorized procedures. Keep CUI and security-sensitive evidence in your approved boundary.
@@ -48,7 +48,7 @@ On **November 11**, we formally launch the Veterans Day service initiative, demo
 
 Objective-by-objective assessment under applicable official procedures, effectiveness testing across real systems, validated draft SPRS scoring, and schema-tested OSCAL export remain development milestones. Government submission authority, C3PAO accreditation, and government endorsement are not capabilities that this software can grant.
 
-**FreeCompliance does not itself certify CMMC compliance or replace an authorized assessment. A matching file hash does not prove a control works.** There is no claim of adoption, sponsorship, or endorsement by the Department of Defense / Department of War.
+**OpenCMMC does not itself certify CMMC compliance or replace an authorized assessment. A matching file hash does not prove a control works.** There is no claim of adoption, sponsorship, or endorsement by the Department of Defense / Department of War.
 
 ### Help improve it
 

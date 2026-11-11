@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Make FreeCompliance useful as a complete **offline assessment workbench** while maintaining an explicit boundary between free software and government or third-party authorization. The roadmap below is a development plan, not an announcement that the milestones have shipped.
+Make OpenCMMC useful as a complete **offline assessment workbench** while maintaining an explicit boundary between free software and government or third-party authorization. The roadmap below is a development plan, not an announcement that the milestones have shipped.
 
 ## Current demonstrated scope
 

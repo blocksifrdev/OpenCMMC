@@ -1,19 +1,19 @@
 # Security policy
 
-**Scope:** FreeCompliance is an open-source, offline-first readiness workbench. It does **not** come with government authorization to operate, CUI accreditation, official CMMC certification, or a warranty that an organization's controls are effective.
+**Scope:** OpenCMMC is an open-source, offline-first readiness workbench. It does **not** come with government authorization to operate, CUI accreditation, official CMMC certification, or a warranty that an organization's controls are effective.
 
 ## Report vulnerabilities privately
 
 Do **not** submit proof-of-concept exploits, sensitive logs, passwords, CUI, customer artifacts, or private infrastructure details to public GitHub issues or PRs.
 
-1. On the [FreeCompliance Security page](https://github.com/blocksifrdev/freecompliance/security), use **Report a vulnerability** if the repository has enabled private vulnerability reporting.
+1. On the [OpenCMMC Security page](https://github.com/blocksifrdev/OpenCMMC/security), use **Report a vulnerability** if the repository has enabled private vulnerability reporting.
 2. If that private channel is not available, request a secure contact route from repository maintainers **without disclosing exploit details publicly**. Do not assume an email address or bug-bounty program exists.
 3. When a private channel is established, provide the affected version and OS, a minimal sanitized reproduction, the security impact, and whether there is evidence of exploitation. Never send CUI into GitHub.
 4. Maintainers should acknowledge, triage, reproduce, develop a regression test, fix, and coordinate publication with the reporter. No specific response-time SLA is offered by this open-source preview.
 
 ## Supported release policy
 
-Only the newest published [GitHub Release](https://github.com/blocksifrdev/freecompliance/releases) is recommended for evaluation. Older preview binaries are not security-maintained enterprise branches unless explicitly announced. Users must check for fixes manually; the offline app does not auto-update.
+Only the newest published [GitHub Release](https://github.com/blocksifrdev/OpenCMMC/releases) is recommended for evaluation. Older preview binaries are not security-maintained enterprise branches unless explicitly announced. Users must check for fixes manually; the offline app does not auto-update.
 
 ## Threat boundaries and mitigations
 

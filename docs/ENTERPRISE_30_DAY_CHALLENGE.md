@@ -1,10 +1,10 @@
-# FreeCompliance 30-Day Enterprise Proof Challenge
+# OpenCMMC 30-Day Enterprise Proof Challenge
 
 **Category:** Proof-Driven Compliance. **Sponsor:** BlockSiFr. **Offer:** Free Apache-2.0 source and a separately scoped, optional professional-services proof engagement. **Status:** Pilot protocol, not independently validated product ROI.
 
 ## A decision, not a demo
 
-**Can a compliance status be supported by source-bound evidence over the exact technical scope being claimed?** Compare FreeCompliance with an organization's current workflow and, only where the customer has legitimate access, its Vanta or Symetri deployment. No unlicensed competitive access, scraping, inference about competitor internals, or fabricated outputs.
+**Can a compliance status be supported by source-bound evidence over the exact technical scope being claimed?** Compare OpenCMMC with an organization's current workflow and, only where the customer has legitimate access, its Vanta or Symetri deployment. No unlicensed competitive access, scraping, inference about competitor internals, or fabricated outputs.
 
 **Customer outputs:** a versioned control-claim register, evidence provenance, theorem-supported and counterexample/unknown results, independently reviewed false-assurance findings, a prioritized evidence acquisition plan, and an actual time-on-task scorecard. All exports remain customer-controlled.
 
@@ -14,7 +14,7 @@
 - Technical owner: GitHub and CI/CD administrator with least-privilege read-only access.
 - Independent adjudicator: customer Internal Audit, assessor, or delegated reviewer who did not configure either tested tool.
 - Security/privacy owner: approves scope, access, retention, and data export.
-- Product operator: runs the same cases through FreeCompliance and existing systems, without changing production controls.
+- Product operator: runs the same cases through OpenCMMC and existing systems, without changing production controls.
 
 ## 30-day execution
 
@@ -54,7 +54,7 @@ Acceptance is technical completion, not a warranty of legal or regulatory compli
 
 - Open-source evaluation: $0 software license, customer-operated.
 - Optional assisted 30-day proof engagement: **$25,000 fixed fee**, limited to one workflow, one primary evidence source, and a mutually agreed case set. Professional-service scope must be signed before kickoff.
-- Post-pilot: customer can keep FreeCompliance indefinitely. Optional BlockSiFr Control proposal covers additional integrations, runtime authority and protected-action enforcement separately. No coercive license conversion.
+- Post-pilot: customer can keep OpenCMMC indefinitely. Optional BlockSiFr Control proposal covers additional integrations, runtime authority and protected-action enforcement separately. No coercive license conversion.
 
 ## Decision at day 30
 
