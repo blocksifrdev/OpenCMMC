@@ -20,6 +20,10 @@ After a user creates a local assessment, the workbench offers **three separate, 
 - CortexTrace and runtime control are capabilities of the BlockSiFr commercial control stack. A link to an overview does **not** automatically activate either product.
 - BLAKE offers deeper security discovery outside CMMC's local readiness review. No vulnerability result is implied and no live testing begins from these links.
 
+## Prepare a private request
+
+Each service card also opens an optional local preparation screen. After explicit confirmation, OpenCMMC downloads a JSON planning request with no assessment data. The file is not submitted and no paid service is activated. See [the local handoff guide](SERVICE_HANDOFF.md).
+
 ## Future integration contract
 
 When a service-specific authenticated integration exists, it must use a separate, revocable **opt-in** action with a displayed data inventory, precise scope and recipient, evidence minimization, user approval and a local receipt. Default is **no transfer**. Treat URLs as navigation only until such an authorization flow is implemented and tested.
