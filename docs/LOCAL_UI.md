@@ -20,6 +20,12 @@ The browser usually opens for you. Otherwise, open the **private URL printed in 
 
 No coding or editing JSON is needed for these browser steps. Command-line scoring remains **draft-only**; it is not part of the browser workbench.
 
+## Optional next steps (only after you create an assessment)
+
+The bottom of the workbench offers **CortexTrace** for AI coding-session change review, **BlockSiFr Control** for runtime enforcement, and **BLAKE** for deeper vulnerability discovery. These are separate services. You decide whether to follow each link; it opens an external website and requires internet access. No evidence, scope, report, filenames, cookies or CUI are sent by the workbench. The links do not automatically launch a coding session, policy enforcement or a scan. The free workflow remains available offline.
+
+[How the optional service paths work](OPTIONAL_SERVICES.md)
+
 ## If the browser rejects a form
 
 An older tab may have an expired session token after the app restarts.

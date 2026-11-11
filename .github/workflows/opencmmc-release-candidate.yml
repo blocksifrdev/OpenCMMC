@@ -12,17 +12,17 @@ on:
       - 'docs/DOWNLOADS.md'
   push:
     branches:
-      - 'release/v1.0.0-rc.2'
+      - 'release/v1.0.0-rc.3'
   workflow_dispatch:
     inputs:
       version:
         description: 'Version v1.*; candidate version; publishing requires release branch and passing tests'
         required: true
-        default: 'v1.0.0-rc.2'
+        default: 'v1.0.0-rc.3'
 permissions:
   contents: read
 env:
-  RELEASE_VERSION: ${{ github.event.inputs.version || 'v1.0.0-rc.2' }}
+  RELEASE_VERSION: ${{ github.event.inputs.version || 'v1.0.0-rc.3' }}
 
 jobs:
   package:
@@ -37,6 +37,8 @@ jobs:
         shell: bash
         run: |
           [[ "$RELEASE_VERSION" =~ ^v1\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]] || exit 1
+      - name: Guard source branding
+        run: python3 scripts/verify_distribution.py --source
       - name: Unit tests, race checks, and vet
         run: |
           go test ./...
@@ -52,6 +54,8 @@ jobs:
           python3 scripts/create_sbom.py --version "$RELEASE_VERSION" --source-sha "$GITHUB_SHA" --out dist/SBOM.spdx.json
           (cd dist && sha256sum SBOM.spdx.json >> SHA256SUMS && sha256sum SHA256SUMS > SHA256SUMS.sha256)
           (cd dist && sha256sum -c SHA256SUMS && sha256sum -c SHA256SUMS.sha256)
+      - name: Verify OpenCMMC-only archive contents and manifest
+        run: python3 scripts/verify_distribution.py --artifacts dist --version "$RELEASE_VERSION"
       - name: Upload candidate packages
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -127,7 +131,7 @@ jobs:
           test -s readiness.json
 
   publish-prerelease:
-    if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/release/v1.0.0-rc.2' }}"
+    if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/release/v1.0.0-rc.3' }}"
     needs: [package, smoke-windows, smoke-linux]
     runs-on: ubuntu-latest
     permissions:
@@ -146,26 +150,26 @@ jobs:
           sha256sum -c SHA256SUMS
           sha256sum -c SHA256SUMS.sha256
           test -s SBOM.spdx.json
-          test -f opencmmc-v1.0.0-rc.2-windows-arm64.zip
-          test -f opencmmc-v1.0.0-rc.2-windows-amd64.zip
-          test -f opencmmc-v1.0.0-rc.2-linux-arm64.tar.gz
-          test -f opencmmc-v1.0.0-rc.2-linux-amd64.tar.gz
+          test -f opencmmc-v1.0.0-rc.3-windows-arm64.zip
+          test -f opencmmc-v1.0.0-rc.3-windows-amd64.zip
+          test -f opencmmc-v1.0.0-rc.3-linux-arm64.tar.gz
+          test -f opencmmc-v1.0.0-rc.3-linux-amd64.tar.gz
       - name: Create public release candidate after all native checks pass
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          test "$GITHUB_REF" = 'refs/heads/release/v1.0.0-rc.2'
-          if gh release view v1.0.0-rc.2 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          test "$GITHUB_REF" = 'refs/heads/release/v1.0.0-rc.3'
+          if gh release view v1.0.0-rc.3 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'Release candidate already exists; refusing to replace.' >&2
             exit 1
           fi
-          gh release create v1.0.0-rc.2 \
-            dist/opencmmc-v1.0.0-rc.2-*.zip dist/opencmmc-v1.0.0-rc.2-*.tar.gz \
+          gh release create v1.0.0-rc.3 \
+            dist/opencmmc-v1.0.0-rc.3-*.zip dist/opencmmc-v1.0.0-rc.3-*.tar.gz \
             dist/SHA256SUMS dist/SHA256SUMS.sha256 dist/SBOM.spdx.json \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title 'OpenCMMC v1.0.0-rc.2 | Veterans Day 2026 Release Candidate' \
-            --notes-file docs/RELEASE_NOTES_v1.0.0-rc.2.md \
+            --title 'OpenCMMC v1.0.0-rc.3 | Veterans Day 2026 Release Candidate' \
+            --notes-file docs/RELEASE_NOTES_v1.0.0-rc.3.md \
             --prerelease --latest=false

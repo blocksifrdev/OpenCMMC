@@ -12,6 +12,8 @@ jobs:
       - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
         with:
           go-version-file: go.mod
+      - name: Prevent retired branding in tracked source
+        run: python3 scripts/verify_distribution.py --source
       - name: Unit tests
         run: go test ./...
       - name: Official NIST SP 800-171A CSV format check
@@ -27,7 +29,7 @@ jobs:
       - name: Race and concurrency regression tests
         run: go test -race ./internal/cmmc ./cmd/opencmmc
       - name: Software composition inventory tests
-        run: python3 -m unittest discover -s scripts -p 'test_create_sbom.py' -v
+        run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
       - name: Vet
         run: go vet ./...
       - name: Repository evidence scan

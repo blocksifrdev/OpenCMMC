@@ -48,6 +48,10 @@ Evidence is stored locally **without application-level encryption at rest**. Use
 
 For current CMMC obligations, consult [official DoD CMMC guidance](https://business.defense.gov/cmmc/) and your contract. See [release limitations](docs/RELEASE_GATES_2026-11-11.md) and [security policy](SECURITY.md).
 
+## Optional next steps
+
+After a local assessment, OpenCMMC offers three **optional** ways to go further: [CortexTrace](https://exchange.blocksifr.com/solutions/software-delivery-governance) for AI coding-session governance, [BlockSiFr Control](https://www.blocksifr.com/control) for runtime authority and protected actions, and [BLAKE](https://www.blocksifr.com/) for deeper vulnerability discovery. These are separate services, **not required for the free readiness workflow**. Opening a link never uploads your assessment or starts a scan. [Privacy and service boundaries](docs/OPTIONAL_SERVICES.md).
+
 ## Project and support
 
 New OpenCMMC releases use the `opencmmc` command and distribution filenames exclusively.

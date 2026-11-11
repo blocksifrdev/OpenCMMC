@@ -411,6 +411,7 @@ textarea{min-height:72px}.muted{color:#506075;font-size:14px}.grid{display:grid;
 .sidebar{max-height:70vh;overflow:auto}.control{display:block;padding:9px 6px;border-bottom:1px solid #e4e9ef;font-size:13px}
 label{display:block;margin-top:12px;font-weight:600}form{padding:15px 0;border-top:1px solid #e1e7ef}
 .item{padding:16px;border:1px solid #e2e7ee;border-radius:9px;margin:12px 0}small{color:#4d5c6e}
+.optional-services{border-color:#cfc7b8;background:#fffdfa}.service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.service-card{padding:15px;border:1px solid #ded7cd;border-radius:10px;background:#fff}.service-card h3{margin:0;font-size:17px}.service-card p{font-size:14px;line-height:1.5}.service-card a{font-weight:650}@media(max-width:900px){.service-grid{grid-template-columns:1fr}}
 @media(max-width:740px){.grid{grid-template-columns:1fr}.sidebar{max-height:250px}}
 </style></head><body><header class="top"><div>BLOCKSIFR / OPEN SOURCE</div><h1>OpenCMMC</h1><div>Local CMMC evidence workbench | No subscription, no cloud</div></header>
 <main><div class="intro"><strong>Readiness, not certification.</strong> Reviewer decisions and matching hashes do not establish security control effectiveness. No SPRS submission, C3PAO accreditation or government endorsement. Keep CUI inside an approved boundary.</div>
@@ -459,5 +460,15 @@ label{display:block;margin-top:12px;font-weight:600}form{padding:15px 0;border-t
 <p class="muted">{{len .Evidence}} local evidence reference(s).</p>
 {{end}}
 {{end}}
-</section></div>{{end}}
+</section></div>
+<section class="panel optional-services" aria-label="Optional BlockSiFr services">
+<h2>Want to go further?</h2>
+<p>OpenCMMC's local readiness assessment remains free. These are <strong>optional, separately operated BlockSiFr services</strong>, not required to complete your report.</p>
+<div class="service-grid">
+<article class="service-card"><h3>CortexTrace</h3><p><strong>Fixing findings with an AI coding assistant?</strong> Explore governed coding sessions, change-impact review and execution evidence before merge or deployment.</p><p><a href="https://exchange.blocksifr.com/solutions/software-delivery-governance" target="_blank" rel="noopener noreferrer">Explore AI coding governance</a></p></article>
+<article class="service-card"><h3>BlockSiFr Control</h3><p><strong>Should agents be allowed to make changes?</strong> Explore runtime authority, constraints, human step-up decisions and execution receipts for consequential actions.</p><p><a href="https://www.blocksifr.com/control" target="_blank" rel="noopener noreferrer">Explore runtime control</a></p></article>
+<article class="service-card"><h3>BLAKE</h3><p><strong>Could there be more high-impact vulnerabilities?</strong> Explore deeper, consequence-focused security discovery and validation beyond the OpenCMMC readiness review.</p><p><a href="https://www.blocksifr.com/" target="_blank" rel="noopener noreferrer">Explore vulnerability discovery</a></p></article>
+</div>
+<p class="muted"><strong>Your data stays here.</strong> No workspace, control identifier, evidence, file path or report is sent to these sites by OpenCMMC. Links open external websites <em>only when you choose them</em> and require network access. Before providing any CUI, sensitive files or repository access to a service, obtain your organization's authorization. These links do not start a coding session, enforce a policy, or run a vulnerability scan.</p>
+</section>{{end}}
 <footer class="muted">OpenCMMC by BlockSiFr | Offline-first | Not an approved assessment methodology or government certification</footer></main></body></html>`))
