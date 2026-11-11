@@ -1,0 +1,127 @@
+name: OpenCMMC candidate build and native smoke
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/opencmmc-release-candidate.yml'
+      - 'scripts/package_release.py'
+      - 'scripts/start-cmmc-*.sh'
+      - 'scripts/START-CMMC-*.cmd'
+      - 'cmd/freecompliance/**'
+      - 'internal/cmmc/**'
+      - 'docs/DOWNLOADS.md'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version v1.*; candidate artifacts only, no publication'
+        required: true
+        default: 'v1.0.0-rc.1'
+permissions:
+  contents: read
+env:
+  RELEASE_VERSION: ${ github.event.inputs.version || 'v1.0.0-rc.1' }
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: go.mod
+      - name: Validate candidate version
+        shell: bash
+        run: |
+          [[ "$RELEASE_VERSION" =~ ^v1\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]] || exit 1
+      - name: Unit tests, race checks, and vet
+        run: |
+          go test ./...
+          go test -race ./internal/cmmc ./cmd/freecompliance
+          go vet ./...
+          python3 -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Build Windows and Linux archives
+        run: python3 scripts/package_release.py --version "$RELEASE_VERSION" --out dist
+      - name: Generate SPDX and validate checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/create_sbom.py --version "$RELEASE_VERSION" --source-sha "$GITHUB_SHA" --out dist/SBOM.spdx.json
+          (cd dist && sha256sum SBOM.spdx.json >> SHA256SUMS && sha256sum SHA256SUMS > SHA256SUMS.sha256)
+          (cd dist && sha256sum -c SHA256SUMS && sha256sum -c SHA256SUMS.sha256)
+      - name: Upload candidate packages
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: opencmmc-candidate
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+  smoke-windows:
+    needs: package
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-11-arm
+            arch: arm64
+          - runner: windows-latest
+            arch: amd64
+    runs-on: ${ matrix.runner }
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: go.mod
+      - name: Native UI and CSRF regression tests
+        run: go test ./cmd/freecompliance ./internal/cmmc
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: opencmmc-candidate
+          path: dist
+      - name: Run actual Windows package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Expand-Archive -Path "dist/opencmmc-$env:RELEASE_VERSION-windows-${ matrix.arch }.zip" -DestinationPath smoke
+          Push-Location smoke
+          $ver = & .\opencmmc.exe version
+          if ($LASTEXITCODE -ne 0 -or $ver -notmatch '^OpenCMMC v1\.') { throw "Version failed: $ver" }
+          & .\freecompliance.exe version
+          if ($LASTEXITCODE -ne 0) { throw "Compatibility alias failed" }
+          & .\opencmmc.exe cmmc init --level 2 --scope "Synthetic Windows test" --out workspace.json
+          if ($LASTEXITCODE -ne 0) { throw "Init failed" }
+          New-Item -ItemType Directory evidence | Out-Null
+          & .\opencmmc.exe cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path readiness.json)) { throw "Report failed" }
+          Pop-Location
+  smoke-linux:
+    needs: package
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${ matrix.runner }
+    timeout-minutes: 20
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: opencmmc-candidate
+          path: dist
+      - name: Run actual Linux package
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir smoke
+          tar -xzf "dist/opencmmc-$RELEASE_VERSION-linux-${ matrix.arch }.tar.gz" -C smoke
+          cd smoke
+          ./opencmmc version | grep -Fx "OpenCMMC $RELEASE_VERSION"
+          ./freecompliance version | grep -Fx "OpenCMMC $RELEASE_VERSION"
+          ./opencmmc cmmc init --level 2 --scope "Synthetic Linux test" --out workspace.json
+          mkdir evidence
+          ./opencmmc cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
+          test -s readiness.json
