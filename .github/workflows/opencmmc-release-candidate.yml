@@ -130,7 +130,7 @@ jobs:
           test -s readiness.json
 
   publish-prerelease:
-    if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/release/v1.0.0-rc.1' }"
+    if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/release/v1.0.0-rc.1' }}"
     needs: [package, smoke-windows, smoke-linux]
     runs-on: ubuntu-latest
     permissions:
@@ -155,7 +155,7 @@ jobs:
           test -f opencmmc-v1.0.0-rc.1-linux-amd64.tar.gz
       - name: Create public release candidate after all native checks pass
         env:
-          GH_TOKEN: ${{ github.token }
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
