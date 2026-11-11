@@ -13,17 +13,36 @@ A SHA-256 checksum is a **file fingerprint**. Compare the fingerprint of your do
 
 Run the command in the folder containing your download. The two results must match. A checksum does **not** establish publisher identity; follow your organization's software-approval process. Windows packages are not claimed to be Authenticode-signed.
 
-## 2. Open the app
+## 2. Unzip (extract) the downloaded file
 
-**Windows:** Extract the ZIP, open the extracted folder, and double-click `START-CMMC-UI.cmd`.
+### Windows 11 (ARM64 or x64)
 
-**Linux:** Extract the TAR.GZ, open a terminal in the extracted folder, and run:
+1. Open **File Explorer → Downloads**.
+2. Right-click the downloaded `.zip` file and choose **Extract All**. On some systems, select the ZIP first and choose **Extract all** at the top.
+3. Choose an approved destination folder (or keep the suggested one) and click **Extract**.
+4. Open the **newly extracted folder**. You should see `opencmmc.exe` and `START-CMMC-UI.cmd`. **Do not launch files directly from the compressed ZIP.**
+5. Double-click **`START-CMMC-UI.cmd`**. Keep its command window open while you use OpenCMMC.
+
+**No ZIP software or PowerShell commands are needed** for this Windows method. If Windows or your organization's security controls block the app, follow your software-approval process. Do not bypass security warnings.
+
+### Linux (ARM64 or x64)
+
+In your file manager, right-click the `.tar.gz` download and select **Extract Here**, then open the new extracted folder. Alternatively, in a terminal in your **Downloads** directory, use these commands for **Linux x64**:
 
 ```sh
+mkdir -p OpenCMMC
+tar -xzf opencmmc-v1.0.0-rc.4-linux-amd64.tar.gz -C OpenCMMC
+cd OpenCMMC
 ./start-cmmc-ui.sh
 ```
 
-Leave the terminal/command window open. Open the **private local URL it prints** in a browser on **the same computer** if the browser does not open automatically. Do not copy that URL to another device or share it.
+For **Linux ARM64**, replace `linux-amd64` in the `tar` command with `linux-arm64`. The other commands are the same. This `tar` command extracts the files; it does not install a system-wide application.
+
+### Open your local workbench
+
+Your browser should open automatically. If not, open the **private local URL printed in the command window** in a browser on **the same computer**. Keep the window open, and do not share or bookmark the private URL.
+
+**Important:** OpenCMMC keeps assessment data in a `private-assessment` subfolder beside the launcher. Keep the extracted folder in an approved, access-controlled location, and do not delete it if you need to retain your assessment. Local evidence is not encrypted by OpenCMMC.
 
 ## 3. Review and export
 
