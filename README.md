@@ -1,16 +1,22 @@
 # OpenCMMC
 
-> **Name transition:** The project is now **OpenCMMC**. The currently released v0.5.0 preview packages, executable and CLI commands still use the historical `freecompliance` name for backward compatibility. Renaming the repository does not itself constitute a v1.0 release. The November 11 launch remains subject to release verification.
+> **Veterans Day 2026 release:** [OpenCMMC v1.0.0-rc.1](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.1) is publicly available as a **release candidate**, not a certified or fully validated v1.0.0 general-availability product. Older v0.5 preview files retain the historical `freecompliance` command name.
 
 ## Download OpenCMMC
 
-**Windows and Linux portable preview packages:** [GitHub Releases](https://github.com/blocksifrdev/OpenCMMC/releases) | [Download and offline installation guide](docs/DOWNLOADS.md)
+**Get the current OpenCMMC-branded portable release candidate:**
 
-**Download now:** [Windows x64](https://github.com/blocksifrdev/OpenCMMC/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-windows-amd64.zip) | [Windows ARM64](https://github.com/blocksifrdev/OpenCMMC/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-windows-arm64.zip) | [Linux x64](https://github.com/blocksifrdev/OpenCMMC/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-linux-amd64.tar.gz) | [Linux ARM64](https://github.com/blocksifrdev/OpenCMMC/releases/download/v0.5.0-preview.4/freecompliance-v0.5.0-preview.4-linux-arm64.tar.gz) | [SHA256SUMS](https://github.com/blocksifrdev/OpenCMMC/releases/download/v0.5.0-preview.4/SHA256SUMS)
+- [Windows ARM64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/opencmmc-v1.0.0-rc.1-windows-arm64.zip)
+- [Windows x64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/opencmmc-v1.0.0-rc.1-windows-amd64.zip)
+- [Linux ARM64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/opencmmc-v1.0.0-rc.1-linux-arm64.tar.gz)
+- [Linux x64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/opencmmc-v1.0.0-rc.1-linux-amd64.tar.gz)
+- [SHA256SUMS](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/SHA256SUMS) | [SPDX inventory](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/SBOM.spdx.json)
+
+[Offline installation instructions](docs/INSTALL_V1.md) | [Candidate release notes](docs/RELEASE_NOTES_v1.0.0-rc.1.md) | [Previous Preview 4 downloads](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v0.5.0-preview.4)
 
 **No coding or JSON editing needed to start.** Download the package for your computer and verify its checksum. Extract it, then double-click `START-CMMC-UI.cmd` on Windows or run `./start-cmmc-ui.sh` on Linux. The launcher attempts to open the **local browser workbench** automatically. Select your CMMC level, add evidence, review findings, and export an internal-readiness report. [Illustrated workflow and security guide](docs/LOCAL_UI.md).
 
-No Go compiler, account, internet connection or subscription is required at runtime. The Preview 4 download includes the NIST objective CSV importer, draft-only scoring CLI, a separately published SPDX Go-module inventory, and GitHub/Sigstore build-provenance attestations verified during release CI. [Verify release integrity](docs/RELEASE_INTEGRITY.md) before installation. It is a **portable executable with a local browser interface, not a native graphical installer**, not a complete CMMC assessment, and not a validated SPRS scoring or government submission system. Review your organization's endpoint and CUI approvals before use.
+No Go compiler, account, internet connection or subscription is required at runtime. The new v1.0.0-rc.1 packages contain OpenCMMC-branded binaries, a legacy command alias, the NIST objective CSV importer, and draft-only scoring tools. Release CI performed native execution checks on Windows ARM64, Windows x64, Linux ARM64 and Linux x64. Verify the released SHA-256 manifest and review the source; checksums alone are not publisher signatures. The older Preview 4 release has separate [attestation instructions](docs/RELEASE_INTEGRITY.md). It is a **portable executable with a local browser interface, not a native graphical installer**, not a complete CMMC assessment, and not a validated SPRS scoring or government submission system. Review your organization's endpoint and CUI approvals before use.
 
 > **AVAILABLE NOW | OFFICIAL VETERANS DAY LAUNCH: NOVEMBER 11, 2026**
 >

@@ -1,4 +1,12 @@
-# OpenCMMC downloads (historically named preview binaries)
+# OpenCMMC downloads
+
+## Current public release candidate: v1.0.0-rc.1
+
+[Official Veterans Day release page](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.1) | [Offline install guide](INSTALL_V1.md) | [Release notes](RELEASE_NOTES_v1.0.0-rc.1.md)
+
+Download the `opencmmc-v1.0.0-rc.1` ZIP/TAR.GZ for your platform and the [SHA256SUMS](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.1/SHA256SUMS) file. Public artifacts were built and smoke-tested on native Windows ARM64, Windows x64, Linux ARM64 and Linux x64 GitHub runners before release. The candidate is **not** official CMMC certification, complete enterprise assessment functionality or v1.0.0 general availability.
+
+## Historical Preview 4 downloads
 
 **Public preview v0.5.0-preview.4:** [GitHub Releases](https://github.com/blocksifrdev/OpenCMMC/releases).
 
