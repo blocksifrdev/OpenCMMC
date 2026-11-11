@@ -1,15 +1,15 @@
 # Download OpenCMMC
 
-**Current public version:** [v1.0.0-rc.2, Veterans Day 2026 release candidate](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.2). **Not** v1.0.0 general availability or official CMMC certification.
+**Current public version:** [v1.0.0-rc.3, Veterans Day 2026 release candidate](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.3). **Not** v1.0.0 general availability or official CMMC certification.
 
 | Computer | Download |
 | --- | --- |
-| Windows ARM64 | [ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.2/opencmmc-v1.0.0-rc.2-windows-arm64.zip) |
-| Windows x64 (Intel/AMD) | [ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.2/opencmmc-v1.0.0-rc.2-windows-amd64.zip) |
-| Linux ARM64 | [TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.2/opencmmc-v1.0.0-rc.2-linux-arm64.tar.gz) |
-| Linux x64 | [TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.2/opencmmc-v1.0.0-rc.2-linux-amd64.tar.gz) |
+| Windows ARM64 | [ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.3/opencmmc-v1.0.0-rc.3-windows-arm64.zip) |
+| Windows x64 (Intel/AMD) | [ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.3/opencmmc-v1.0.0-rc.3-windows-amd64.zip) |
+| Linux ARM64 | [TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.3/opencmmc-v1.0.0-rc.3-linux-arm64.tar.gz) |
+| Linux x64 | [TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.3/opencmmc-v1.0.0-rc.3-linux-amd64.tar.gz) |
 
-**Next:** Download [SHA256SUMS](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.2/SHA256SUMS), verify your file, extract it, and start the local browser with `START-CMMC-UI.cmd` (Windows) or `./start-cmmc-ui.sh` (Linux). See the [step-by-step installation guide](INSTALL_V1.md).
+**Next:** Download [SHA256SUMS](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.3/SHA256SUMS), verify your file, extract it, and start the local browser with `START-CMMC-UI.cmd` (Windows) or `./start-cmmc-ui.sh` (Linux). See the [step-by-step installation guide](INSTALL_V1.md).
 
 Packages were tested on native runners for all four listed architectures. This checks installation and basic workflows, **not** complete security or compliance. They are portable archives, not signed native installers.
 

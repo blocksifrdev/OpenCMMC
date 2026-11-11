@@ -1,15 +1,15 @@
 # Install OpenCMMC
 
-These instructions cover **[v1.0.0-rc.2](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.2)**, a public release candidate. No coding, account, subscription, or internet connection is needed **after** obtaining the package.
+These instructions cover **[v1.0.0-rc.3](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.3)**, a public release candidate. No coding, account, subscription, or internet connection is needed **after** obtaining the package.
 
 ## 1. Download and verify
 
-[Choose your Windows or Linux download](DOWNLOADS.md). Get the matching archive and the [SHA256SUMS file](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.2/SHA256SUMS).
+[Choose your Windows or Linux download](DOWNLOADS.md). Get the matching archive and the [SHA256SUMS file](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.3/SHA256SUMS).
 
 A SHA-256 checksum is a **file fingerprint**. Compare the fingerprint of your download with the line for that exact file in `SHA256SUMS`:
 
-- **Windows PowerShell (example for ARM64):** `Get-FileHash .\opencmmc-v1.0.0-rc.2-windows-arm64.zip -Algorithm SHA256`
-- **Linux terminal (example for x64):** `sha256sum opencmmc-v1.0.0-rc.2-linux-amd64.tar.gz`
+- **Windows PowerShell (example for ARM64):** `Get-FileHash .\opencmmc-v1.0.0-rc.3-windows-arm64.zip -Algorithm SHA256`
+- **Linux terminal (example for x64):** `sha256sum opencmmc-v1.0.0-rc.3-linux-amd64.tar.gz`
 
 Run the command in the folder containing your download. The two results must match. A checksum does **not** establish publisher identity; follow your organization's software-approval process. Windows packages are not claimed to be Authenticode-signed.
 
