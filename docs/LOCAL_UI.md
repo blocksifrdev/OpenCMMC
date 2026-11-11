@@ -4,8 +4,8 @@ OpenCMMC runs **on your computer**. The browser screen is served locally at `127
 
 ## Open it
 
-- **Windows:** Extract the ZIP and double-click `START-CMMC-UI.cmd`.
-- **Linux:** Extract the TAR.GZ and run `./start-cmmc-ui.sh`.
+- **Windows:** In Downloads, right-click the ZIP → **Extract All** → **Extract**. Open the new folder and double-click `START-CMMC-UI.cmd`. Do not run the launcher inside the ZIP.
+- **Linux:** Right-click the `.tar.gz` file → **Extract Here**, open the extracted folder, then run `./start-cmmc-ui.sh` in a terminal. For `tar` command examples, see the [installation guide](INSTALL_V1.md#2-unzip-extract-the-downloaded-file).
 
 The browser usually opens for you. Otherwise, open the **private URL printed in the command window** using a browser **on the same computer**. Keep that window open. Do **not** share or bookmark the private URL.
 

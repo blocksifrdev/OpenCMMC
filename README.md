@@ -19,10 +19,10 @@ Built by BlockSiFr for defense contractors and security teams. No subscription, 
 
 [Check your download's SHA-256 fingerprint](docs/INSTALL_V1.md) before running it. Your organization's software-approval rules still apply.
 
-**2. Extract the download and start the workbench.**
+**2. Unzip (extract) the download, then start OpenCMMC.**
 
-- **Windows:** Double-click `START-CMMC-UI.cmd`.
-- **Linux:** Run `./start-cmmc-ui.sh` in the extracted folder.
+- **Windows:** In **Downloads**, right-click the downloaded ZIP, choose **Extract All**, and click **Extract**. Open the **new extracted folder**, then double-click `START-CMMC-UI.cmd`. **Do not run it from inside the ZIP.**
+- **Linux:** In your file manager, right-click the downloaded `.tar.gz` file and choose **Extract Here** (or use the `tar` command in the [installation guide](docs/INSTALL_V1.md)). Open the extracted folder and run `./start-cmmc-ui.sh` there.
 
 Your browser should open. If it does not, open the **private URL shown in the terminal on that same computer**. Keep the terminal open while using the app. Never share that URL.
 

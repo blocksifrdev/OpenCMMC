@@ -9,7 +9,7 @@
 | Linux ARM64 | [TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/opencmmc-v1.0.0-rc.4-linux-arm64.tar.gz) |
 | Linux x64 | [TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/opencmmc-v1.0.0-rc.4-linux-amd64.tar.gz) |
 
-**Next:** Download [SHA256SUMS](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/SHA256SUMS), verify your file, extract it, and start the local browser with `START-CMMC-UI.cmd` (Windows) or `./start-cmmc-ui.sh` (Linux). See the [step-by-step installation guide](INSTALL_V1.md).
+**Next:** Download [SHA256SUMS](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/SHA256SUMS) and verify your download. On **Windows**, right-click the ZIP → **Extract All** → **Extract**, then open the new folder and double-click `START-CMMC-UI.cmd`. On **Linux**, extract the `.tar.gz` file and run `./start-cmmc-ui.sh` from the extracted folder. See [step-by-step unzip instructions for both platforms](INSTALL_V1.md#2-unzip-extract-the-downloaded-file).
 
 Packages were tested on native runners for all four listed architectures. This checks installation and basic workflows, **not** complete security or compliance. They are portable archives, not signed native installers.
 
