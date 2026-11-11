@@ -137,3 +137,54 @@ func TestUIEmptyObjectiveCatalogCannotPass(t *testing.T){
     if r.Summary.MissingObjectiveLists!=110 || r.Summary.ReviewReady!=0{t.Fatalf("unexpected assessment: %+v",r.Summary)}
     if r.SPRSScore!="NOT_CALCULATED"{t.Fatal("incorrect SPRS status")}
 }
+
+// TestUIBrowserBootstrapRecoveryOnChromeOS checks browser behavior at the
+// application boundary. SameSite=Lax prevents a newly set session cookie from
+// being suppressed by an external app-to-Chrome first navigation and redirect.
+func TestUIBrowserBootstrapRecoveryOnChromeOS(t *testing.T) {
+    u:=testUI(t)
+    first:=uiRequest(t,u,"GET","/",nil,false,"")
+    if first.Code!=http.StatusForbidden {
+        t.Fatalf("missing session should explain recovery, got %d",first.Code)
+    }
+    for _,hint:=range []string{"Reconnect OpenCMMC","private URL","127.0.0.1","start-cmmc-ui.sh"} {
+        if !strings.Contains(first.Body.String(),hint) {t.Errorf("missing recovery instruction %q",hint)}
+    }
+    if strings.Contains(first.Body.String(),u.secret) {
+        t.Fatal("unauthorized response must never disclose the secret")
+    }
+
+    bootstrap:=uiRequest(t,u,"GET","/?access="+u.secret,nil,false,"")
+    if bootstrap.Code!=http.StatusSeeOther {
+        t.Fatalf("private URL bootstrap: %d",bootstrap.Code)
+    }
+    cookieList:=bootstrap.Result().Cookies()
+    if len(cookieList)!=1 {t.Fatalf("expected exactly one session cookie: %d",len(cookieList))}
+    cookie:=cookieList[0]
+    if cookie.Name!="oc_session" || cookie.Value!=u.secret ||
+       cookie.SameSite!=http.SameSiteLaxMode || !cookie.HttpOnly ||
+       cookie.Path!="/" {
+        t.Fatalf("unexpected bootstrap cookie attributes: %+v",cookie)
+    }
+    if bootstrap.Header().Get("Location")!="/" {t.Fatal("access token must be removed from the browser URL")}
+    if bootstrap.Header().Get("Referrer-Policy")!="no-referrer" {
+        t.Fatal("access-code redirect must not leak a referrer")
+    }
+    // Simulate Chrome following the safe top-level redirect with the new cookie.
+    after:=httptest.NewRequest("GET","http://127.0.0.1:8765/",nil)
+    after.AddCookie(cookie)
+    response:=httptest.NewRecorder()
+    u.ServeHTTP(response,after)
+    if response.Code!=http.StatusOK || !strings.Contains(response.Body.String(),"Create an offline assessment") {
+        t.Fatalf("session bootstrap did not reach assessment: %d",response.Code)
+    }
+    // A session cookie alone must not make a state-changing request safe.
+    wrongOrigin:=uiRequest(t,u,"POST","/create",url.Values{
+        "csrf":{u.secret},"scope":{"Synthetic"},"level":{"1"},
+    },true,"https://untrusted.example")
+    if wrongOrigin.Code!=http.StatusForbidden {t.Fatal("cross-origin POST accepted")}
+    withoutFormToken:=uiRequest(t,u,"POST","/create",url.Values{
+        "scope":{"Synthetic"},"level":{"1"},
+    },true,"http://127.0.0.1:8765")
+    if withoutFormToken.Code!=http.StatusConflict {t.Fatal("CSRF-less POST accepted")}
+}

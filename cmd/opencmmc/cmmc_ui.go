@@ -136,10 +136,22 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
         if subtle.ConstantTimeCompare([]byte(r.URL.Query().Get("access")),[]byte(u.secret))!=1 {
             http.Error(w,"invalid access token",http.StatusForbidden);return
         }
-        http.SetCookie(w,&http.Cookie{Name:"oc_session",Value:u.secret,Path:"/",HttpOnly:true,SameSite:http.SameSiteStrictMode})
+        // A ChromeOS-hosted browser can arrive from the Linux VM through an external
+        // top-level navigation. SameSite=Strict may omit the just-issued cookie
+        // on the immediate redirect, producing an unauthorized workbench page.
+        // Lax permits the safe top-level GET bootstrap while session + exact
+        // Origin + CSRF requirements continue to guard all state-changing POSTs.
+        http.SetCookie(w,&http.Cookie{Name:"oc_session",Value:u.secret,Path:"/",HttpOnly:true,SameSite:http.SameSiteLaxMode})
         http.Redirect(w,r,"/",http.StatusSeeOther);return
     }
-    if !u.authorized(r){http.Error(w,"Open the private local URL shown by opencmmc cmmc ui",http.StatusForbidden);return}
+    if !u.authorized(r){
+        // Do not reveal an access token, lower origin checks, or silently allow
+        // unauthenticated requests. Explain how to re-establish a local session.
+        w.Header().Set("Content-Type","text/html; charset=utf-8")
+        w.WriteHeader(http.StatusForbidden)
+        _,_ = io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Reconnect local session</title><style>body{font:16px system-ui,sans-serif;max-width:680px;margin:48px auto;padding:0 18px;line-height:1.55;color:#18283b}main{border:1px solid #d6deea;padding:24px;border-radius:12px;background:#fff}code{background:#edf0f5;padding:3px 5px}</style></head><body><main><h1>Reconnect OpenCMMC</h1><p>This browser tab is not connected to the active local OpenCMMC session. Nothing was changed.</p><ol><li>Return to the terminal running OpenCMMC on this computer.</li><li>Find <strong>Open this private URL on the same computer:</strong> and copy the full address, including the access code.</li><li>Open that exact address in a new tab using <strong>http://127.0.0.1</strong>. Do not substitute localhost, omit the code or use an old bookmark.</li><li>If the terminal no longer shows a running app, close old tabs and restart <code>./start-cmmc-ui.sh</code> from the extracted directory.</li></ol><p>Keep the terminal running while using OpenCMMC. Do not share the private URL or delete your <code>private-assessment</code> folder.</p></main></body></html>`)
+        return
+    }
     if r.Method=="POST" {
         r.Body=http.MaxBytesReader(w,r.Body,maxUICSV+(2<<20))
         if !u.csrfOK(r){

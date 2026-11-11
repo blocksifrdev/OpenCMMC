@@ -30,6 +30,8 @@ The bottom of the workbench offers **CortexTrace** for AI coding-session change 
 
 An older tab may have an expired session token after the app restarts.
 
+If a tab instead says **Reconnect OpenCMMC**, the browser has no valid session cookie. Use the entire new private URL printed in the active terminal; it must start with `http://127.0.0.1:8765/?access=`. The access code is a secret. Never share it.
+
 1. Close older OpenCMMC browser tabs.
 2. Open the **new private URL** from the currently running command window.
 3. If a **Refresh your assessment session** page appears, use its reload option and retry. The rejected form was not saved.
