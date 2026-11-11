@@ -171,10 +171,12 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
     case r.Method=="POST" && r.URL.Path=="/decide": err=u.decide(r)
     case r.Method=="POST" && r.URL.Path=="/evidence": err=u.evidence(r)
     case r.Method=="GET" && r.URL.Path=="/export": err=u.export(w,r)
+    case r.Method=="GET" && r.URL.Path=="/handoff": err=u.viewHandoff(w,r)
+    case r.Method=="POST" && r.URL.Path=="/handoff": err=u.prepareHandoff(w,r)
     default: http.NotFound(w,r);return
     }
     if err!=nil {http.Error(w,"OpenCMMC: "+err.Error(),http.StatusBadRequest);return}
-    if r.Method=="POST" {
+    if r.Method=="POST" && r.URL.Path!="/handoff" {
         dest:="/"
         if control:=r.FormValue("control");control!="" {dest="/?control="+url.QueryEscape(control)}
         http.Redirect(w,r,dest,http.StatusSeeOther)
@@ -465,9 +467,9 @@ label{display:block;margin-top:12px;font-weight:600}form{padding:15px 0;border-t
 <h2>Want to go further?</h2>
 <p>OpenCMMC's local readiness assessment remains free. These are <strong>optional, separately operated BlockSiFr services</strong>, not required to complete your report.</p>
 <div class="service-grid">
-<article class="service-card"><h3>CortexTrace</h3><p><strong>Fixing findings with an AI coding assistant?</strong> Explore governed coding sessions, change-impact review and execution evidence before merge or deployment.</p><p><a href="https://exchange.blocksifr.com/solutions/software-delivery-governance" target="_blank" rel="noopener noreferrer">Explore AI coding governance</a></p></article>
-<article class="service-card"><h3>BlockSiFr Control</h3><p><strong>Should agents be allowed to make changes?</strong> Explore runtime authority, constraints, human step-up decisions and execution receipts for consequential actions.</p><p><a href="https://www.blocksifr.com/control" target="_blank" rel="noopener noreferrer">Explore runtime control</a></p></article>
-<article class="service-card"><h3>BLAKE</h3><p><strong>Could there be more high-impact vulnerabilities?</strong> Explore deeper, consequence-focused security discovery and validation beyond the OpenCMMC readiness review.</p><p><a href="https://www.blocksifr.com/" target="_blank" rel="noopener noreferrer">Explore vulnerability discovery</a></p></article>
+<article class="service-card"><h3>CortexTrace</h3><p><strong>Fixing findings with an AI coding assistant?</strong> Explore governed coding sessions, change-impact review and execution evidence before merge or deployment.</p><p><a href="/handoff?service=cortextrace">Prepare a private CortexTrace request</a> | <a href="https://exchange.blocksifr.com/solutions/software-delivery-governance" target="_blank" rel="noopener noreferrer">Service overview</a></p></article>
+<article class="service-card"><h3>BlockSiFr Control</h3><p><strong>Should agents be allowed to make changes?</strong> Explore runtime authority, constraints, human step-up decisions and execution receipts for consequential actions.</p><p><a href="/handoff?service=control">Prepare a private Control request</a> | <a href="https://www.blocksifr.com/control" target="_blank" rel="noopener noreferrer">Service overview</a></p></article>
+<article class="service-card"><h3>BLAKE</h3><p><strong>Could there be more high-impact vulnerabilities?</strong> Explore deeper, consequence-focused security discovery and validation beyond the OpenCMMC readiness review.</p><p><a href="/handoff?service=blake">Prepare a private BLAKE request</a> | <a href="https://www.blocksifr.com/" target="_blank" rel="noopener noreferrer">Service overview</a></p></article>
 </div>
 <p class="muted"><strong>Your data stays here.</strong> No workspace, control identifier, evidence, file path or report is sent to these sites by OpenCMMC. Links open external websites <em>only when you choose them</em> and require network access. Before providing any CUI, sensitive files or repository access to a service, obtain your organization's authorization. These links do not start a coding session, enforce a policy, or run a vulnerability scan.</p>
 </section>{{end}}
