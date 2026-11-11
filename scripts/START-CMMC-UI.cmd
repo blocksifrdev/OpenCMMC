@@ -4,12 +4,7 @@ cd /d "%~dp0"
 echo OpenCMMC offline CMMC browser workbench.
 echo No cloud, subscription, telemetry, CMMC certification or SPRS submission.
 echo Keep this window running. Open the private local URL printed below.
-if exist ".\opencmmc.exe" (
-  set "CMMC_EXE=.\opencmmc.exe"
-) else (
-  set "CMMC_EXE=.\freecompliance.exe"
-)
-"%CMMC_EXE%" cmmc ui --data-dir ".\private-assessment" --port 8765 --open-browser
+".\opencmmc.exe" cmmc ui --data-dir ".\private-assessment" --port 8765 --open-browser
 if errorlevel 1 (
   echo UI could not start. Check if another program is using port 8765.
   pause

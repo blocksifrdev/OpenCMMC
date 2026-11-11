@@ -21,18 +21,18 @@ jobs:
             --output /tmp/nist171a.csv
           python3 -c 'import csv; f=open("/tmp/nist171a.csv",newline="",encoding="utf-8-sig"); r=csv.reader(f); print("NIST CSV header", [(i,x[:100]) for i,x in enumerate(next(r))]); print("NIST CSV rows", [(row[1][:50],row[4][:110]) for _,row in zip(range(12),r)])'
           sha=$(sha256sum /tmp/nist171a.csv | cut -d' ' -f1)
-          go run ./cmd/freecompliance cmmc objectives-import \
+          go run ./cmd/opencmmc cmmc objectives-import \
             --csv /tmp/nist171a.csv --sha256 "$sha" --scope "CI synthetic boundary" \
             --out /tmp/nist171a-workspace.json
       - name: Race and concurrency regression tests
-        run: go test -race ./internal/cmmc ./cmd/freecompliance
+        run: go test -race ./internal/cmmc ./cmd/opencmmc
       - name: Software composition inventory tests
         run: python3 -m unittest discover -s scripts -p 'test_create_sbom.py' -v
       - name: Vet
         run: go vet ./...
       - name: Repository evidence scan
-        run: go run ./cmd/freecompliance scan --path . --json report.json --html report.html --fail-on-gap
+        run: go run ./cmd/opencmmc scan --path . --json report.json --html report.html --fail-on-gap
       - name: Bounded theorem demonstration
-        run: go run ./cmd/freecompliance prove --input examples/theorem/branch-controls.json --json theorem.json --html theorem.html
+        run: go run ./cmd/opencmmc prove --input examples/theorem/branch-controls.json --json theorem.json --html theorem.html
       - name: Source-bound theorem unit tests
         run: go test ./internal/sourceproof -count=1

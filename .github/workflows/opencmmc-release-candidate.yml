@@ -7,22 +7,22 @@ on:
       - 'scripts/package_release.py'
       - 'scripts/start-cmmc-*.sh'
       - 'scripts/START-CMMC-*.cmd'
-      - 'cmd/freecompliance/**'
+      - 'cmd/opencmmc/**'
       - 'internal/cmmc/**'
       - 'docs/DOWNLOADS.md'
   push:
     branches:
-      - 'release/v1.0.0-rc.1'
+      - 'release/v1.0.0-rc.2'
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version v1.*; candidate artifacts only, no publication'
+        description: 'Version v1.*; candidate version; publishing requires release branch and passing tests'
         required: true
-        default: 'v1.0.0-rc.1'
+        default: 'v1.0.0-rc.2'
 permissions:
   contents: read
 env:
-  RELEASE_VERSION: ${{ github.event.inputs.version || 'v1.0.0-rc.1' }}
+  RELEASE_VERSION: ${{ github.event.inputs.version || 'v1.0.0-rc.2' }}
 
 jobs:
   package:
@@ -40,7 +40,7 @@ jobs:
       - name: Unit tests, race checks, and vet
         run: |
           go test ./...
-          go test -race ./internal/cmmc ./cmd/freecompliance
+          go test -race ./internal/cmmc ./cmd/opencmmc
           go vet ./...
           python3 -m unittest discover -s scripts -p 'test_*.py' -v
       - name: Build Windows and Linux archives
@@ -77,7 +77,7 @@ jobs:
         with:
           go-version-file: go.mod
       - name: Native UI and CSRF regression tests
-        run: go test ./cmd/freecompliance ./internal/cmmc
+        run: go test ./cmd/opencmmc ./internal/cmmc
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: opencmmc-candidate
@@ -90,8 +90,6 @@ jobs:
           Push-Location smoke
           $ver = & .\opencmmc.exe version
           if ($LASTEXITCODE -ne 0 -or $ver -notmatch '^OpenCMMC v1\.') { throw "Version failed: $ver" }
-          & .\freecompliance.exe version
-          if ($LASTEXITCODE -ne 0) { throw "Compatibility alias failed" }
           & .\opencmmc.exe cmmc init --level 2 --scope "Synthetic Windows test" --out workspace.json
           if ($LASTEXITCODE -ne 0) { throw "Init failed" }
           New-Item -ItemType Directory evidence | Out-Null
@@ -123,14 +121,13 @@ jobs:
           tar -xzf "dist/opencmmc-$RELEASE_VERSION-linux-${{ matrix.arch }}.tar.gz" -C smoke
           cd smoke
           ./opencmmc version | grep -Fx "OpenCMMC $RELEASE_VERSION"
-          ./freecompliance version | grep -Fx "OpenCMMC $RELEASE_VERSION"
           ./opencmmc cmmc init --level 2 --scope "Synthetic Linux test" --out workspace.json
           mkdir evidence
           ./opencmmc cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
           test -s readiness.json
 
   publish-prerelease:
-    if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/release/v1.0.0-rc.1' }}"
+    if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/release/v1.0.0-rc.2' }}"
     needs: [package, smoke-windows, smoke-linux]
     runs-on: ubuntu-latest
     permissions:
@@ -149,26 +146,26 @@ jobs:
           sha256sum -c SHA256SUMS
           sha256sum -c SHA256SUMS.sha256
           test -s SBOM.spdx.json
-          test -f opencmmc-v1.0.0-rc.1-windows-arm64.zip
-          test -f opencmmc-v1.0.0-rc.1-windows-amd64.zip
-          test -f opencmmc-v1.0.0-rc.1-linux-arm64.tar.gz
-          test -f opencmmc-v1.0.0-rc.1-linux-amd64.tar.gz
+          test -f opencmmc-v1.0.0-rc.2-windows-arm64.zip
+          test -f opencmmc-v1.0.0-rc.2-windows-amd64.zip
+          test -f opencmmc-v1.0.0-rc.2-linux-arm64.tar.gz
+          test -f opencmmc-v1.0.0-rc.2-linux-amd64.tar.gz
       - name: Create public release candidate after all native checks pass
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          test "$GITHUB_REF" = 'refs/heads/release/v1.0.0-rc.1'
-          if gh release view v1.0.0-rc.1 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          test "$GITHUB_REF" = 'refs/heads/release/v1.0.0-rc.2'
+          if gh release view v1.0.0-rc.2 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'Release candidate already exists; refusing to replace.' >&2
             exit 1
           fi
-          gh release create v1.0.0-rc.1 \
-            dist/opencmmc-v1.0.0-rc.1-*.zip dist/opencmmc-v1.0.0-rc.1-*.tar.gz \
+          gh release create v1.0.0-rc.2 \
+            dist/opencmmc-v1.0.0-rc.2-*.zip dist/opencmmc-v1.0.0-rc.2-*.tar.gz \
             dist/SHA256SUMS dist/SHA256SUMS.sha256 dist/SBOM.spdx.json \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title 'OpenCMMC v1.0.0-rc.1 | Veterans Day 2026 Release Candidate' \
-            --notes-file docs/RELEASE_NOTES_v1.0.0-rc.1.md \
+            --title 'OpenCMMC v1.0.0-rc.2 | Veterans Day 2026 Release Candidate' \
+            --notes-file docs/RELEASE_NOTES_v1.0.0-rc.2.md \
             --prerelease --latest=false

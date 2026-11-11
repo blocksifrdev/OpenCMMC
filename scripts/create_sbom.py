@@ -66,9 +66,9 @@ def make_document(modules, version, source_sha, toolchain, created):
                               'relatedSpdxElement': identifiers[mod['Path']]})
     return {
         'spdxVersion': 'SPDX-2.3', 'dataLicense': 'CC0-1.0', 'SPDXID': 'SPDXRef-DOCUMENT',
-        'name': f'FreeCompliance-{version}-Go-module-inventory',
-        'documentNamespace': f'https://github.com/blocksifrdev/freecompliance/spdx/{version}/{source_sha}',
-        'creationInfo': {'creators': ['Tool: freecompliance/scripts/create_sbom.py'], 'created': created},
+        'name': f'OpenCMMC-{version}-Go-module-inventory',
+        'documentNamespace': f'https://github.com/blocksifrdev/OpenCMMC/spdx/{version}/{source_sha}',
+        'creationInfo': {'creators': ['Tool: opencmmc/scripts/create_sbom.py'], 'created': created},
         'documentComment': 'Go module/toolchain inventory for pinned source checkout. Not independently validated complete software or OS inventory, vulnerability scan, or certification.',
         'packages': packages, 'relationships': relations,
     }

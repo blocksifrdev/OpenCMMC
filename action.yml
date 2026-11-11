@@ -23,7 +23,7 @@ runs:
       run: |
         set -euo pipefail
         cd "$GITHUB_ACTION_PATH"
-        go build -o "$RUNNER_TEMP/opencmmc-cli" ./cmd/freecompliance
+        go build -o "$RUNNER_TEMP/opencmmc-cli" ./cmd/opencmmc
     - name: Assess checked-out repository
       id: assess
       shell: bash
