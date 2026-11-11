@@ -4,7 +4,7 @@
 
 Built by BlockSiFr for defense contractors and security teams. No subscription, account, or cloud service required for the local workbench.
 
-**Latest download:** [OpenCMMC v1.0.0-rc.4](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.4), an OpenCMMC release candidate. This is a **release candidate**, not a finished or certified CMMC assessment product.
+**Latest download:** [OpenCMMC v1.0.0-rc.5](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.5), an OpenCMMC release candidate. This is a **release candidate**, not a finished or certified CMMC assessment product.
 
 ## Get started
 
@@ -12,10 +12,10 @@ Built by BlockSiFr for defense contractors and security teams. No subscription, 
 
 | Your computer | Download |
 | --- | --- |
-| Windows 11 ARM64 | [Windows ARM64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/opencmmc-v1.0.0-rc.4-windows-arm64.zip) |
-| Windows x64 (Intel or AMD) | [Windows x64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/opencmmc-v1.0.0-rc.4-windows-amd64.zip) |
-| Linux ARM64 | [Linux ARM64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/opencmmc-v1.0.0-rc.4-linux-arm64.tar.gz) |
-| Linux x64 | [Linux x64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.4/opencmmc-v1.0.0-rc.4-linux-amd64.tar.gz) |
+| Windows 11 ARM64 | [Windows ARM64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.5/opencmmc-v1.0.0-rc.5-windows-arm64.zip) |
+| Windows x64 (Intel or AMD) | [Windows x64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.5/opencmmc-v1.0.0-rc.5-windows-amd64.zip) |
+| Linux ARM64 | [Linux ARM64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.5/opencmmc-v1.0.0-rc.5-linux-arm64.tar.gz) |
+| Linux x64 | [Linux x64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.5/opencmmc-v1.0.0-rc.5-linux-amd64.tar.gz) |
 
 [Check your download's SHA-256 fingerprint](docs/INSTALL_V1.md) before running it. Your organization's software-approval rules still apply.
 
@@ -25,6 +25,8 @@ Built by BlockSiFr for defense contractors and security teams. No subscription, 
 - **Linux:** In your file manager, right-click the downloaded `.tar.gz` file and choose **Extract Here** (or use the `tar` command in the [installation guide](docs/INSTALL_V1.md)). Open the extracted folder and run `./start-cmmc-ui.sh` there.
 
 Your browser should open. If it does not, open the **private URL shown in the terminal on that same computer**. Keep the terminal open while using the app. Never share that URL.
+
+**If you see “Reconnect OpenCMMC” or a missing-session error:** Close old OpenCMMC tabs and reopen the **entire new private URL**, including `?access=...`, from the *currently running* terminal. After successful connection, the app removes that code from the browser address bar. Do not share the code or disable browser protections.
 
 **3. Create a workspace and review your evidence.**
 
