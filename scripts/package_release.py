@@ -70,6 +70,7 @@ def build(version, out_dir):
                '-o', str(stage), './cmd/freecompliance']
         subprocess.run(cmd, cwd=ROOT, env=env, check=True)
         binary = stage.read_bytes()
+        install_guide = ROOT / ('docs/DOWNLOADS.md' if prefix == 'freecompliance' else 'docs/INSTALL_V1.md')
         files = [archive_file(exe_name, binary, 0o755),
                  archive_file('LICENSE', (ROOT / 'LICENSE').read_bytes()),
                  archive_file('README.md', (ROOT / 'README.md').read_bytes()),
@@ -77,7 +78,7 @@ def build(version, out_dir):
                  archive_file('CMMC_OBJECTIVE_WORKBENCH.md', (ROOT / 'docs/CMMC_OBJECTIVE_WORKBENCH.md').read_bytes()),
                  archive_file('CMMC_ASSESSMENT_NEXT.md', (ROOT / 'docs/CMMC_ASSESSMENT_NEXT.md').read_bytes()),
                  archive_file('LOCAL_UI.md', (ROOT / 'docs/LOCAL_UI.md').read_bytes()),
-                 archive_file('INSTALL-OFFLINE.txt', (ROOT / 'docs/DOWNLOADS.md').read_bytes())]
+                 archive_file('INSTALL-OFFLINE.txt', install_guide.read_bytes())]
         # A byte-identical legacy CLI alias supports existing local scripts.
         if prefix == 'opencmmc':
             alias = 'freecompliance.exe' if goos == 'windows' else 'freecompliance'
