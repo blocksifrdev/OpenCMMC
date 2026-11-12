@@ -305,3 +305,86 @@ func TestUIPortScopedSessionCookiesPreventParallelInstanceCollisions(t *testing.
         t.Fatal("accepted another port's session cookie")
     }
 }
+
+func TestUIOriginAllowedChromeOSAliasesAndRejectedOutsiders(t *testing.T) {
+    // ChromeOS can forward a localhost or penguin.linux.test browser Origin
+    // to the Crostini listener with Host rewritten to 127.0.0.1:8765.
+    // Never accept a wildcard or a mismatched/non-HTTP origin.
+    allowed:=[]string{
+        "", "http://127.0.0.1:8765", "http://localhost:8765",
+        "http://penguin.linux.test:8765", "http://[::1]:8765",
+    }
+    for _,origin:=range allowed {
+        if !localUIOriginOK(origin,"127.0.0.1:8765","8765") {
+            t.Errorf("failed to accept allowlisted browser Origin %q",origin)
+        }
+    }
+    rejected:=[]string{
+        "null", "file://", "chrome-extension://testing",
+        "https://127.0.0.1:8765","http://127.0.0.1:9999",
+        "http://localhost:8766","http://penguin.linux.test:9999",
+        "http://evil.example:8765","http://evil.penguin.linux.test:8765",
+        "http://localhost.evil.example:8765","http://0.0.0.0:8765",
+        "http://192.168.0.8:8765","http://127.1:8765",
+        "http://localhost:8765/","http://localhost:8765?secret=1",
+        "http://localhost:8765#fragment","http://username@localhost:8765",
+    }
+    for _,origin:=range rejected {
+        if localUIOriginOK(origin,"127.0.0.1:8765","8765") {
+            t.Errorf("accepted untrusted or malformed Origin %q",origin)
+        }
+    }
+    for _,host:=range []string{"evil.example:8765","localhost:8765","127.0.0.1:8766"} {
+        if localUIOriginOK("http://localhost:8765",host,"8765") {
+            t.Errorf("accepted untrusted Host %q",host)
+        }
+    }
+}
+func TestUIChromeOSForwardedOriginCanCreateAssessment(t *testing.T) {
+    // Verify the real POST handler, not merely the Origin predicate.
+    for _,origin:=range []string{
+        "http://localhost:8765",
+        "http://penguin.linux.test:8765",
+        "http://[::1]:8765",
+    } {
+        t.Run(origin,func(t *testing.T){
+            u:=testUI(t)
+            post:=uiRequest(t,u,"POST","/create",url.Values{
+                "scope":{"Synthetic ChromeOS loopback workspace"},
+                "level":{"1"},
+                "csrf":{u.secret},
+            },true,origin)
+            if post.Code!=http.StatusSeeOther {
+                t.Fatalf("valid ChromeOS forwarded Origin rejected: %d %s",post.Code,post.Body.String())
+            }
+            if got:=post.Header().Get("X-OpenCMMC-Form-Diagnostic");got!="" {
+                t.Fatalf("successful request has failure diagnostic: %q",got)
+            }
+            report:=uiRequest(t,u,"GET","/export",nil,true,"")
+            if report.Code!=http.StatusOK {t.Fatalf("free local assessment export failed: %d",report.Code)}
+            var output map[string]any
+            if err:=json.Unmarshal(report.Body.Bytes(),&output);err!=nil {t.Fatal(err)}
+        })
+    }
+}
+func TestUIChromeOSAliasesStillRequireCSRFAndValidSession(t *testing.T) {
+    for _,origin:=range []string{"http://localhost:8765","http://penguin.linux.test:8765"} {
+        t.Run(origin,func(t *testing.T){
+            u:=testUI(t)
+            noCSRF:=uiRequest(t,u,"POST","/create",url.Values{
+                "scope":{"Synthetic"},"level":{"1"},
+            },true,origin)
+            if noCSRF.Code!=http.StatusConflict ||
+               noCSRF.Header().Get("X-OpenCMMC-Form-Diagnostic")!="FORM_TOKEN_EXPIRED" {
+                t.Fatalf("CSRF-less request accepted: %d",noCSRF.Code)
+            }
+            noSession:=uiRequest(t,u,"POST","/create",url.Values{
+                "scope":{"Synthetic"},"level":{"1"},"csrf":{u.secret},
+            },false,origin)
+            if noSession.Code!=http.StatusForbidden {t.Fatalf("unauthenticated POST accepted: %d",noSession.Code)}
+            if _,err:=os.Stat(filepath.Join(u.root,"state.json"));!os.IsNotExist(err) {
+                t.Fatalf("rejected request wrote assessment: %v",err)
+            }
+        })
+    }
+}
