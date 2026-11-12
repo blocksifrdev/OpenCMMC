@@ -12,17 +12,17 @@ on:
       - 'docs/DOWNLOADS.md'
   push:
     branches:
-      - 'release/v1.0.0-rc.8'
+      - 'release/v1.0.0-rc.9'
   workflow_dispatch:
     inputs:
       version:
         description: 'Version v1.*; candidate version; publishing requires release branch and passing tests'
         required: true
-        default: 'v1.0.0-rc.8'
+        default: 'v1.0.0-rc.9'
 permissions:
   contents: read
 env:
-  RELEASE_VERSION: ${{ github.event.inputs.version || 'v1.0.0-rc.8' }}
+  RELEASE_VERSION: ${{ github.event.inputs.version || 'v1.0.0-rc.9' }}
 
 jobs:
   package:
@@ -131,7 +131,7 @@ jobs:
           test -s readiness.json
 
   publish-prerelease:
-    if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/release/v1.0.0-rc.8' }}"
+    if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/release/v1.0.0-rc.9' }}"
     needs: [package, smoke-windows, smoke-linux]
     runs-on: ubuntu-latest
     permissions:
@@ -150,26 +150,26 @@ jobs:
           sha256sum -c SHA256SUMS
           sha256sum -c SHA256SUMS.sha256
           test -s SBOM.spdx.json
-          test -f opencmmc-v1.0.0-rc.8-windows-arm64.zip
-          test -f opencmmc-v1.0.0-rc.8-windows-amd64.zip
-          test -f opencmmc-v1.0.0-rc.8-linux-arm64.tar.gz
-          test -f opencmmc-v1.0.0-rc.8-linux-amd64.tar.gz
+          test -f opencmmc-v1.0.0-rc.9-windows-arm64.zip
+          test -f opencmmc-v1.0.0-rc.9-windows-amd64.zip
+          test -f opencmmc-v1.0.0-rc.9-linux-arm64.tar.gz
+          test -f opencmmc-v1.0.0-rc.9-linux-amd64.tar.gz
       - name: Create public release candidate after all native checks pass
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          test "$GITHUB_REF" = 'refs/heads/release/v1.0.0-rc.8'
-          if gh release view v1.0.0-rc.8 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+          test "$GITHUB_REF" = 'refs/heads/release/v1.0.0-rc.9'
+          if gh release view v1.0.0-rc.9 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'Release candidate already exists; refusing to replace.' >&2
             exit 1
           fi
-          gh release create v1.0.0-rc.8 \
-            dist/opencmmc-v1.0.0-rc.8-*.zip dist/opencmmc-v1.0.0-rc.8-*.tar.gz \
+          gh release create v1.0.0-rc.9 \
+            dist/opencmmc-v1.0.0-rc.9-*.zip dist/opencmmc-v1.0.0-rc.9-*.tar.gz \
             dist/SHA256SUMS dist/SHA256SUMS.sha256 dist/SBOM.spdx.json \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title 'OpenCMMC v1.0.0-rc.8 | ChromeOS Forwarded Same-Origin Forms' \
-            --notes-file docs/RELEASE_NOTES_v1.0.0-rc.8.md \
+            --title 'OpenCMMC v1.0.0-rc.9 | Browser Origin Metadata Correction' \
+            --notes-file docs/RELEASE_NOTES_v1.0.0-rc.9.md \
             --prerelease --latest=false
