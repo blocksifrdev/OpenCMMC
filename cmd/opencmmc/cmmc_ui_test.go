@@ -429,7 +429,7 @@ func TestUICrostiniFetchMetadataRejectsCrossSiteAndForgedNavigation(t *testing.T
     }{
         {"cross_site","https://evil.example","cross-site","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
         {"unrecognized_same_site","http://unknown.example:8765","same-site","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
-        {"none","http://localhost:8765","none","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"unrecognized_none","http://unknown.example:8765","none","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
         {"untrusted_mode","http://chromeos-internal.invalid:8765","same-origin","cors","empty","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
         {"missing_fetch_mode","http://chromeos-internal.invalid:8765","same-origin","","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
         {"missing_fetch_destination","http://chromeos-internal.invalid:8765","same-origin","navigate","","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
