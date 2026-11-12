@@ -143,9 +143,39 @@ func localUIOriginOK(origin,host,port string) bool {
         return false
     }
 }
+// localUIBrowserOriginOK accounts for ChromeOS browser-to-Crostini forwarding.
+// The browser's address/origin can differ from the Host as received by the
+// container. Fetch Metadata describes the browser-side request relationship
+// before port forwarding; site scripts cannot set the Sec-Fetch-* headers.
+// We only use this for actual same-origin HTML form navigations. Cookies,
+// exact CSRF, proper form encoding, and strict loopback Host checks remain
+// mandatory. If the browser reports cross-site/same-site/none, refuse it
+// even if the textual Origin happens to match an allowlisted hostname.
+func localUIBrowserOriginOK(r *http.Request,port string) bool {
+    if !localUIHostOK(r.Host,port) {return false}
+    site:=r.Header.Get("Sec-Fetch-Site")
+    if site!="" && site!="same-origin" {return false}
+    origin:=r.Header.Get("Origin")
+    if localUIOriginOK(origin,r.Host,port) {return true}
+    if site!="same-origin" ||
+       r.Header.Get("Sec-Fetch-Mode")!="navigate" ||
+       r.Header.Get("Sec-Fetch-Dest")!="document" {
+        return false
+    }
+    if origin=="" || origin=="null" {return false}
+    parsed,err:=url.Parse(origin)
+    if err!=nil || parsed.Scheme!="http" || parsed.Hostname()=="" ||
+       parsed.User!=nil || parsed.Path!="" || parsed.RawPath!="" ||
+       parsed.RawQuery!="" || parsed.Fragment!="" || parsed.Opaque!="" {
+        return false
+    }
+    // Only the browser-reported same-origin navigation may bridge a textual
+    // Origin mismatch. Never permit untrusted Fetch Metadata values.
+    return true
+}
 func (u *localUI) formAuthFailure(r *http.Request) string {
     if r.Method!="POST" || !u.authorized(r) {return "SESSION_INVALID"}
-    if !localUIOriginOK(r.Header.Get("Origin"),r.Host,u.port) {
+    if !localUIBrowserOriginOK(r,u.port) {
         return "ORIGIN_MISMATCH"
     }
     contentType:=r.Header.Get("Content-Type")
@@ -204,7 +234,7 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
             w.WriteHeader(http.StatusForbidden)
             switch reason {
             case "ORIGIN_MISMATCH":
-                _,_=io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Browser origin blocked</title></head><body><main><h1>Browser origin blocked</h1><p><strong>Diagnostic: ORIGIN_MISMATCH</strong></p><p>Your browser sent an origin outside OpenCMMC's recognized local addresses. This request was safely rejected; nothing was changed.</p><p>Use the full private address printed in the current terminal. OpenCMMC accepts local HTTP origins for <code>127.0.0.1</code>, <code>localhost</code>, and the ChromeOS Crostini address <code>penguin.linux.test</code> on the same port. Public or HTTPS origins, wrong ports, browser extension pages and opaque origins are still blocked.</p><p>If this happens again, report only this diagnostic code and the address shown in the browser <strong>before any question mark</strong>. Do not share session tokens, cookies, findings or evidence.</p></main></body></html>`)
+                _,_=io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Browser origin blocked</title></head><body><main><h1>Browser origin blocked</h1><p><strong>Diagnostic: ORIGIN_MISMATCH</strong></p><p>Your browser did not provide a trusted local form origin or a browser-verified same-origin form navigation. Nothing was changed.</p><p>Open the full private URL from the currently running OpenCMMC terminal and submit its built-in form. OpenCMMC accepts known local HTTP origins and browser-confirmed same-origin navigation through ChromeOS port forwarding, but still rejects cross-site requests and requires session and form-token checks.</p><p>For troubleshooting, use Chrome DevTools to inspect the failed POST's <code>Origin</code>, <code>Sec-Fetch-Site</code>, <code>Sec-Fetch-Mode</code>, and <code>Sec-Fetch-Dest</code>. Share those header values only; never share Cookie, the private access URL, CSRF, or assessment data.</p><p>If this happens again, report only this diagnostic code and the address shown in the browser <strong>before any question mark</strong>. Do not share session tokens, cookies, findings or evidence.</p></main></body></html>`)
             case "UNSUPPORTED_FORM_TYPE":
                 _,_=io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Form format blocked</title></head><body><main><h1>Unsupported browser form</h1><p><strong>Diagnostic: UNSUPPORTED_FORM_TYPE</strong></p><p>Your browser did not send one of OpenCMMC's supported form formats. The request was not saved. Open the workbench directly on the local URL and use the built-in form, without browser extensions that rewrite requests.</p><p>If this continues, report only this diagnostic code. Never share your private session URL, cookies or evidence.</p></main></body></html>`)
             default:
