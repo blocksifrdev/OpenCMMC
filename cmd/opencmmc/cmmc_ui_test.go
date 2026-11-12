@@ -388,3 +388,85 @@ func TestUIChromeOSAliasesStillRequireCSRFAndValidSession(t *testing.T) {
         })
     }
 }
+
+
+func TestUICrostiniFetchMetadataSameOriginFormNavigation(t *testing.T) {
+    // ChromeOS forwards a browser-side host to 127.0.0.1 inside Crostini.
+    // Browser-side origin and the Host seen by Go can differ. Require a
+    // browser-generated same-origin form navigation AND the exact CSRF token.
+    for _,origin:=range []string{
+        "http://crostini-forwarder.invalid:8765",
+        "http://localhost:18765",
+        "http://penguin.linux.test:18765",
+    } {
+        t.Run(origin,func(t *testing.T){
+            u:=testUI(t)
+            values:=url.Values{"level":{"1"},"scope":{"Synthetic ChromeOS test"},"csrf":{u.secret}}
+            req:=httptest.NewRequest(http.MethodPost,"http://127.0.0.1:8765/create",strings.NewReader(values.Encode()))
+            req.Header.Set("Content-Type","application/x-www-form-urlencoded")
+            req.Header.Set("Origin",origin)
+            req.Header.Set("Sec-Fetch-Site","same-origin")
+            req.Header.Set("Sec-Fetch-Mode","navigate")
+            req.Header.Set("Sec-Fetch-Dest","document")
+            req.AddCookie(&http.Cookie{Name:u.sessionCookieName(),Value:u.secret})
+            result:=httptest.NewRecorder()
+            u.ServeHTTP(result,req)
+            if result.Code!=http.StatusSeeOther {
+                t.Fatalf("browser-confirmed same-origin forwarded POST rejected: %d %s",result.Code,result.Body.String())
+            }
+            if _,err:=os.Stat(filepath.Join(u.root,"state.json"));err!=nil{
+                t.Fatalf("valid local assessment not created: %v",err)
+            }
+        })
+    }
+}
+func TestUICrostiniFetchMetadataRejectsCrossSiteAndForgedNavigation(t *testing.T) {
+    cases:=[]struct{
+        name,origin,site,mode,dest,token string
+        authenticated bool
+        wantStatus int
+        wantReason string
+    }{
+        {"cross_site","https://evil.example","cross-site","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"same_site","http://localhost:8765","same-site","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"none","http://localhost:8765","none","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"untrusted_mode","http://chromeos-internal.invalid:8765","same-origin","cors","empty","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"missing_fetch_mode","http://chromeos-internal.invalid:8765","same-origin","","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"missing_fetch_destination","http://chromeos-internal.invalid:8765","same-origin","navigate","","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"unsupported_scheme","https://chromeos-internal.invalid:8765","same-origin","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"opaque_origin","null","same-origin","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"embedded_path","http://chromeos-internal.invalid:8765/path","same-origin","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"embedded_credentials","http://user@chromeos-internal.invalid:8765","same-origin","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"no_csrf","http://chromeos-internal.invalid:8765","same-origin","navigate","document","invalid",true,http.StatusConflict,"FORM_TOKEN_EXPIRED"},
+        {"no_session","http://chromeos-internal.invalid:8765","same-origin","navigate","document","valid",false,http.StatusForbidden,""},
+    }
+    for _,tc:=range cases{
+        t.Run(tc.name,func(t *testing.T) {
+            u:=testUI(t)
+            csrf:="not-the-session-token"
+            if tc.token=="valid" {csrf=u.secret}
+            values:=url.Values{"level":{"1"},"scope":{"Sensitive synthetic test"},"csrf":{csrf}}
+            req:=httptest.NewRequest(http.MethodPost,"http://127.0.0.1:8765/create",strings.NewReader(values.Encode()))
+            req.Header.Set("Content-Type","application/x-www-form-urlencoded")
+            req.Header.Set("Origin",tc.origin)
+            if tc.site!="" {req.Header.Set("Sec-Fetch-Site",tc.site)}
+            if tc.mode!="" {req.Header.Set("Sec-Fetch-Mode",tc.mode)}
+            if tc.dest!="" {req.Header.Set("Sec-Fetch-Dest",tc.dest)}
+            if tc.authenticated {req.AddCookie(&http.Cookie{Name:u.sessionCookieName(),Value:u.secret})}
+            result:=httptest.NewRecorder()
+            u.ServeHTTP(result,req)
+            if result.Code!=tc.wantStatus {
+                t.Fatalf("unexpected code %d, expected %d",result.Code,tc.wantStatus)
+            }
+            if got:=result.Header().Get("X-OpenCMMC-Form-Diagnostic");got!=tc.wantReason {
+                t.Fatalf("unexpected diagnostic %q vs %q",got,tc.wantReason)
+            }
+            for _,private:=range []string{u.secret,"Sensitive synthetic test","https://evil.example"}{
+                if strings.Contains(result.Body.String(),private){t.Fatal("failure page reflects private input")}
+            }
+            if _,err:=os.Stat(filepath.Join(u.root,"state.json"));!os.IsNotExist(err) {
+                t.Fatalf("rejected form changed assessment: %v",err)
+            }
+        })
+    }
+}
