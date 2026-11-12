@@ -30,7 +30,7 @@ The bottom of the workbench offers **CortexTrace** for AI coding-session change 
 
 An older tab may have an expired session token after the app restarts.
 
-If a form is rejected, check the displayed **diagnostic label**. `FORM_TOKEN_EXPIRED` means reload the current assessment and retry; `ORIGIN_MISMATCH` means the browser did not submit from the same local origin; `UNSUPPORTED_FORM_TYPE` means the browser did not use a supported HTML form encoding. Never disable security checks. If a tab instead says **Reconnect OpenCMMC**, the browser has no valid session cookie. Use the entire new private URL printed in the active terminal; it must start with `http://127.0.0.1:8765/?access=`. The access code is a secret. Never share it.
+If a form is rejected, check the displayed **diagnostic label**. `FORM_TOKEN_EXPIRED` means reload the current assessment and retry; `ORIGIN_MISMATCH` means the browser submitted from an origin outside the allowlisted local HTTP addresses or the expected port; ChromeOS `localhost` and `penguin.linux.test` are accepted in rc.7; `UNSUPPORTED_FORM_TYPE` means the browser did not use a supported HTML form encoding. Never disable security checks. If a tab instead says **Reconnect OpenCMMC**, the browser has no valid session cookie. Use the entire new private URL printed in the active terminal; it must start with `http://127.0.0.1:8765/?access=`. The access code is a secret. Never share it.
 
 1. Close older OpenCMMC browser tabs.
 2. Open the **new private URL** from the currently running command window.

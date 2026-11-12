@@ -6,7 +6,7 @@ The canonical Go module is `github.com/blocksifrdev/OpenCMMC`, the executable so
 
 ## Current status
 
-The **next OpenCMMC release candidate** is [`v1.0.0-rc.6`](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.6), subject to successful native smoke tests across four architectures and publication. Previously published archives remain accessible as historical records. The `opencmmc-release-candidate.yml` workflow can publish a prerelease only from the dedicated `release/v1.0.0-rc.6` branch after all test jobs pass. Neither candidate publication nor green CI establishes feature-complete `v1.0.0` GA.
+The **next OpenCMMC release candidate** is [`v1.0.0-rc.7`](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.7), subject to successful native smoke tests across four architectures and publication. Previously published archives remain accessible as historical records. The `opencmmc-release-candidate.yml` workflow can publish a prerelease only from the dedicated `release/v1.0.0-rc.7` branch after all test jobs pass. Neither candidate publication nor green CI establishes feature-complete `v1.0.0` GA.
 
 ## Validate fresh source
 
@@ -19,7 +19,7 @@ go vet ./...
 python3 -m unittest discover -s scripts -p 'test_*.py' -v
 go build -trimpath -o opencmmc ./cmd/opencmmc
 ./opencmmc version
-python3 scripts/package_release.py --version v1.0.0-rc.6 --out dist
+python3 scripts/package_release.py --version v1.0.0-rc.7 --out dist
 (cd dist && sha256sum -c SHA256SUMS)
 ```
 
