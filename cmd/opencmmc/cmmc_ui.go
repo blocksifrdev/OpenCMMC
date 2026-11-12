@@ -445,7 +445,7 @@ label{display:block;margin-top:12px;font-weight:600}form{padding:15px 0;border-t
 .optional-services{border-color:#cfc7b8;background:#fffdfa}.service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.service-card{padding:15px;border:1px solid #ded7cd;border-radius:10px;background:#fff}.service-card h3{margin:0;font-size:17px}.service-card p{font-size:14px;line-height:1.5}.service-card a{font-weight:650}@media(max-width:900px){.service-grid{grid-template-columns:1fr}}
 @media(max-width:740px){.grid{grid-template-columns:1fr}.sidebar{max-height:250px}}
 </style></head><body><header class="top"><div>BLOCKSIFR / OPEN SOURCE</div><h1>OpenCMMC</h1><div>Local CMMC evidence workbench | No subscription, no cloud</div></header>
-<main><div class="intro"><small>OpenCMMC build: <strong>{{.Version}}</strong></small><p><strong>Readiness, not certification.</strong> Reviewer decisions and matching hashes do not establish security control effectiveness. No SPRS submission, C3PAO accreditation or government endorsement. Keep CUI inside an approved boundary.</div>
+<main><div class="intro"><small>OpenCMMC build: <strong>{{.Version}}</strong></small><p><strong>Readiness, not certification.</strong> Reviewer decisions and matching hashes do not establish security control effectiveness. No SPRS submission, C3PAO accreditation or government endorsement. Keep CUI inside an approved boundary.</p></div>
 {{if not .HasWorkspace}}
 <section class="panel"><h2>Create an offline assessment</h2><p>Choose your baseline and name the actual system or enclave boundary. Your data will stay on this device.</p>
 <form method="post" action="/create"><input type="hidden" name="csrf" value="{{.CSRF}}">

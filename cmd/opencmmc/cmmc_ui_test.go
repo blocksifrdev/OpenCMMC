@@ -188,3 +188,59 @@ func TestUIBrowserBootstrapRecoveryOnChromeOS(t *testing.T) {
     },true,"http://127.0.0.1:8765")
     if withoutFormToken.Code!=http.StatusConflict {t.Fatal("CSRF-less POST accepted")}
 }
+
+func TestUIFormDiagnosticsNoTokenLeakAndNoCrossOriginExecution(t *testing.T) {
+    u:=testUI(t)
+    cases:=[]struct{
+        name string
+        form url.Values
+        origin string
+        contentType string
+        wantStatus int
+        wantCode string
+    }{
+        {"stale_token",url.Values{"csrf":{"not-current"},"scope":{"Private Assessment"},"level":{"1"}},"http://127.0.0.1:8765","",http.StatusConflict,"FORM_TOKEN_EXPIRED"},
+        {"missing_token",url.Values{"scope":{"Private Assessment"},"level":{"1"}},"","",http.StatusConflict,"FORM_TOKEN_EXPIRED"},
+        {"cross_site",url.Values{"csrf":{u.secret},"scope":{"Private Assessment"},"level":{"1"}},"https://evil.example","",http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"opaque_origin",url.Values{"csrf":{u.secret},"scope":{"Private Assessment"},"level":{"1"}},"null","",http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"wrong_port",url.Values{"csrf":{u.secret},"scope":{"Private Assessment"},"level":{"1"}},"http://127.0.0.1:9999","",http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"unsupported_type",url.Values{"csrf":{u.secret},"scope":{"Private Assessment"},"level":{"1"}},"","text/plain",http.StatusForbidden,"UNSUPPORTED_FORM_TYPE"},
+    }
+    for _,tc:=range cases {
+        t.Run(tc.name,func(t *testing.T) {
+            req:=httptest.NewRequest(http.MethodPost,"http://127.0.0.1:8765/create",strings.NewReader(tc.form.Encode()))
+            if tc.contentType!="" {req.Header.Set("Content-Type",tc.contentType)} else {req.Header.Set("Content-Type","application/x-www-form-urlencoded")}
+            if tc.origin!="" {req.Header.Set("Origin",tc.origin)}
+            req.AddCookie(&http.Cookie{Name:"oc_session",Value:u.secret})
+            out:=httptest.NewRecorder()
+            u.ServeHTTP(out,req)
+            if out.Code!=tc.wantStatus {t.Fatalf("got status %d, want %d: %s",out.Code,tc.wantStatus,out.Body.String())}
+            if v:=out.Header().Get("X-OpenCMMC-Form-Diagnostic");v!=tc.wantCode {
+                t.Fatalf("got diagnostic %q, want %q",v,tc.wantCode)
+            }
+            for _,needle:=range []string{tc.wantCode} {
+                if !strings.Contains(out.Body.String(),needle) {t.Fatalf("missing diagnostic in response: %q",needle)}
+            }
+            for _,sensitive:=range []string{u.secret,"Private Assessment","https://evil.example"} {
+                if strings.Contains(out.Body.String(),sensitive) {t.Fatal("unsafe form echo")}
+            }
+            if !strings.Contains(out.Header().Get("X-OpenCMMC-Version"),"dev") {
+                t.Fatal("version must be identifiable even on failed requests")
+            }
+            if _,err:=os.Stat(filepath.Join(u.root,"state.json"));!os.IsNotExist(err) {
+                t.Fatalf("rejected POST mutated local state: %v",err)
+            }
+        })
+    }
+    // A valid locally authenticated form must still work.
+    valid:=uiRequest(t,u,"POST","/create",url.Values{
+        "csrf":{u.secret},"scope":{"Synthetic"},"level":{"1"},
+    },true,"http://127.0.0.1:8765")
+    if valid.Code!=http.StatusSeeOther {
+        t.Fatalf("valid form rejected: %d %s",valid.Code,valid.Body.String())
+    }
+    page:=uiRequest(t,u,"GET","/",nil,true,"")
+    if page.Code!=http.StatusOK || !strings.Contains(page.Body.String(),"OpenCMMC build:") {
+        t.Fatal("user-visible running version missing from workbench")
+    }
+}
