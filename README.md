@@ -6,6 +6,8 @@ Built by BlockSiFr for defense contractors and security teams. No subscription, 
 
 **Latest download:** [OpenCMMC v1.0.0-rc.8](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.8), an OpenCMMC release candidate. This is a **release candidate**, not a finished or certified CMMC assessment product.
 
+**Chromebook Linux:** If ChromeOS Chrome reports `ORIGIN_MISMATCH`, use the [Linux-native Firefox recovery steps](docs/INSTALL_V1.md#chromebook-open-opencmmc-without-chromeos-browser-forwarding) instead of turning off Origin/CSRF protection. The host-Chrome issue remains open in [issue #49](https://github.com/blocksifrdev/OpenCMMC/issues/49).
+
 ## Get started
 
 **1. Download the ZIP or TAR.GZ for your computer.**

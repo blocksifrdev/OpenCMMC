@@ -40,6 +40,8 @@ If a form is rejected, check the displayed **diagnostic label**. `FORM_TOKEN_EXP
 
 If it still fails, restart the launcher, confirm only one app is using port 8765, and report the browser/Windows version and error message. **Never share the private URL, cookies, or real assessment evidence. Do not disable CSRF protection.**
 
+**Chromebook Linux workaround:** If ChromeOS host Chrome still gives `ORIGIN_MISMATCH`, use [Firefox ESR installed directly in the Crostini Linux environment](INSTALL_V1.md#chromebook-open-opencmmc-without-chromeos-browser-forwarding). This avoids the ChromeOS forwarding path; do not change CSRF validation or delete your assessment folder. The Chromebook-specific host-browser defect is [still open](https://github.com/blocksifrdev/OpenCMMC/issues/49).
+
 ## Protect your information
 
 - Evidence stays in a local private folder but is **not encrypted at rest by OpenCMMC**. Use approved device/storage encryption.

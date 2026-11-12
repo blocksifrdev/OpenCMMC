@@ -61,6 +61,32 @@ Your browser should open automatically. If not, open the **private local URL pri
 
 **To verify which binary is installed:** Run `cd ~/OpenCMMC && ./opencmmc version` in the Linux terminal. The browser workbench also shows the build version. If port 8765 is already in use, first identify the listener with `ss -ltnp '( sport = :8765 )'`. Stop only a confirmed old OpenCMMC process, and launch the new version. These operations do not require deleting your assessment directory.
 
+### Chromebook: open OpenCMMC without ChromeOS browser forwarding
+
+If host Chrome repeatedly shows **ORIGIN_MISMATCH** even with the latest release, do not disable OpenCMMC's Origin or CSRF checks. Use a graphical **Linux-native Firefox ESR** browser running in the **same Crostini Linux container** as OpenCMMC. ChromeOS documentation supports Linux-installed browsers opening `localhost` directly.
+
+In a second Chromebook Linux terminal, install and launch Firefox:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y firefox-esr
+firefox-esr --new-window
+```
+
+In the first terminal keep OpenCMMC running:
+
+```bash
+cd ~/OpenCMMC
+./opencmmc version
+./start-cmmc-ui.sh
+```
+
+If OpenCMMC is already running, do not start it twice. Copy the **complete private URL printed by the active OpenCMMC server** into **Linux Firefox**, including the access parameter. Never share or bookmark the private URL. Try saving an assessment.
+
+This workaround avoids the host-Chrome-to-Linux forwarding boundary and preserves the app's server-side Origin, session and CSRF protections. It does **not** prove the root cause in host Chrome has been resolved. For persistent errors, inspect the failed POST's **Origin, Sec-Fetch-Site, Sec-Fetch-Mode and Sec-Fetch-Dest headers only**. Do not share any Cookies, CSRF or access tokens, private paths, or evidence. Leave `private-assessment` untouched.
+
+Reference: [Google's ChromeOS web environment documentation](https://developers.google.com/chromeos/app-development/develop/web-environment) and [Mozilla's Firefox on ChromeOS instructions](https://support.mozilla.org/en-US/kb/run-firefox-chromeos).
+
 ## Know the limits
 
 This is a local readiness workbench, **not** certified CMMC software, an accredited assessment, verified SPRS scoring, or government submission. Local evidence is **not encrypted by the app**; use an approved device and obtain permission before introducing CUI. It is not a multi-user enterprise system.
