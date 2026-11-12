@@ -149,8 +149,8 @@ func localUIOriginOK(origin,host,port string) bool {
 // before port forwarding; site scripts cannot set the Sec-Fetch-* headers.
 // We only use this for actual same-origin HTML form navigations. Cookies,
 // exact CSRF, proper form encoding, and strict loopback Host checks remain
-// mandatory. If the browser reports cross-site/same-site/none, refuse it
-// even if the textual Origin happens to match an allowlisted hostname.
+// mandatory. Explicit cross-site requests are rejected; same-site or
+// none metadata does not override an independently validated local Origin.
 func localUIBrowserOriginOK(r *http.Request,port string) bool {
     if !localUIHostOK(r.Host,port) {return false}
     site:=r.Header.Get("Sec-Fetch-Site")
