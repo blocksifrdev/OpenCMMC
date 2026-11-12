@@ -114,8 +114,11 @@ func localUIHostOK(host,port string) bool {
     h,p,err:=net.SplitHostPort(host)
     return err==nil && h=="127.0.0.1" && (port=="" || p==port)
 }
+// Browser cookies are scoped by host and path, not TCP port. Distinct
+// OpenCMMC instances on 127.0.0.1 must not overwrite each other's sessions.
+func (u *localUI) sessionCookieName() string {return "oc_session_p"+u.port}
 func (u *localUI) authorized(r *http.Request) bool {
-    c,err:=r.Cookie("oc_session")
+    c,err:=r.Cookie(u.sessionCookieName())
     return err==nil && subtle.ConstantTimeCompare([]byte(c.Value),[]byte(u.secret))==1
 }
 // formAuthFailure returns a stable diagnostic code, never a secret, Origin
@@ -155,7 +158,7 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
         // on the immediate redirect, producing an unauthorized workbench page.
         // Lax permits the safe top-level GET bootstrap while session + exact
         // Origin + CSRF requirements continue to guard all state-changing POSTs.
-        http.SetCookie(w,&http.Cookie{Name:"oc_session",Value:u.secret,Path:"/",HttpOnly:true,SameSite:http.SameSiteLaxMode})
+        http.SetCookie(w,&http.Cookie{Name:u.sessionCookieName(),Value:u.secret,Path:"/",HttpOnly:true,SameSite:http.SameSiteLaxMode})
         http.Redirect(w,r,"/",http.StatusSeeOther);return
     }
     if !u.authorized(r){

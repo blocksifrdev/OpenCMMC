@@ -29,7 +29,7 @@ func uiRequest(t *testing.T,u *localUI,method,path string,form url.Values,authen
         req=httptest.NewRequest(method,"http://127.0.0.1:8765"+path,strings.NewReader(form.Encode()))
         req.Header.Set("Content-Type","application/x-www-form-urlencoded")
     }else {req=httptest.NewRequest(method,"http://127.0.0.1:8765"+path,nil)}
-    if authenticated {req.AddCookie(&http.Cookie{Name:"oc_session",Value:u.secret})}
+    if authenticated {req.AddCookie(&http.Cookie{Name:u.sessionCookieName(),Value:u.secret})}
     if origin!=""{req.Header.Set("Origin",origin)}
     response:=httptest.NewRecorder()
     u.ServeHTTP(response,req)
@@ -44,7 +44,7 @@ func TestUILoopbackAuthenticationAndCSRF(t *testing.T){
     if r:=uiRequest(t,u,"POST","/create",url.Values{"scope":{"Demo"},"level":{"1"},"csrf":{u.secret}},true,"https://evil.example");r.Code!=http.StatusForbidden{t.Fatalf("cross-origin request: %d",r.Code)}
     r:=httptest.NewRecorder()
     badHost:=httptest.NewRequest("GET","http://evil.example:8765/",nil)
-    badHost.AddCookie(&http.Cookie{Name:"oc_session",Value:u.secret})
+    badHost.AddCookie(&http.Cookie{Name:u.sessionCookieName(),Value:u.secret})
     u.ServeHTTP(r,badHost)
     if r.Code!=http.StatusForbidden{t.Fatalf("host rebinding accepted: %d",r.Code)}
     if localUIHostOK("0.0.0.0:8765","8765")||localUIHostOK("127.0.0.1:8766","8765"){t.Fatal("unsafe binding accepted")}
@@ -111,7 +111,7 @@ func TestUIEvidenceUploadStoredLocally(t *testing.T){
     if err=multi.Close();err!=nil{t.Fatal(err)}
     req:=httptest.NewRequest("POST","http://127.0.0.1:8765/evidence",&body)
     req.Header.Set("Content-Type",multi.FormDataContentType())
-    req.AddCookie(&http.Cookie{Name:"oc_session",Value:u.secret})
+    req.AddCookie(&http.Cookie{Name:u.sessionCookieName(),Value:u.secret})
     result:=httptest.NewRecorder();u.ServeHTTP(result,req)
     if result.Code!=http.StatusSeeOther{t.Fatalf("upload: %d %s",result.Code,result.Body.String())}
     ws,err=u.readBasic();if err!=nil{t.Fatal(err)}
@@ -161,7 +161,7 @@ func TestUIBrowserBootstrapRecoveryOnChromeOS(t *testing.T) {
     cookieList:=bootstrap.Result().Cookies()
     if len(cookieList)!=1 {t.Fatalf("expected exactly one session cookie: %d",len(cookieList))}
     cookie:=cookieList[0]
-    if cookie.Name!="oc_session" || cookie.Value!=u.secret ||
+    if cookie.Name!=u.sessionCookieName() || cookie.Value!=u.secret ||
        cookie.SameSite!=http.SameSiteLaxMode || !cookie.HttpOnly ||
        cookie.Path!="/" {
         t.Fatalf("unexpected bootstrap cookie attributes: %+v",cookie)
@@ -211,7 +211,7 @@ func TestUIFormDiagnosticsNoTokenLeakAndNoCrossOriginExecution(t *testing.T) {
             req:=httptest.NewRequest(http.MethodPost,"http://127.0.0.1:8765/create",strings.NewReader(tc.form.Encode()))
             if tc.contentType!="" {req.Header.Set("Content-Type",tc.contentType)} else {req.Header.Set("Content-Type","application/x-www-form-urlencoded")}
             if tc.origin!="" {req.Header.Set("Origin",tc.origin)}
-            req.AddCookie(&http.Cookie{Name:"oc_session",Value:u.secret})
+            req.AddCookie(&http.Cookie{Name:u.sessionCookieName(),Value:u.secret})
             out:=httptest.NewRecorder()
             u.ServeHTTP(out,req)
             if out.Code!=tc.wantStatus {t.Fatalf("got status %d, want %d: %s",out.Code,tc.wantStatus,out.Body.String())}
@@ -242,5 +242,66 @@ func TestUIFormDiagnosticsNoTokenLeakAndNoCrossOriginExecution(t *testing.T) {
     page:=uiRequest(t,u,"GET","/",nil,true,"")
     if page.Code!=http.StatusOK || !strings.Contains(page.Body.String(),"OpenCMMC build:") {
         t.Fatal("user-visible running version missing from workbench")
+    }
+}
+
+func TestUIPortScopedSessionCookiesPreventParallelInstanceCollisions(t *testing.T) {
+    // Chrome/ChromeOS cookies are not scoped to port. Two processes serving
+    // 127.0.0.1:8765 and 127.0.0.1:8876 must have different cookie names.
+    a:=testUI(t)
+    b:=testUI(t)
+    b.port="8876"
+    b.secret=strings.Repeat("b",64)
+    if a.sessionCookieName()==b.sessionCookieName() {
+        t.Fatal("cookie names must be unique per TCP port")
+    }
+    if a.sessionCookieName()!="oc_session_p8765" {
+        t.Fatalf("unexpected session-cookie name %q",a.sessionCookieName())
+    }
+    // A legacy unscoped cookie must not authenticate new builds.
+    legacy:=httptest.NewRequest("GET","http://127.0.0.1:8765/",nil)
+    legacy.AddCookie(&http.Cookie{Name:"oc_session",Value:a.secret})
+    legacyResult:=httptest.NewRecorder()
+    a.ServeHTTP(legacyResult,legacy)
+    if legacyResult.Code!=http.StatusForbidden {
+        t.Fatal("legacy cookie unexpectedly authenticated new build")
+    }
+
+    aAccess:=uiRequest(t,a,"GET","/?access="+a.secret,nil,false,"")
+    if aAccess.Code!=http.StatusSeeOther{t.Fatalf("a bootstrap: %d",aAccess.Code)}
+    // b's redirect, on its own port.
+    bAccessReq:=httptest.NewRequest("GET","http://127.0.0.1:8876/?access="+b.secret,nil)
+    bAccess:=httptest.NewRecorder()
+    b.ServeHTTP(bAccess,bAccessReq)
+    if bAccess.Code!=http.StatusSeeOther{t.Fatalf("b bootstrap: %d",bAccess.Code)}
+    cookieA:=aAccess.Result().Cookies()[0]
+    cookieB:=bAccess.Result().Cookies()[0]
+    if cookieA.Name==cookieB.Name {t.Fatal("two instances issued colliding cookie names")}
+    if cookieA.Value==cookieB.Value{t.Fatal("independent sessions reused a token")}
+    if !cookieA.HttpOnly || !cookieB.HttpOnly ||
+       cookieA.SameSite!=http.SameSiteLaxMode || cookieB.SameSite!=http.SameSiteLaxMode{
+        t.Fatal("session cookie flags incorrect")
+    }
+    // A browser sends both host-scoped cookies, regardless of port.
+    for _,tc:=range []struct{ui *localUI;port string}{
+        {a,"8765"},{b,"8876"},
+    } {
+        req:=httptest.NewRequest("GET","http://127.0.0.1:"+tc.port+"/",nil)
+        req.AddCookie(cookieA)
+        req.AddCookie(cookieB)
+        output:=httptest.NewRecorder()
+        tc.ui.ServeHTTP(output,req)
+        if output.Code!=http.StatusOK {
+            t.Fatalf("instance on %s rejected the correct port-scoped cookie: %d",tc.port,output.Code)
+        }
+    }
+    // A wrong-port cookie cannot authenticate a listener, even when it
+    // carries a valid secret for a different process.
+    req:=httptest.NewRequest("GET","http://127.0.0.1:8765/",nil)
+    req.AddCookie(cookieB)
+    output:=httptest.NewRecorder()
+    a.ServeHTTP(output,req)
+    if output.Code!=http.StatusForbidden {
+        t.Fatal("accepted another port's session cookie")
     }
 }
