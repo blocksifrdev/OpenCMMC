@@ -428,7 +428,7 @@ func TestUICrostiniFetchMetadataRejectsCrossSiteAndForgedNavigation(t *testing.T
         wantReason string
     }{
         {"cross_site","https://evil.example","cross-site","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
-        {"same_site","http://localhost:8765","same-site","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
+        {"unrecognized_same_site","http://unknown.example:8765","same-site","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
         {"none","http://localhost:8765","none","navigate","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
         {"untrusted_mode","http://chromeos-internal.invalid:8765","same-origin","cors","empty","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
         {"missing_fetch_mode","http://chromeos-internal.invalid:8765","same-origin","","document","valid",true,http.StatusForbidden,"ORIGIN_MISMATCH"},
@@ -468,5 +468,77 @@ func TestUICrostiniFetchMetadataRejectsCrossSiteAndForgedNavigation(t *testing.T
                 t.Fatalf("rejected form changed assessment: %v",err)
             }
         })
+    }
+}
+
+func TestUIAllowlistedLocalOriginNotVetoedByFetchMetadata(t *testing.T) {
+    // A browser may classify its local/forwarded navigation as same-site or
+    // none, even though the Origin is an allowed loopback URL. The exact
+    // authenticated form, not the Fetch Metadata hint, decides this case.
+    for _,origin:=range []string{"http://127.0.0.1:8765","http://localhost:8765","http://penguin.linux.test:8765"} {
+        for _,site:=range []string{"","same-origin","same-site","none"} {
+            t.Run(origin+"/"+site,func(t *testing.T) {
+                u:=testUI(t)
+                body:=url.Values{"level":{"1"},"scope":{"Synthetic Browser Regression"},"csrf":{u.secret}}
+                req:=httptest.NewRequest(http.MethodPost,"http://127.0.0.1:8765/create",strings.NewReader(body.Encode()))
+                req.Header.Set("Content-Type","application/x-www-form-urlencoded")
+                req.Header.Set("Origin",origin)
+                if site!="" {req.Header.Set("Sec-Fetch-Site",site)}
+                req.Header.Set("Sec-Fetch-Mode","navigate")
+                req.Header.Set("Sec-Fetch-Dest","document")
+                req.AddCookie(&http.Cookie{Name:u.sessionCookieName(),Value:u.secret})
+                result:=httptest.NewRecorder()
+                u.ServeHTTP(result,req)
+                if result.Code!=http.StatusSeeOther {
+                    t.Fatalf("valid local form must work with Fetch Site %q: %d %s",site,result.Code,result.Body.String())
+                }
+                if _,err:=os.Stat(filepath.Join(u.root,"state.json"));err!=nil{
+                    t.Fatalf("accepted local form not persisted: %v",err)
+                }
+            })
+        }
+    }
+}
+func TestUIOriginDiagnosticIsSafeAndCrossSiteStillRejected(t *testing.T) {
+    u:=testUI(t)
+    private:="http://malicious.example:8765/?access="+u.secret
+    values:=url.Values{"csrf":{u.secret},"scope":{"DO NOT REFLECT PRIVATE TEXT"},"level":{"1"}}
+    req:=httptest.NewRequest(http.MethodPost,"http://127.0.0.1:8765/create",strings.NewReader(values.Encode()))
+    req.Header.Set("Content-Type","application/x-www-form-urlencoded")
+    req.Header.Set("Origin",private)
+    req.Header.Set("Sec-Fetch-Site","none")
+    req.Header.Set("Sec-Fetch-Mode","navigate")
+    req.Header.Set("Sec-Fetch-Dest","document")
+    req.AddCookie(&http.Cookie{Name:u.sessionCookieName(),Value:u.secret})
+    out:=httptest.NewRecorder()
+    u.ServeHTTP(out,req)
+    if out.Code!=http.StatusForbidden || out.Header().Get("X-OpenCMMC-Form-Diagnostic")!="ORIGIN_MISMATCH" {
+        t.Fatalf("unrecognized Origin must be rejected: %d",out.Code)
+    }
+    class:=out.Header().Get("X-OpenCMMC-Origin-Classification")
+    if !strings.Contains(class,"origin=other-http-host") ||
+       !strings.Contains(class,"fetch-site=none") ||
+       !strings.Contains(out.Body.String(),"Safe request classification:") ||
+       !strings.Contains(out.Body.String(),class) {
+        t.Fatalf("safe diagnostic absent: %s",class)
+    }
+    for _,privateValue:=range []string{u.secret,private,"malicious.example","DO NOT REFLECT PRIVATE TEXT"}{
+        if strings.Contains(class,privateValue)||strings.Contains(out.Body.String(),privateValue) {
+            t.Fatal("origin rejection reflected sensitive content")
+        }
+    }
+    if _,err:=os.Stat(filepath.Join(u.root,"state.json"));!os.IsNotExist(err) {
+        t.Fatalf("rejected request altered assessment data: %v",err)
+    }
+    cross:=httptest.NewRequest(http.MethodPost,"http://127.0.0.1:8765/create",strings.NewReader(values.Encode()))
+    cross.Header.Set("Content-Type","application/x-www-form-urlencoded")
+    cross.Header.Set("Origin","http://127.0.0.1:8765")
+    cross.Header.Set("Sec-Fetch-Site","cross-site")
+    cross.AddCookie(&http.Cookie{Name:u.sessionCookieName(),Value:u.secret})
+    blocked:=httptest.NewRecorder()
+    u.ServeHTTP(blocked,cross)
+    if blocked.Code!=http.StatusForbidden ||
+       !strings.Contains(blocked.Header().Get("X-OpenCMMC-Origin-Classification"),"fetch-site=cross-site") {
+        t.Fatal("explicit cross-site request must remain blocked with safe classification")
     }
 }
