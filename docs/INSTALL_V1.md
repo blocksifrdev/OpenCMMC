@@ -1,15 +1,15 @@
 # Install OpenCMMC
 
-These instructions cover **[v1.0.0-rc.7](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.7)**, a public release candidate. No coding, account, subscription, or internet connection is needed **after** obtaining the package.
+These instructions cover **[v1.0.0-rc.8](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.8)**, a public release candidate. No coding, account, subscription, or internet connection is needed **after** obtaining the package.
 
 ## 1. Download and verify
 
-[Choose your Windows or Linux download](DOWNLOADS.md). Get the matching archive and the [SHA256SUMS file](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.7/SHA256SUMS).
+[Choose your Windows or Linux download](DOWNLOADS.md). Get the matching archive and the [SHA256SUMS file](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.8/SHA256SUMS).
 
 A SHA-256 checksum is a **file fingerprint**. Compare the fingerprint of your download with the line for that exact file in `SHA256SUMS`:
 
-- **Windows PowerShell (example for ARM64):** `Get-FileHash .\opencmmc-v1.0.0-rc.7-windows-arm64.zip -Algorithm SHA256`
-- **Linux terminal (example for x64):** `sha256sum opencmmc-v1.0.0-rc.7-linux-amd64.tar.gz`
+- **Windows PowerShell (example for ARM64):** `Get-FileHash .\opencmmc-v1.0.0-rc.8-windows-arm64.zip -Algorithm SHA256`
+- **Linux terminal (example for x64):** `sha256sum opencmmc-v1.0.0-rc.8-linux-amd64.tar.gz`
 
 Run the command in the folder containing your download. The two results must match. A checksum does **not** establish publisher identity; follow your organization's software-approval process. Windows packages are not claimed to be Authenticode-signed.
 
@@ -31,7 +31,7 @@ In your file manager, right-click the `.tar.gz` download and select **Extract He
 
 ```sh
 mkdir -p OpenCMMC
-tar -xzf opencmmc-v1.0.0-rc.7-linux-amd64.tar.gz -C OpenCMMC
+tar -xzf opencmmc-v1.0.0-rc.8-linux-amd64.tar.gz -C OpenCMMC
 cd OpenCMMC
 ./start-cmmc-ui.sh
 ```
@@ -55,7 +55,9 @@ Your browser should open automatically. If not, open the **private local URL pri
 
 **If a form-token or origin error persists:** Close all earlier OpenCMMC tabs; use the fresh private URL from the same computer. Never disable the browser's security controls. Version rc.6 also isolates session cookies by port and provides safe form diagnostics. Browser responses distinguish `FORM_TOKEN_EXPIRED`, `ORIGIN_MISMATCH` and `UNSUPPORTED_FORM_TYPE`, rather than presenting one generic error. If your error persists, report only the diagnostic label and the local browser address up to (not including) any `?` character. Do not share session secrets, file paths, CUI or evidence.
 
-**ChromeOS / ORIGIN_MISMATCH in rc.7:** The browser may label a Crostini app's Origin as `http://localhost:8765` or `http://penguin.linux.test:8765` even if the Linux server sees Host `127.0.0.1:8765`. OpenCMMC rc.7 accepts these exact local HTTP origins on the matching port, only after validating the session cookie and per-form CSRF token. No public or arbitrary origins are allowed. If rejection persists, provide the browser address up to the question mark, but never the private access code or assessment data.
+**ChromeOS / ORIGIN_MISMATCH in rc.8:** The browser may label a Crostini app's Origin as `http://localhost:8765` or `http://penguin.linux.test:8765` even if the Linux server sees Host `127.0.0.1:8765`. OpenCMMC rc.7 accepts these exact local HTTP origins on the matching port, only after validating the session cookie and per-form CSRF token. No public or arbitrary origins are allowed. If rejection persists, provide the browser address up to the question mark, but never the private access code or assessment data.
+
+**ChromeOS port-forwarding issue (rc.8):** ChromeOS can forward browser requests into its Linux VM with a rewritten Host header. If that changes the textual Origin, OpenCMMC accepts a browser-confirmed `Sec-Fetch-Site: same-origin` HTML form navigation (`Sec-Fetch-Mode: navigate`, `Sec-Fetch-Dest: document`). This is in addition to a matching private session cookie, an exact form token and safe local Host binding; `cross-site`, `same-site`, and `none` requests remain blocked. If you still see `ORIGIN_MISMATCH`, use Chrome DevTools > Network > failed POST > Headers to record only `Origin`, `Sec-Fetch-Site`, `Sec-Fetch-Mode` and `Sec-Fetch-Dest`. Never share session cookies, private URL, CSRF token, or assessment data.
 
 **To verify which binary is installed:** Run `cd ~/OpenCMMC && ./opencmmc version` in the Linux terminal. The browser workbench also shows the build version. If port 8765 is already in use, first identify the listener with `ss -ltnp '( sport = :8765 )'`. Stop only a confirmed old OpenCMMC process, and launch the new version. These operations do not require deleting your assessment directory.
 

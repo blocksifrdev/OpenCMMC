@@ -4,7 +4,7 @@
 
 Built by BlockSiFr for defense contractors and security teams. No subscription, account, or cloud service required for the local workbench.
 
-**Latest download:** [OpenCMMC v1.0.0-rc.7](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.7), an OpenCMMC release candidate. This is a **release candidate**, not a finished or certified CMMC assessment product.
+**Latest download:** [OpenCMMC v1.0.0-rc.8](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.8), an OpenCMMC release candidate. This is a **release candidate**, not a finished or certified CMMC assessment product.
 
 ## Get started
 
@@ -12,10 +12,10 @@ Built by BlockSiFr for defense contractors and security teams. No subscription, 
 
 | Your computer | Download |
 | --- | --- |
-| Windows 11 ARM64 | [Windows ARM64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.7/opencmmc-v1.0.0-rc.7-windows-arm64.zip) |
-| Windows x64 (Intel or AMD) | [Windows x64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.7/opencmmc-v1.0.0-rc.7-windows-amd64.zip) |
-| Linux ARM64 | [Linux ARM64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.7/opencmmc-v1.0.0-rc.7-linux-arm64.tar.gz) |
-| Linux x64 | [Linux x64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.7/opencmmc-v1.0.0-rc.7-linux-amd64.tar.gz) |
+| Windows 11 ARM64 | [Windows ARM64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.8/opencmmc-v1.0.0-rc.8-windows-arm64.zip) |
+| Windows x64 (Intel or AMD) | [Windows x64 ZIP](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.8/opencmmc-v1.0.0-rc.8-windows-amd64.zip) |
+| Linux ARM64 | [Linux ARM64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.8/opencmmc-v1.0.0-rc.8-linux-arm64.tar.gz) |
+| Linux x64 | [Linux x64 TAR.GZ](https://github.com/blocksifrdev/OpenCMMC/releases/download/v1.0.0-rc.8/opencmmc-v1.0.0-rc.8-linux-amd64.tar.gz) |
 
 [Check your download's SHA-256 fingerprint](docs/INSTALL_V1.md) before running it. Your organization's software-approval rules still apply.
 
@@ -26,9 +26,9 @@ Built by BlockSiFr for defense contractors and security teams. No subscription, 
 
 Your browser should open. If it does not, open the **private URL shown in the terminal on that same computer**. Keep the terminal open while using the app. Never share that URL.
 
-**Running multiple copies?** OpenCMMC v1.0.0-rc.7 isolates browser sessions per listening port. The banner shows the running build. If a previous copy is already using port 8765, stop only that OpenCMMC process before launching the new one. Keep the local `private-assessment` directory; do not delete it.
+**Running multiple copies?** OpenCMMC v1.0.0-rc.8 isolates browser sessions per listening port. The banner shows the running build. If a previous copy is already using port 8765, stop only that OpenCMMC process before launching the new one. Keep the local `private-assessment` directory; do not delete it.
 
-**ChromeOS origin fix in rc.7:** The app recognizes Google's local Linux browser origins `localhost` and `penguin.linux.test` when forwarded to the same loopback port. Remote hosts, different ports, HTTPS origins, and requests without a valid session or form token remain blocked. The workbench still stores evidence locally.
+**ChromeOS origin compatibility in rc.8:** The app recognizes Google's local Linux browser origins `localhost` and `penguin.linux.test` when forwarded to the same loopback port. Remote hosts, different ports, HTTPS origins, and requests without a valid session or form token remain blocked. The workbench still stores evidence locally.
 
 **If you see “Reconnect OpenCMMC” or a missing-session error:** Close old OpenCMMC tabs and reopen the **entire new private URL**, including `?access=...`, from the *currently running* terminal. After successful connection, the app removes that code from the browser address bar. Do not share the code or disable browser protections.
 
