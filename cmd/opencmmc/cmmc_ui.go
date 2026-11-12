@@ -43,7 +43,7 @@ type localUIControl struct {
     ID, Description, Status string
 }
 type localUIPage struct {
-    CSRF, Scope, Mode, Selected, SelectedText, SelectedStatus, Summary string
+    CSRF, Scope, Mode, Selected, SelectedText, SelectedStatus, Summary, Version string
     Controls []localUIControl
     Objectives []cmmc.ObjectiveItem
     Basic *cmmc.Control
@@ -114,18 +114,35 @@ func localUIHostOK(host,port string) bool {
     h,p,err:=net.SplitHostPort(host)
     return err==nil && h=="127.0.0.1" && (port=="" || p==port)
 }
+// Browser cookies are scoped by host and path, not TCP port. Distinct
+// OpenCMMC instances on 127.0.0.1 must not overwrite each other's sessions.
+func (u *localUI) sessionCookieName() string {return "oc_session_p"+u.port}
 func (u *localUI) authorized(r *http.Request) bool {
-    c,err:=r.Cookie("oc_session")
+    c,err:=r.Cookie(u.sessionCookieName())
     return err==nil && subtle.ConstantTimeCompare([]byte(c.Value),[]byte(u.secret))==1
 }
+// formAuthFailure returns a stable diagnostic code, never a secret, Origin
+// value, cookie or submitted assessment content. No failed POST executes.
+func (u *localUI) formAuthFailure(r *http.Request) string {
+    if r.Method!="POST" || !u.authorized(r) {return "SESSION_INVALID"}
+    if origin:=r.Header.Get("Origin");origin!="" && origin!="http://"+r.Host {
+        return "ORIGIN_MISMATCH"
+    }
+    contentType:=r.Header.Get("Content-Type")
+    if !strings.HasPrefix(contentType,"application/x-www-form-urlencoded") &&
+       !strings.HasPrefix(contentType,"multipart/form-data") {
+        return "UNSUPPORTED_FORM_TYPE"
+    }
+    if subtle.ConstantTimeCompare([]byte(r.FormValue("csrf")),[]byte(u.secret))!=1 {
+        return "FORM_TOKEN_EXPIRED"
+    }
+    return ""
+}
 func (u *localUI) csrfOK(r *http.Request) bool {
-    if !u.authorized(r) || r.Method!="POST" {return false}
-    if origin:=r.Header.Get("Origin");origin!="" && origin!="http://"+r.Host{return false}
-    if !strings.HasPrefix(r.Header.Get("Content-Type"),"application/x-www-form-urlencoded") &&
-       !strings.HasPrefix(r.Header.Get("Content-Type"),"multipart/form-data"){return false}
-    return subtle.ConstantTimeCompare([]byte(r.FormValue("csrf")),[]byte(u.secret))==1
+    return u.formAuthFailure(r)==""
 }
 func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
+    w.Header().Set("X-OpenCMMC-Version",releaseVersion)
     w.Header().Set("Cache-Control","no-store")
     w.Header().Set("Referrer-Policy","no-referrer")
     w.Header().Set("X-Content-Type-Options","nosniff")
@@ -141,7 +158,7 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
         // on the immediate redirect, producing an unauthorized workbench page.
         // Lax permits the safe top-level GET bootstrap while session + exact
         // Origin + CSRF requirements continue to guard all state-changing POSTs.
-        http.SetCookie(w,&http.Cookie{Name:"oc_session",Value:u.secret,Path:"/",HttpOnly:true,SameSite:http.SameSiteLaxMode})
+        http.SetCookie(w,&http.Cookie{Name:u.sessionCookieName(),Value:u.secret,Path:"/",HttpOnly:true,SameSite:http.SameSiteLaxMode})
         http.Redirect(w,r,"/",http.StatusSeeOther);return
     }
     if !u.authorized(r){
@@ -154,24 +171,27 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
     }
     if r.Method=="POST" {
         r.Body=http.MaxBytesReader(w,r.Body,maxUICSV+(2<<20))
-        if !u.csrfOK(r){
-        // A browser tab left open across a process restart can hold an old
-        // form token while the browser already has the replacement session
-        // cookie. Never execute such a POST: offer a safe, one-click refresh.
-        origin:=r.Header.Get("Origin")
-        contentType:=r.Header.Get("Content-Type")
-        sameOrigin:=origin=="" || origin=="http://"+r.Host
-        supportedForm:=strings.HasPrefix(contentType,"application/x-www-form-urlencoded") ||
-            strings.HasPrefix(contentType,"multipart/form-data")
-        if u.authorized(r) && sameOrigin && supportedForm {
+        if reason:=u.formAuthFailure(r);reason!="" {
+            w.Header().Set("X-OpenCMMC-Form-Diagnostic",reason)
             w.Header().Set("Content-Type","text/html; charset=utf-8")
-            w.WriteHeader(http.StatusConflict)
-            _,_ = io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>OpenCMMC session refresh</title></head><body><main><h1>Refresh your assessment session</h1><p>This form is no longer current. This often happens when a browser tab stays open after the OpenCMMC application is restarted. No assessment changes were saved.</p><p><a href="/">Reload the current workbench and retry</a></p><p>If reloading does not help, close older tabs and open the newly printed private URL from your OpenCMMC command window. Keep that URL private.</p></main></body></html>`)
+            if reason=="FORM_TOKEN_EXPIRED" {
+                // A new process and an old tab may have different form tokens.
+                // Do not replay or execute the rejected POST.
+                w.WriteHeader(http.StatusConflict)
+                _,_=io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Refresh assessment session</title></head><body><main><h1>Refresh your assessment session</h1><p><strong>Diagnostic: FORM_TOKEN_EXPIRED</strong></p><p>This form is no longer valid. This often happens when you restart OpenCMMC and keep an older browser tab open. The rejected change was not saved.</p><p><a href="/">Reload the current workbench and retry</a></p><p>If the problem repeats, close older tabs and open the newly printed private URL from your OpenCMMC terminal. Never share the access code.</p></main></body></html>`)
+                return
+            }
+            w.WriteHeader(http.StatusForbidden)
+            switch reason {
+            case "ORIGIN_MISMATCH":
+                _,_=io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Browser origin blocked</title></head><body><main><h1>Browser origin blocked</h1><p><strong>Diagnostic: ORIGIN_MISMATCH</strong></p><p>Your browser sent a request origin different from the local OpenCMMC address. This request was safely rejected; nothing was changed.</p><p>Close other OpenCMMC tabs. Open the full private URL from the current terminal using <code>http://127.0.0.1:8765</code> (not https, localhost, or a browser extension view), then retry.</p><p>If this happens again, report only this diagnostic code and the address shown in the browser <strong>before any question mark</strong>. Do not share session tokens, cookies, findings or evidence.</p></main></body></html>`)
+            case "UNSUPPORTED_FORM_TYPE":
+                _,_=io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Form format blocked</title></head><body><main><h1>Unsupported browser form</h1><p><strong>Diagnostic: UNSUPPORTED_FORM_TYPE</strong></p><p>Your browser did not send one of OpenCMMC's supported form formats. The request was not saved. Open the workbench directly on the local URL and use the built-in form, without browser extensions that rewrite requests.</p><p>If this continues, report only this diagnostic code. Never share your private session URL, cookies or evidence.</p></main></body></html>`)
+            default:
+                _,_=io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><title>OpenCMMC | Session blocked</title></head><body><main><h1>Session blocked</h1><p><strong>Diagnostic: SESSION_INVALID</strong></p><p>Close old tabs and reopen the full new private URL printed by the OpenCMMC terminal. No data was changed.</p></main></body></html>`)
+            }
             return
         }
-        http.Error(w,"invalid form token or request origin",http.StatusForbidden)
-        return
-    }
     }
     u.mu.Lock()
     defer u.mu.Unlock()
@@ -338,7 +358,7 @@ func (u *localUI) export(w http.ResponseWriter,r *http.Request) error {
 }
 func (u *localUI) view(w http.ResponseWriter,r *http.Request) error {
     state,err:=u.state();if err!=nil{return err}
-    p:=localUIPage{CSRF:u.secret,Mode:state.Mode,HasWorkspace:state.Mode!=""}
+    p:=localUIPage{CSRF:u.secret,Version:releaseVersion,Mode:state.Mode,HasWorkspace:state.Mode!=""}
     if !p.HasWorkspace{return uiHTML.Execute(w,p)}
     _,statuses,summary,err:=u.assessed();if err!=nil{return err}
     p.Summary=summary
@@ -399,7 +419,7 @@ func cmmcUICommand(args []string,out io.Writer) error {
     defer ln.Close()
     handler:=&localUI{root:root,port:strconv.Itoa(*port),secret:token}
     server:=&http.Server{Handler:handler,ReadHeaderTimeout:5*time.Second,ReadTimeout:45*time.Second,WriteTimeout:60*time.Second,IdleTimeout:40*time.Second,MaxHeaderBytes:8192}
-    fmt.Fprintln(out,"OpenCMMC LOCAL ONLY | no cloud, telemetry, certification or government submission.")
+    fmt.Fprintln(out,"OpenCMMC",releaseVersion,"LOCAL ONLY | no cloud, telemetry, certification or government submission.")
     privateURL:=fmt.Sprintf("http://127.0.0.1:%d/?access=%s",*port,token)
     fmt.Fprintln(out,"Open this private URL on the same computer:",privateURL)
     fmt.Fprintln(out,"Keep the URL private. Press Ctrl+C to stop. Evidence remains in",root)
@@ -428,7 +448,7 @@ label{display:block;margin-top:12px;font-weight:600}form{padding:15px 0;border-t
 .optional-services{border-color:#cfc7b8;background:#fffdfa}.service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.service-card{padding:15px;border:1px solid #ded7cd;border-radius:10px;background:#fff}.service-card h3{margin:0;font-size:17px}.service-card p{font-size:14px;line-height:1.5}.service-card a{font-weight:650}@media(max-width:900px){.service-grid{grid-template-columns:1fr}}
 @media(max-width:740px){.grid{grid-template-columns:1fr}.sidebar{max-height:250px}}
 </style></head><body><header class="top"><div>BLOCKSIFR / OPEN SOURCE</div><h1>OpenCMMC</h1><div>Local CMMC evidence workbench | No subscription, no cloud</div></header>
-<main><div class="intro"><strong>Readiness, not certification.</strong> Reviewer decisions and matching hashes do not establish security control effectiveness. No SPRS submission, C3PAO accreditation or government endorsement. Keep CUI inside an approved boundary.</div>
+<main><div class="intro"><small>OpenCMMC build: <strong>{{.Version}}</strong></small><p><strong>Readiness, not certification.</strong> Reviewer decisions and matching hashes do not establish security control effectiveness. No SPRS submission, C3PAO accreditation or government endorsement. Keep CUI inside an approved boundary.</p></div>
 {{if not .HasWorkspace}}
 <section class="panel"><h2>Create an offline assessment</h2><p>Choose your baseline and name the actual system or enclave boundary. Your data will stay on this device.</p>
 <form method="post" action="/create"><input type="hidden" name="csrf" value="{{.CSRF}}">
