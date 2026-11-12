@@ -123,9 +123,29 @@ func (u *localUI) authorized(r *http.Request) bool {
 }
 // formAuthFailure returns a stable diagnostic code, never a secret, Origin
 // value, cookie or submitted assessment content. No failed POST executes.
+// localUIOriginOK accepts only the local browser origin and the two explicit
+// ChromeOS Crostini forwarding aliases documented by Google. ChromeOS may
+// rewrite Host to 127.0.0.1 while preserving its browser-visible Origin.
+// Never trust generic .test, private-network, wildcard, or remote origins.
+func localUIOriginOK(origin,host,port string) bool {
+    if !localUIHostOK(host,port) {return false}
+    if origin=="" {return true} // allowed by existing clients; CSRF stays mandatory
+    parsed,err:=url.Parse(origin)
+    if err!=nil || parsed.Scheme!="http" || parsed.User!=nil ||
+       parsed.Opaque!="" || parsed.Path!="" || parsed.RawPath!="" ||
+       parsed.RawQuery!="" || parsed.Fragment!="" || parsed.Port()!=port {
+        return false
+    }
+    switch parsed.Hostname() {
+    case "127.0.0.1","localhost","penguin.linux.test","::1":
+        return true
+    default:
+        return false
+    }
+}
 func (u *localUI) formAuthFailure(r *http.Request) string {
     if r.Method!="POST" || !u.authorized(r) {return "SESSION_INVALID"}
-    if origin:=r.Header.Get("Origin");origin!="" && origin!="http://"+r.Host {
+    if !localUIOriginOK(r.Header.Get("Origin"),r.Host,u.port) {
         return "ORIGIN_MISMATCH"
     }
     contentType:=r.Header.Get("Content-Type")
@@ -184,7 +204,7 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
             w.WriteHeader(http.StatusForbidden)
             switch reason {
             case "ORIGIN_MISMATCH":
-                _,_=io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Browser origin blocked</title></head><body><main><h1>Browser origin blocked</h1><p><strong>Diagnostic: ORIGIN_MISMATCH</strong></p><p>Your browser sent a request origin different from the local OpenCMMC address. This request was safely rejected; nothing was changed.</p><p>Close other OpenCMMC tabs. Open the full private URL from the current terminal using <code>http://127.0.0.1:8765</code> (not https, localhost, or a browser extension view), then retry.</p><p>If this happens again, report only this diagnostic code and the address shown in the browser <strong>before any question mark</strong>. Do not share session tokens, cookies, findings or evidence.</p></main></body></html>`)
+                _,_=io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Browser origin blocked</title></head><body><main><h1>Browser origin blocked</h1><p><strong>Diagnostic: ORIGIN_MISMATCH</strong></p><p>Your browser sent an origin outside OpenCMMC's recognized local addresses. This request was safely rejected; nothing was changed.</p><p>Use the full private address printed in the current terminal. OpenCMMC accepts local HTTP origins for <code>127.0.0.1</code>, <code>localhost</code>, and the ChromeOS Crostini address <code>penguin.linux.test</code> on the same port. Public or HTTPS origins, wrong ports, browser extension pages and opaque origins are still blocked.</p><p>If this happens again, report only this diagnostic code and the address shown in the browser <strong>before any question mark</strong>. Do not share session tokens, cookies, findings or evidence.</p></main></body></html>`)
             case "UNSUPPORTED_FORM_TYPE":
                 _,_=io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Form format blocked</title></head><body><main><h1>Unsupported browser form</h1><p><strong>Diagnostic: UNSUPPORTED_FORM_TYPE</strong></p><p>Your browser did not send one of OpenCMMC's supported form formats. The request was not saved. Open the workbench directly on the local URL and use the built-in form, without browser extensions that rewrite requests.</p><p>If this continues, report only this diagnostic code. Never share your private session URL, cookies or evidence.</p></main></body></html>`)
             default:
