@@ -4,7 +4,8 @@ on:
   pull_request:
     paths:
       - '.github/workflows/opencmmc-release-candidate.yml'
-      - 'scripts/package_release.py'
+      - 'scripts/*.py'
+      - 'docs/PACKAGE_*.md'
       - 'scripts/start-cmmc-*.sh'
       - 'scripts/START-CMMC-*.cmd'
       - 'cmd/opencmmc/**'
