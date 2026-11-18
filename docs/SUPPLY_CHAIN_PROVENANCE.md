@@ -1,5 +1,13 @@
 # Signed release provenance and offline verification
 
+**Availability:** Signed provenance first passed integrated CI on November 18,
+2026. The older public `v1.0.0-rc.11` release was published *before* this
+signing workflow and does not contain the bundles described here. Only
+verify and install a **new, explicitly signed** release which actually
+publishes the two Sigstore bundle files and matches the expected tag, source
+commit and SHA-256 manifest.
+
+
 OpenCMMC's distribution pipeline now requests keyless, signed Sigstore
 attestations through GitHub Actions' short-lived OIDC identity.
 
