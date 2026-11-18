@@ -14,9 +14,11 @@ import (
 
 func cmmcCommand(args []string, out io.Writer) error {
 	if len(args) == 0 {
-		return errors.New("usage: opencmmc cmmc init|assess|verify-bundle|objectives-init|objectives-import|objectives-assess|score-template|score-draft|ui")
+		return errors.New("usage: opencmmc cmmc init|assess|verify-bundle|objectives-init|objectives-import|objectives-assess|score-template|score-draft|backup|verify-backup|restore-backup|ui")
 	}
 	switch args[0] {
+	case "backup", "verify-backup", "restore-backup":
+		return cmmcBackupCommand(args, out)
 	case "ui":
 		return cmmcUICommand(args[1:], out)
 	case "score-template", "score-draft":
