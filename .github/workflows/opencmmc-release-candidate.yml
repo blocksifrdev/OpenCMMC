@@ -101,14 +101,27 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          python3 - <<'PY'
+          import base64, json
+          for kind in ('provenance','sbom'):
+              with open(f'dist/opencmmc-{kind}.sigstore.json', encoding='utf-8') as fp:
+                  bundle = json.load(fp)
+              envelope = bundle.get('dsseEnvelope') or bundle.get('content',{}).get('dsseEnvelope')
+              if not envelope:
+                  raise SystemExit(f'GA BLOCKED: missing DSSE envelope in {kind} bundle')
+              statement = json.loads(base64.b64decode(envelope['payload']))
+              print(f'{kind} predicate: {statement.get("predicateType")}, subjects: {[x.get("name") for x in statement.get("subject",[])]}')
+          PY
           for archive in dist/opencmmc-*.zip dist/opencmmc-*.tar.gz; do
             gh attestation verify "$archive" \
               --repo "$GITHUB_REPOSITORY" \
               --bundle dist/opencmmc-provenance.sigstore.json \
+              --predicate-type https://slsa.dev/provenance/v1 \
               --format json > /dev/null
             gh attestation verify "$archive" \
               --repo "$GITHUB_REPOSITORY" \
               --bundle dist/opencmmc-sbom.sigstore.json \
+              --predicate-type https://spdx.dev/Document/v2.3 \
               --format json > /dev/null
           done
           echo "PASS: independently verified signed provenance and SBOM identity for all four artifacts"
