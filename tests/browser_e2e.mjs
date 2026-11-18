@@ -124,20 +124,6 @@ try {
     await page.getByRole("heading", {name: "Create an offline assessment"}).waitFor();
     assert.ok(!page.url().includes("access="), "private access code was retained in the browser URL");
 
-    // Cross-origin forged form attempts must fail before writing any state.
-    const forged = await context.request.post("http://127.0.0.1:" + port + "/create", {
-        headers: {
-            "Origin": "https://untrusted.invalid",
-            "Sec-Fetch-Site": "cross-site",
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        data: "scope=forged&level=1&csrf=bogus",
-        failOnStatusCode: false
-    });
-    assert.equal(forged.status(), 403, "forged cross-site POST was not forbidden");
-    await page.reload();
-    await page.getByRole("heading", {name: "Create an offline assessment"}).waitFor();
-
     await createAssessment(page, "1", "Synthetic Chromium Level 1");
     await recordGap(page);
     await page.getByText(/Gaps: 1/).waitFor();
@@ -150,6 +136,21 @@ try {
     await evidenceForm.getByRole("button", {name: "Attach evidence locally"}).click();
     await page.getByText(/1 local evidence reference/).waitFor();
     await exportJSON(page);
+
+    // Isolate hostile API-style requests from the browser navigation setup.
+    // The forged cross-site POST must be rejected without modifying findings.
+    const forged = await context.request.post("http://127.0.0.1:" + port + "/decide", {
+        headers: {
+            "Origin": "https://untrusted.invalid",
+            "Sec-Fetch-Site": "cross-site",
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        data: "control=3.1.1&decision=IMPLEMENTED&csrf=bogus",
+        failOnStatusCode: false
+    });
+    assert.equal(forged.status(), 403, "forged cross-site POST was not forbidden");
+    await page.reload();
+    await page.getByText(/Gaps: 1/).waitFor();
 
     proxy = await listenProxy(port);
     const forwarded = await browser.newContext({acceptDownloads: true});
