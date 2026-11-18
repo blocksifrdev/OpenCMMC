@@ -277,6 +277,9 @@ func (u *localUI) csrfOK(r *http.Request) bool {
 func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
     w.Header().Set("X-OpenCMMC-Version",releaseVersion)
     w.Header().Set("Cache-Control","no-store")
+    // The private access-code bootstrap must never forward its URL as Referer.
+    // Authenticated GET pages containing forms switch to "same-origin" below,
+    // because no-referrer makes Chromium send Origin: null on HTML form POSTs.
     w.Header().Set("Referrer-Policy","no-referrer")
     w.Header().Set("X-Content-Type-Options","nosniff")
     w.Header().Set("X-Frame-Options","DENY")
@@ -301,6 +304,13 @@ func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
         w.WriteHeader(http.StatusForbidden)
         _,_ = io.WriteString(w,`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>OpenCMMC | Reconnect local session</title><style>body{font:16px system-ui,sans-serif;max-width:680px;margin:48px auto;padding:0 18px;line-height:1.55;color:#18283b}main{border:1px solid #d6deea;padding:24px;border-radius:12px;background:#fff}code{background:#edf0f5;padding:3px 5px}</style></head><body><main><h1>Reconnect OpenCMMC</h1><p>This browser tab is not connected to the active local OpenCMMC session. Nothing was changed.</p><ol><li>Return to the terminal running OpenCMMC on this computer.</li><li>Find <strong>Open this private URL on the same computer:</strong> and copy the full address, including the access code.</li><li>Open that exact address in a new tab using <strong>http://127.0.0.1</strong>. Do not substitute localhost, omit the code or use an old bookmark.</li><li>If the terminal no longer shows a running app, close old tabs and restart <code>./start-cmmc-ui.sh</code> from the extracted directory.</li></ol><p>Keep the terminal running while using OpenCMMC. Do not share the private URL or delete your <code>private-assessment</code> folder.</p></main></body></html>`)
         return
+    }
+    // The secret access-code URL was already removed before authorization.
+    // Preserve normal browser Origin on local form POSTs without ever sending
+    // a Referer to external services. Bootstrap, errors, and downloads keep
+    // the stricter no-referrer default.
+    if r.Method=="GET" && (r.URL.Path=="/" || r.URL.Path=="/handoff") {
+        w.Header().Set("Referrer-Policy","same-origin")
     }
     if r.Method=="POST" {
         r.Body=http.MaxBytesReader(w,r.Body,maxUICSV+(2<<20))

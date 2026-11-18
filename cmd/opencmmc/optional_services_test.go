@@ -45,7 +45,7 @@ func TestOptionalServicesOnlyAfterWorkspaceAndNoAutomaticTransfer(t *testing.T) 
     if strings.Contains(page,`<script`) || strings.Contains(page,`<iframe`) {
         t.Fatal("optional services must not install remote scripts or frames")
     }
-    if got:=result.Header().Get("Referrer-Policy");got!="no-referrer" { t.Fatalf("referrer policy: %q",got) }
+    if got:=result.Header().Get("Referrer-Policy");got!="same-origin" { t.Fatalf("referrer policy: %q",got) }
     if !strings.Contains(result.Header().Get("Content-Security-Policy"),"default-src 'none'") {
         t.Fatal("external scripts/requests must stay blocked")
     }
