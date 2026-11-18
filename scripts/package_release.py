@@ -53,6 +53,22 @@ def write_tar(path, files):
                     out.addfile(info, io.BytesIO(payload))
 
 
+
+def render_package_doc(source: Path, version: str) -> bytes:
+    """Freeze version-specific, offline-readable help within each archive.
+
+    Do not embed the repository's RC.11 download text into a GA archive.
+    """
+    placeholder = '@OPENCMMC_VERSION@'
+    raw = source.read_text(encoding='utf-8')
+    if placeholder not in raw:
+        raise ValueError(f'package guide is missing version placeholder: {source.name}')
+    rendered = raw.replace(placeholder, version)
+    if placeholder in rendered:
+        raise ValueError(f'unreplaced package version placeholder in: {source.name}')
+    return rendered.encode('utf-8')
+
+
 def build(version, out_dir):
     if not version.startswith('v') or len(version) > 50 or any(ch not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-' for ch in version):
         raise SystemExit('invalid release version')
@@ -68,15 +84,16 @@ def build(version, out_dir):
                '-o', str(stage), './cmd/opencmmc']
         subprocess.run(cmd, cwd=ROOT, env=env, check=True)
         binary = stage.read_bytes()
-        install_guide = ROOT / 'docs/INSTALL_V1.md'
+        readme = render_package_doc(ROOT / 'docs/PACKAGE_README.md', version)
+        install_guide = render_package_doc(ROOT / 'docs/PACKAGE_INSTALL.md', version)
         files = [archive_file(exe_name, binary, 0o755),
                  archive_file('LICENSE', (ROOT / 'LICENSE').read_bytes()),
-                 archive_file('README.md', (ROOT / 'README.md').read_bytes()),
+                 archive_file('README.md', readme),
                  archive_file('CMMC_AIRGAP.md', (ROOT / 'docs/CMMC_AIRGAP.md').read_bytes()),
                  archive_file('CMMC_OBJECTIVE_WORKBENCH.md', (ROOT / 'docs/CMMC_OBJECTIVE_WORKBENCH.md').read_bytes()),
                  archive_file('CMMC_ASSESSMENT_NEXT.md', (ROOT / 'docs/CMMC_ASSESSMENT_NEXT.md').read_bytes()),
                  archive_file('LOCAL_UI.md', (ROOT / 'docs/LOCAL_UI.md').read_bytes()),
-                 archive_file('INSTALL-OFFLINE.txt', install_guide.read_bytes())]
+                 archive_file('INSTALL-OFFLINE.txt', install_guide)]
         if goos == 'windows':
             files.append(archive_file('START-CMMC-DEMO.cmd', (ROOT / 'scripts/START-CMMC-DEMO.cmd').read_bytes()))
             files.append(archive_file('START-CMMC-UI.cmd', (ROOT / 'scripts/START-CMMC-UI.cmd').read_bytes()))
