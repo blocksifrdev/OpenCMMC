@@ -49,3 +49,12 @@ organization must separately approve any use involving CUI.
 For general install and browser troubleshooting, see
 [INSTALL_V1.md](INSTALL_V1.md). For security boundaries, see
 [SECURITY.md](../SECURITY.md).
+
+## Built-in verified offline backup commands
+
+In addition to the manual copy procedure above, the CLI now supports
+`cmmc backup`, `cmmc verify-backup`, and `cmmc restore-backup`.
+See [OFFLINE_BACKUPS.md](OFFLINE_BACKUPS.md) for the complete workflow and
+security limitations. This ZIP archive is plaintext and must be placed on
+approved encrypted media. Only restore into a new, nonexistent destination,
+never over an existing assessment directory.
