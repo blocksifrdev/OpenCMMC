@@ -52,6 +52,8 @@ jobs:
           go test -race ./internal/cmmc ./cmd/opencmmc
           go vet ./...
           python3 -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Fail closed on reachable Go security advisories
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.10.0 ./...
       - name: Build Windows and Linux archives
         run: python3 scripts/package_release.py --version "$RELEASE_VERSION" --out dist
       - name: Generate SPDX and validate checksums
