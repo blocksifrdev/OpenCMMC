@@ -41,6 +41,8 @@ class BrandGuardTests(unittest.TestCase):
                 data = {
                     binary: b"synthetic executable",
                     "LICENSE": b"synthetic license",
+                    "README.md": f"OpenCMMC {version} synthetic package".encode(),
+                    "INSTALL-OFFLINE.txt": f"OpenCMMC {version} synthetic install".encode(),
                 }
                 data["PACKAGE-MANIFEST.json"] = json.dumps({
                     "schema": "opencmmc.package.v1",
