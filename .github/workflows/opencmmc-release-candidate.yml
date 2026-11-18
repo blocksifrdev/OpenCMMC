@@ -8,6 +8,8 @@ on:
       - 'scripts/start-cmmc-*.sh'
       - 'scripts/START-CMMC-*.cmd'
       - 'cmd/opencmmc/**'
+      - 'tests/browser_e2e.mjs'
+      - 'package.json'
       - 'internal/cmmc/**'
       - 'docs/DOWNLOADS.md'
   push:
@@ -130,9 +132,29 @@ jobs:
           ./opencmmc cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
           test -s readiness.json
 
+
+  browser-e2e:
+    name: Real Chromium offline workbench acceptance
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: go.mod
+      - name: Build exact source for browser run
+        run: go build -trimpath -o opencmmc-e2e ./cmd/opencmmc
+      - name: Install pinned test-only Chromium
+        run: |
+          npm install --package-lock=false --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Run real browser form, evidence, forwarding and export acceptance
+        run: OPENCMMC_BIN="$PWD/opencmmc-e2e" npm run test:browser
+
   publish-prerelease:
     if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/release/v1.0.0-rc.10' }}"
-    needs: [package, smoke-windows, smoke-linux]
+    needs: [package, smoke-windows, smoke-linux, browser-e2e]
     runs-on: ubuntu-latest
     permissions:
       contents: write
