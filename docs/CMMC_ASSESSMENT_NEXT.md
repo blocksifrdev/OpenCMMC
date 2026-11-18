@@ -14,6 +14,21 @@ Sources:
 - https://dodcio.defense.gov/cmmc/About/
 - https://www.ecfr.gov/current/title-32/section-170.24
 
+## November 18, 2026 program status
+
+On July 13, 2026, the Department of Defense announced a suspension of
+CMMC Phase II implementation, originally planned for November 10, 2026.
+The Department states that the current interim approach maintains
+NIST SP 800-171 Revision 2 compliance through self-assessments and select
+government-led assessments. Do **not** infer that all contractual obligations
+are suspended, that government requirements have disappeared, or that this
+software is authorized to submit official assessments.
+
+Review the latest program guidance and the actual solicitation/contract
+before relying on this dated status:
+- https://business.defense.gov/cmmc/
+- https://dodcio.defense.gov/CMMC/about/
+
 ## 1. Import the full local NIST source CSV
 
 Download the official supplemental CSV in a **connected, approved staging environment** from:
