@@ -15,6 +15,7 @@ on:
   push:
     branches:
       - 'release/v1.0.0-rc.11'
+      - 'ga/validation/**'
   workflow_dispatch:
     inputs:
       version:
@@ -24,7 +25,7 @@ on:
 permissions:
   contents: read
 env:
-  RELEASE_VERSION: ${{ github.event.inputs.version || 'v1.0.0-rc.11' }}
+  RELEASE_VERSION: ${{ (startsWith(github.ref, 'refs/heads/ga/validation/') || startsWith(github.head_ref, 'ga/validation/')) && 'v1.0.0' || (github.event.inputs.version || 'v1.0.0-rc.11') }}
 
 jobs:
   package:
@@ -94,6 +95,23 @@ jobs:
           cp "$SBOM_BUNDLE" dist/opencmmc-sbom.sigstore.json
           (cd dist && sha256sum opencmmc-*.sigstore.json >> SHA256SUMS && sha256sum SHA256SUMS > SHA256SUMS.sha256)
           (cd dist && sha256sum -c SHA256SUMS && sha256sum -c SHA256SUMS.sha256)
+      - name: Independently verify GitHub/Sigstore identity of signed GA drill archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for archive in dist/opencmmc-*.zip dist/opencmmc-*.tar.gz; do
+            gh attestation verify "$archive" \
+              --repo "$GITHUB_REPOSITORY" \
+              --bundle dist/opencmmc-provenance.sigstore.json \
+              --format json > /dev/null
+            gh attestation verify "$archive" \
+              --repo "$GITHUB_REPOSITORY" \
+              --bundle dist/opencmmc-sbom.sigstore.json \
+              --format json > /dev/null
+          done
+          echo "PASS: independently verified signed provenance and SBOM identity for all four artifacts"
       - name: Upload candidate packages
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -131,7 +149,7 @@ jobs:
           Expand-Archive -Path "dist/opencmmc-$env:RELEASE_VERSION-windows-${{ matrix.arch }}.zip" -DestinationPath smoke
           Push-Location smoke
           $ver = & .\opencmmc.exe version
-          if ($LASTEXITCODE -ne 0 -or $ver -notmatch '^OpenCMMC v1\.') { throw "Version failed: $ver" }
+          if ($LASTEXITCODE -ne 0 -or $ver -ne "OpenCMMC $env:RELEASE_VERSION") { throw "Wrong packaged executable version: $ver" }
           & .\opencmmc.exe cmmc init --level 2 --scope "Synthetic Windows test" --out workspace.json
           if ($LASTEXITCODE -ne 0) { throw "Init failed" }
           New-Item -ItemType Directory evidence | Out-Null
