@@ -30,6 +30,11 @@ jobs:
   package:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
@@ -58,6 +63,35 @@ jobs:
           (cd dist && sha256sum -c SHA256SUMS && sha256sum -c SHA256SUMS.sha256)
       - name: Verify OpenCMMC-only archive contents and manifest
         run: python3 scripts/verify_distribution.py --artifacts dist --version "$RELEASE_VERSION"
+      - name: Sign exact release archive provenance with GitHub OIDC
+        id: provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: |
+            dist/opencmmc-*.zip
+            dist/opencmmc-*.tar.gz
+            dist/SBOM.spdx.json
+      - name: Sign SBOM predicate against shipped archives
+        id: sbom-attestation
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: |
+            dist/opencmmc-*.zip
+            dist/opencmmc-*.tar.gz
+          sbom-path: dist/SBOM.spdx.json
+      - name: Preserve Sigstore signing bundles for offline verification
+        shell: bash
+        env:
+          PROVENANCE_BUNDLE: ${{ steps.provenance.outputs.bundle-path }}
+          SBOM_BUNDLE: ${{ steps.sbom-attestation.outputs.bundle-path }}
+        run: |
+          set -euo pipefail
+          test -s "$PROVENANCE_BUNDLE"
+          test -s "$SBOM_BUNDLE"
+          cp "$PROVENANCE_BUNDLE" dist/opencmmc-provenance.sigstore.json
+          cp "$SBOM_BUNDLE" dist/opencmmc-sbom.sigstore.json
+          (cd dist && sha256sum opencmmc-*.sigstore.json >> SHA256SUMS && sha256sum SHA256SUMS > SHA256SUMS.sha256)
+          (cd dist && sha256sum -c SHA256SUMS && sha256sum -c SHA256SUMS.sha256)
       - name: Upload candidate packages
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -223,6 +257,8 @@ jobs:
           test -f opencmmc-v1.0.0-rc.11-windows-amd64.zip
           test -f opencmmc-v1.0.0-rc.11-linux-arm64.tar.gz
           test -f opencmmc-v1.0.0-rc.11-linux-amd64.tar.gz
+          test -s opencmmc-provenance.sigstore.json
+          test -s opencmmc-sbom.sigstore.json
       - name: Create public release candidate after all native checks pass
         env:
           GH_TOKEN: ${{ github.token }}
@@ -237,6 +273,7 @@ jobs:
           gh release create v1.0.0-rc.11 \
             dist/opencmmc-v1.0.0-rc.11-*.zip dist/opencmmc-v1.0.0-rc.11-*.tar.gz \
             dist/SHA256SUMS dist/SHA256SUMS.sha256 dist/SBOM.spdx.json \
+            dist/opencmmc-provenance.sigstore.json dist/opencmmc-sbom.sigstore.json \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title 'OpenCMMC v1.0.0-rc.11 | Chromium Browser Form Reliability' \
