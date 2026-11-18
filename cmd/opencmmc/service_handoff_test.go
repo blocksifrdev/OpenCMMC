@@ -42,7 +42,7 @@ func TestHandoffServiceConsentAndPrivacy(t *testing.T) {
             if strings.Contains(body,scope) || strings.Contains(body,"<script") || strings.Contains(body,"<iframe") {
                 t.Fatal("handoff page leaked scope or loaded active remote content")
             }
-            if page.Header().Get("Referrer-Policy")!="no-referrer" {t.Fatal("missing no-referrer")}
+            if page.Header().Get("Referrer-Policy")!="same-origin" {t.Fatal("authenticated form must preserve same-origin POST Origin")}
             missing:=uiRequest(t,u,"POST","/handoff",url.Values{"csrf":{u.secret},"service":{tc.ID}},true,"")
             if missing.Code!=http.StatusBadRequest {t.Fatalf("unconfirmed request generated: %d",missing.Code)}
             confirmed:=uiRequest(t,u,"POST","/handoff",url.Values{
