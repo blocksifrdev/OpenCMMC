@@ -78,6 +78,14 @@ def verify_archive(archive: Path, version: str, system: str, arch: str) -> list[
         issues.append(f"missing OpenCMMC executable: {archive.name}")
     if system == "windows" and any(n.endswith(".exe") and n != executable for n in members):
         issues.append(f"unexpected second Windows executable in {archive.name}")
+    # An installer whose README/quickstart describes an older release is a
+    # distribution defect, even if every executable checksum matches.
+    for docname in ("README.md", "INSTALL-OFFLINE.txt"):
+        body = data.get(docname)
+        if body is None:
+            issues.append(f"required versioned offline help missing: {docname}")
+        elif f"OpenCMMC {version}".encode("utf-8") not in body:
+            issues.append(f"incorrect version in offline help: {docname}")
     if "PACKAGE-MANIFEST.json" not in data:
         issues.append(f"missing package manifest in {archive.name}")
     else:
