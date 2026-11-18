@@ -51,3 +51,20 @@ NIST SP 800-171 Rev. 2 self-assessments and select government-led assessments.
 Verify the latest official [DoD CMMC guidance](https://business.defense.gov/cmmc/)
 and contract requirements; do not describe the program as repealed or use the
 suspension to claim exemption.
+
+
+**November 18 browser acceptance update (rc.11 candidate):** Real Chromium
+testing exposed a genuine `ORIGIN_MISMATCH` failure caused by the global
+`Referrer-Policy: no-referrer` header: Chrome could send `Origin: null`
+even for a valid local form POST. The authenticated HTML workbench and handoff
+pages now use `same-origin`; the access-token bootstrap redirect, errors and
+exports retain `no-referrer`. Remote sites receive no Referer, and CSRF,
+Origin, Host and session enforcement are unchanged. The patch and CI-only
+real-browser test are merged in
+[PR #55](https://github.com/blocksifrdev/OpenCMMC/pull/55), with Go and
+Chromium tests passing in [CI run #44378443450](https://github.com/blocksifrdev/OpenCMMC/actions/runs/44378443450)
+and native Windows/Linux (ARM64/x64), release packaging and Chromium checks
+passing in [run #44378443601](https://github.com/blocksifrdev/OpenCMMC/actions/runs/44378443601).
+The physical customer Chromebook and independent security and compliance
+methodology verification remain open. Passing internal release gates is
+not a GA approval or authorization to handle CUI.
