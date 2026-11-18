@@ -1,0 +1,12 @@
+{
+  "name": "opencmmc-browser-acceptance",
+  "private": true,
+  "description": "CI-only browser acceptance tests; OpenCMMC has no runtime Node.js dependency",
+  "type": "module",
+  "scripts": {
+    "test:browser": "node tests/browser_e2e.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.65.1"
+  }
+}
