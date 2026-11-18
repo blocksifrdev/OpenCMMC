@@ -124,6 +124,9 @@ jobs:
           $ErrorActionPreference = 'Stop'
           if ($negativeExit -eq 0) { throw "Existing assessment was overwritten" }
           if (-not (Test-Path backup-restored/requirements.json)) { throw "Rejected restore damaged existing assessment" }
+          # GitHub's pwsh wrapper exits using LASTEXITCODE at script end,
+          # including this intentionally nonzero negative-path check.
+          $global:LASTEXITCODE = 0
           Pop-Location
   smoke-linux:
     needs: package
