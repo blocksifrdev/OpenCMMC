@@ -38,3 +38,20 @@ jobs:
         run: go run ./cmd/opencmmc prove --input examples/theorem/branch-controls.json --json theorem.json --html theorem.html
       - name: Source-bound theorem unit tests
         run: go test ./internal/sourceproof -count=1
+  browser-e2e:
+    name: Real Chromium local UI acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: go.mod
+      - name: Build standalone offline Go app
+        run: go build -trimpath -o opencmmc-e2e ./cmd/opencmmc
+      - name: Install pinned CI-only Chromium browser
+        run: |
+          npm install --package-lock=false --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Exercise real local browser, origin forwarding and export
+        run: OPENCMMC_BIN="$PWD/opencmmc-e2e" npm run test:browser
