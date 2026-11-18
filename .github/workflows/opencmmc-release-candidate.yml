@@ -101,6 +101,23 @@ jobs:
           New-Item -ItemType Directory evidence | Out-Null
           & .\opencmmc.exe cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
           if ($LASTEXITCODE -ne 0 -or -not (Test-Path readiness.json)) { throw "Report failed" }
+          # Installed binary must restore actual user data, not merely pass Go tests.
+          & .\opencmmc.exe cmmc init --level 1 --scope "Synthetic backup acceptance" --out backup-source-requirements.json
+          if ($LASTEXITCODE -ne 0) { throw "Level 1 backup fixture init failed" }
+          New-Item -ItemType Directory -Path backup-source/evidence -Force | Out-Null
+          Move-Item backup-source-requirements.json backup-source/requirements.json
+          Set-Content -Path backup-source/state.json -Value '{"mode":"basic","level":1}' -Encoding ascii
+          & .\opencmmc.exe cmmc backup --data-dir backup-source --archive backup.zip
+          if ($LASTEXITCODE -ne 0 -or -not (Test-Path backup.zip)) { throw "Native backup failed" }
+          & .\opencmmc.exe cmmc verify-backup --archive backup.zip
+          if ($LASTEXITCODE -ne 0) { throw "Native backup verification failed" }
+          & .\opencmmc.exe cmmc restore-backup --archive backup.zip --out-dir backup-restored
+          if ($LASTEXITCODE -ne 0) { throw "Native restore failed" }
+          $original = (Get-FileHash backup-source/requirements.json -Algorithm SHA256).Hash
+          $restored = (Get-FileHash backup-restored/requirements.json -Algorithm SHA256).Hash
+          if ($original -ne $restored) { throw "Native restore changed assessment bytes" }
+          & .\opencmmc.exe cmmc restore-backup --archive backup.zip --out-dir backup-restored 2>$null
+          if ($LASTEXITCODE -eq 0) { throw "Existing assessment was overwritten" }
           Pop-Location
   smoke-linux:
     needs: package
@@ -132,6 +149,27 @@ jobs:
           ./opencmmc cmmc assess --input workspace.json --evidence-dir evidence --json readiness.json
           test -s readiness.json
 
+          # Verify backup, restore and overwrite refusal from the shipped binary.
+          mkdir -p backup-source/evidence
+          ./opencmmc cmmc init --level 1 --scope "Synthetic backup acceptance" --out backup-source/requirements.json
+          printf '%s\\n' '{"mode":"basic","level":1}' > backup-source/state.json
+          ./opencmmc cmmc backup --data-dir backup-source --archive backup.zip
+          ./opencmmc cmmc verify-backup --archive backup.zip
+          ./opencmmc cmmc restore-backup --archive backup.zip --out-dir backup-restored
+          cmp backup-source/requirements.json backup-restored/requirements.json
+          cmp backup-source/state.json backup-restored/state.json
+          if ./opencmmc cmmc restore-backup --archive backup.zip --out-dir backup-restored; then
+            echo "ERROR: existing assessment overwritten" >&2
+            exit 1
+          fi
+          # Level 2 objective workspace also has a verified restore path.
+          mkdir -p level2-source/evidence
+          ./opencmmc cmmc objectives-init --level 2 --scope "Synthetic objective backup" --out level2-source/objectives.json
+          printf '%s\\n' '{"mode":"objectives","level":2}' > level2-source/state.json
+          ./opencmmc cmmc backup --data-dir level2-source --archive level2.zip
+          ./opencmmc cmmc verify-backup --archive level2.zip
+          ./opencmmc cmmc restore-backup --archive level2.zip --out-dir level2-restored
+          cmp level2-source/objectives.json level2-restored/objectives.json
 
   browser-e2e:
     name: Real Chromium offline workbench acceptance
