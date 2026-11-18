@@ -116,8 +116,14 @@ jobs:
           $original = (Get-FileHash backup-source/requirements.json -Algorithm SHA256).Hash
           $restored = (Get-FileHash backup-restored/requirements.json -Algorithm SHA256).Hash
           if ($original -ne $restored) { throw "Native restore changed assessment bytes" }
+          # This second restore MUST fail. PowerShell's Stop preference
+          # can otherwise terminate on expected stderr before we check exit code.
+          $ErrorActionPreference = 'Continue'
           & .\opencmmc.exe cmmc restore-backup --archive backup.zip --out-dir backup-restored 2>$null
-          if ($LASTEXITCODE -eq 0) { throw "Existing assessment was overwritten" }
+          $negativeExit = $LASTEXITCODE
+          $ErrorActionPreference = 'Stop'
+          if ($negativeExit -eq 0) { throw "Existing assessment was overwritten" }
+          if (-not (Test-Path backup-restored/requirements.json)) { throw "Rejected restore damaged existing assessment" }
           Pop-Location
   smoke-linux:
     needs: package
