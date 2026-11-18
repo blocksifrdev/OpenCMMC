@@ -93,7 +93,33 @@ func uiReadJSON(path string, v any) error {
 func (u *localUI) state() (localUIState,error) {
     var s localUIState
     err:=uiReadJSON(filepath.Join(u.root,"state.json"),&s)
-    if os.IsNotExist(err){return s,nil}
+    if os.IsNotExist(err) {
+        // Creating an assessment writes its validated workspace first, then
+        // state.json. A crash or full disk between these writes must never
+        // cause the next /create to overwrite the existing assessment.
+        basicInfo,basicErr:=os.Lstat(filepath.Join(u.root,"requirements.json"))
+        if basicErr!=nil && !os.IsNotExist(basicErr) {return s,basicErr}
+        objectiveInfo,objectiveErr:=os.Lstat(filepath.Join(u.root,"objectives.json"))
+        if objectiveErr!=nil && !os.IsNotExist(objectiveErr) {return s,objectiveErr}
+        if basicInfo!=nil && objectiveInfo!=nil {
+            return s,errors.New("ambiguous existing assessment data; preserve files and review before recovery")
+        }
+        if basicInfo!=nil {
+            if _,e:=u.readBasic();e!=nil {
+                return s,fmt.Errorf("existing requirements workspace cannot be safely recovered: %w",e)
+            }
+            // The local UI creates basic workspaces only for Level 1.
+            // Infer state without modifying the original evidence or files.
+            return localUIState{Mode:"basic",Level:1},nil
+        }
+        if objectiveInfo!=nil {
+            if _,e:=u.readObjectives();e!=nil {
+                return s,fmt.Errorf("existing objectives workspace cannot be safely recovered: %w",e)
+            }
+            return localUIState{Mode:"objectives",Level:2},nil
+        }
+        return s,nil
+    }
     if err!=nil{return s,err}
     if s.Mode!="basic" && s.Mode!="objectives"{return s,errors.New("invalid UI state")}
     return s,nil
