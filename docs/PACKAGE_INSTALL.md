@@ -44,7 +44,7 @@ WORKBENCH
 
 BACKUP AND RECOVERY (STOP THE WORKBENCH BEFORE MAKING A BACKUP)
 - Use a separate approved encrypted destination, never the live workspace.
-- The ZIP created by this command is plaintext and must be protected.
+- The ZIP created by this command is plaintext and not encrypted; protect it.
       ./opencmmc cmmc backup --data-dir ./private-assessment --archive /approved/encrypted-backups/assessment.zip
       ./opencmmc cmmc verify-backup --archive /approved/encrypted-backups/assessment.zip
       ./opencmmc cmmc restore-backup --archive /approved/encrypted-backups/assessment.zip --out-dir ./restored-assessment
