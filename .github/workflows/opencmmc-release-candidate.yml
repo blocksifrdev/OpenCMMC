@@ -152,7 +152,7 @@ jobs:
           # Verify backup, restore and overwrite refusal from the shipped binary.
           mkdir -p backup-source/evidence
           ./opencmmc cmmc init --level 1 --scope "Synthetic backup acceptance" --out backup-source/requirements.json
-          printf '%s\\n' '{"mode":"basic","level":1}' > backup-source/state.json
+          printf '%s\n' '{"mode":"basic","level":1}' > backup-source/state.json
           ./opencmmc cmmc backup --data-dir backup-source --archive backup.zip
           ./opencmmc cmmc verify-backup --archive backup.zip
           ./opencmmc cmmc restore-backup --archive backup.zip --out-dir backup-restored
@@ -165,7 +165,7 @@ jobs:
           # Level 2 objective workspace also has a verified restore path.
           mkdir -p level2-source/evidence
           ./opencmmc cmmc objectives-init --level 2 --scope "Synthetic objective backup" --out level2-source/objectives.json
-          printf '%s\\n' '{"mode":"objectives","level":2}' > level2-source/state.json
+          printf '%s\n' '{"mode":"objectives","level":2}' > level2-source/state.json
           ./opencmmc cmmc backup --data-dir level2-source --archive level2.zip
           ./opencmmc cmmc verify-backup --archive level2.zip
           ./opencmmc cmmc restore-backup --archive level2.zip --out-dir level2-restored
