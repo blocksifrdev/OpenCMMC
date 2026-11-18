@@ -15,6 +15,7 @@ on:
       - 'docs/DOWNLOADS.md'
   push:
     branches:
+      - main
       - 'release/v1.0.0-rc.11'
       - 'ga/validation/**'
   workflow_call:
@@ -32,7 +33,7 @@ on:
 permissions:
   contents: read
 env:
-  RELEASE_VERSION: ${{ (startsWith(github.ref, 'refs/heads/ga/validation/') || startsWith(github.head_ref, 'ga/validation/')) && 'v1.0.0' || (inputs.version || github.event.inputs.version || 'v1.0.0-rc.11') }}
+  RELEASE_VERSION: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/ga/validation/') || startsWith(github.head_ref, 'ga/validation/')) && 'v1.0.0' || (inputs.version || github.event.inputs.version || 'v1.0.0-rc.11') }}
 
 jobs:
   package:
