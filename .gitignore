@@ -6,3 +6,9 @@ readiness.html
 report.json
 report.html
 .DS_Store
+
+# CI-only real-browser acceptance dependencies and outputs
+node_modules/
+opencmmc-e2e
+playwright-report/
+test-results/
