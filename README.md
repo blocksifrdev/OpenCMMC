@@ -30,6 +30,8 @@ Your browser should open. If it does not, open the **private URL shown in the te
 
 **Running multiple copies?** OpenCMMC v1.0.0-rc.9 isolates browser sessions per listening port. The banner shows the running build. If a previous copy is already using port 8765, stop only that OpenCMMC process before launching the new one. Keep the local `private-assessment` directory; do not delete it.
 
+**Recovering after an interruption?** If a crash happened while creating a workspace, OpenCMMC recognizes a single intact Level 1 or Level 2 workspace instead of silently overwriting it. An ambiguous or damaged workspace remains blocked. Preserve the entire local data directory and follow the [backup and recovery instructions](docs/DATA_RECOVERY.md). This is not a substitute for encrypted, tested backups.
+
 **ChromeOS origin diagnostics in rc.9:** The app recognizes Google's local Linux browser origins `localhost` and `penguin.linux.test` when forwarded to the same loopback port. Verified local HTTP Origins are allowed even when the browser reports `Sec-Fetch-Site: same-site` or `none`; explicit `cross-site` requests remain blocked. A rejected POST shows safe request-header classifications without exposing credentials or evidence. The workbench still stores evidence locally.
 
 **If you see “Reconnect OpenCMMC” or a missing-session error:** Close old OpenCMMC tabs and reopen the **entire new private URL**, including `?access=...`, from the *currently running* terminal. After successful connection, the app removes that code from the browser address bar. Do not share the code or disable browser protections.
