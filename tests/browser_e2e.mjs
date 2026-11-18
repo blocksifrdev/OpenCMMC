@@ -78,7 +78,15 @@ async function createAssessment(page, level, scope) {
     await form.locator('select[name="level"]').selectOption(level);
     await form.locator('input[name="scope"]').fill(scope);
     await form.getByRole("button", {name: "Create assessment"}).click();
-    await page.getByRole("heading", {name: /^Requirement /}).waitFor();
+    await page.waitForLoadState("domcontentloaded");
+    if (await page.getByRole("heading", {name: /^Requirement /}).count() === 0) {
+        // CI uses synthetic data only. Do not print cookies, private URLs,
+        // form values, or raw request headers.
+        const safeText = (await page.locator("body").innerText())
+            .replace(/access=[^\\s&]*/g, "access=[REDACTED]")
+            .slice(0, 800);
+        throw new Error("Local assessment form did not open workspace. Safe synthetic page: " + safeText);
+    }
 }
 
 async function recordGap(page) {
