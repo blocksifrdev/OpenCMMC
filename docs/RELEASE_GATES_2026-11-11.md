@@ -32,3 +32,22 @@ Do not claim government endorsement, certification, C3PAO accreditation, validat
 **ChromeOS forwarded-form repair (rc.8 candidate):** After rc.7, a customer still reported `ORIGIN_MISMATCH`. The release candidate recognizes `Sec-Fetch-Site: same-origin` plus `Sec-Fetch-Mode: navigate` and `Sec-Fetch-Dest: document` as a browser-side same-origin assertion when ChromeOS forwarding changes the textual Origin relative to the container-side Host. Browsers prohibit page JavaScript from setting these headers. Exact per-port session cookies, exact CSRF tokens, local Host checks and content type enforcement remain mandatory. Reject cross-site, same-site, none, opaque, HTTPS and malformed-origin requests; don't claim device-level verification before customer acceptance.
 
 **Chromebook follow-up (rc.9 candidate, user device not yet verified):** rc.8 still produced `ORIGIN_MISMATCH`, including after the user attempted the Linux-native browser recovery. Source inspection found that `Sec-Fetch-Site: same-site` or `none` unconditionally rejected a form even when the textual Origin was a recognized local loopback hostname. rc.9 removes this contradiction: an explicit local Origin + cookie + matching CSRF token is accepted for these metadata states; `cross-site`, unrecognized cross-origin submissions, expired form tokens and missing sessions are still blocked. The browser error shows fixed-category, privacy-safe request diagnostics rather than raw header values. Customer verification remains open, and prior CI success did not establish device correctness.
+
+
+**November 18 distribution note (rc.10 candidate):** Commit
+`63d8fbe1a1ab6eb6ee0ae69c0ee72fd9eadbed28` introduced crash-safe recovery
+for a single validated local assessment created immediately before process
+interruption, with fail-closed rejection of ambiguous/corrupt data. Validation
+completed on Windows ARM64/x64 and Linux ARM64/x64 native smoke runners in
+[run #44372585123](https://github.com/blocksifrdev/OpenCMMC/actions/runs/44372585123);
+the general Go CI suite passed in
+[run #44372585241](https://github.com/blocksifrdev/OpenCMMC/actions/runs/44372585241).
+These are internal automated checks, not a real-device Chromebook verification,
+independent penetration test, qualified CMMC methodology review or GA approval.
+
+The Department of Defense announced a July 13, 2026 **suspension of CMMC Phase II**
+(originally scheduled for November 10, 2026). Current interim guidance preserves
+NIST SP 800-171 Rev. 2 self-assessments and select government-led assessments.
+Verify the latest official [DoD CMMC guidance](https://business.defense.gov/cmmc/)
+and contract requirements; do not describe the program as repealed or use the
+suspension to claim exemption.
