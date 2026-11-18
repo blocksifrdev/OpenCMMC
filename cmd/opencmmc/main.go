@@ -61,6 +61,9 @@ Usage:
   opencmmc prove --input obligations.json [--json proof.json] [--html proof.html] [--fail-on-counterexample]
   opencmmc prove-github --repo owner/name [--json github-proof.json] [--html github-proof.html] [--fail-on-unproven]
   opencmmc cmmc ui --data-dir ./private-assessment --port 8765
+  opencmmc cmmc backup --data-dir ./private-assessment --archive ./approved-encrypted-backups/assessment.zip
+  opencmmc cmmc verify-backup --archive ./approved-encrypted-backups/assessment.zip
+  opencmmc cmmc restore-backup --archive ./approved-encrypted-backups/assessment.zip --out-dir ./restored-assessment
   opencmmc cmmc init --level 2 --scope "enclave-1" --out workspace.json
   opencmmc cmmc assess --input workspace.json --evidence-dir ./evidence --json readiness.json
   opencmmc cmmc objectives-init --level 2 --scope "enclave-1" --out objectives.json
