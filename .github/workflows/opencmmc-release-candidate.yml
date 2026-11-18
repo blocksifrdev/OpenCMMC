@@ -16,6 +16,12 @@ on:
     branches:
       - 'release/v1.0.0-rc.11'
       - 'ga/validation/**'
+  workflow_call:
+    inputs:
+      version:
+        description: 'Exact version for reusable production build and four-platform verification'
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       version:
@@ -25,7 +31,7 @@ on:
 permissions:
   contents: read
 env:
-  RELEASE_VERSION: ${{ (startsWith(github.ref, 'refs/heads/ga/validation/') || startsWith(github.head_ref, 'ga/validation/')) && 'v1.0.0' || (github.event.inputs.version || 'v1.0.0-rc.11') }}
+  RELEASE_VERSION: ${{ (startsWith(github.ref, 'refs/heads/ga/validation/') || startsWith(github.head_ref, 'ga/validation/')) && 'v1.0.0' || (inputs.version || github.event.inputs.version || 'v1.0.0-rc.11') }}
 
 jobs:
   package:

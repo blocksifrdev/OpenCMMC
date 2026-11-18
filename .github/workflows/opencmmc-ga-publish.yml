@@ -1,0 +1,184 @@
+name: OpenCMMC v1.0.0 GA | protected and independently approved
+
+on:
+  workflow_dispatch:
+    inputs:
+      approved_sha:
+        description: "Exact 40-character SHA of reviewed main commit; independently signed with the archives"
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  source-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require canonical main and the exact reviewed commit
+        shell: bash
+        env:
+          APPROVED_SHA: ${{ inputs.approved_sha }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "blocksifrdev/OpenCMMC"
+          test "$GITHUB_REF" = "refs/heads/main"
+          [[ "$APPROVED_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$GITHUB_SHA" = "$APPROVED_SHA"
+          echo "PASS: reviewed GA source is exact canonical main commit"
+
+  verified-native-build:
+    needs: source-preflight
+    uses: ./.github/workflows/opencmmc-release-candidate.yml
+    with:
+      version: v1.0.0
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+
+  publish-after-independent-acceptance:
+    name: Protected GA approval, draft verification and publication
+    needs: [source-preflight, verified-native-build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: ga-production
+    permissions:
+      contents: write
+      security-events: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: opencmmc-candidate
+          path: dist
+
+      - name: Reassert exact canonical source and independent environment reviews
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APPROVED_SHA: ${{ inputs.approved_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "blocksifrdev/OpenCMMC"
+          test "$GITHUB_REF" = "refs/heads/main"
+          test "$GITHUB_SHA" = "$APPROVED_SHA"
+          # An unconfigured environment can be auto-created by GitHub.
+          # Refuse to publish unless 2 distinct real user reviewers are
+          # explicitly configured AND this environment job is authorized.
+          count="$(gh api "/repos/$GITHUB_REPOSITORY/environments/ga-production" \
+            --jq '[.protection_rules[]? | select(.type == "required_reviewers") | .reviewers[]? | select(.type == "User") | .reviewer.login] | unique | length')"
+          [[ "$count" =~ ^[0-9]+$ ]]
+          test "$count" -ge 2
+          echo "PASS: environment requires at least two distinct human reviewers"
+
+      - name: Reject unresolved high or critical code scanning alerts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          alerts="$(gh api --paginate "/repos/$GITHUB_REPOSITORY/code-scanning/alerts?state=open&per_page=100" | \
+            jq -s '[.[][] | select(.rule.security_severity_level == "high" or .rule.security_severity_level == "critical" or .rule.severity == "error")] | length')"
+          [[ "$alerts" =~ ^[0-9]+$ ]]
+          test "$alerts" -eq 0
+          echo "PASS: no currently open high/critical GitHub code scanning alerts"
+
+      - name: Verify exact portable binary and provenance digests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd dist && sha256sum -c SHA256SUMS && sha256sum -c SHA256SUMS.sha256)
+          python3 scripts/verify_distribution.py --artifacts dist --version v1.0.0
+          for archive in dist/opencmmc-*.zip dist/opencmmc-*.tar.gz; do
+            gh attestation verify "$archive" --repo "$GITHUB_REPOSITORY" \
+              --bundle dist/opencmmc-provenance.sigstore.json \
+              --predicate-type https://slsa.dev/provenance/v1 --format json > /dev/null
+            gh attestation verify "$archive" --repo "$GITHUB_REPOSITORY" \
+              --bundle dist/opencmmc-sbom.sigstore.json \
+              --predicate-type https://spdx.dev/Document/v2.3 --format json > /dev/null
+          done
+          echo "PASS: all GA archive and signature identities validated"
+
+      - name: Load independently managed signing records and trust anchors
+        env:
+          GA_SIGNOFF_RECORDS_B64: ${{ secrets.GA_SIGNOFF_RECORDS_B64 }}
+          GA_TRUSTED_PUBLIC_KEYS_B64: ${{ secrets.GA_TRUSTED_PUBLIC_KEYS_B64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/ga_unpack_approvals.py --destination "$RUNNER_TEMP/ga-independent-approval"
+
+      - name: Require six valid independent Ed25519 release approvals
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/verify_ga_signoffs.py \
+            --version v1.0.0 --source-sha "$GITHUB_SHA" --dist dist \
+            --records-dir "$RUNNER_TEMP/ga-independent-approval/records" \
+            --trust-dir "$RUNNER_TEMP/ga-independent-approval/trusted"
+
+      - name: Create a draft, not a public GA release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v1.0.0 --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "GA BLOCKED: v1.0.0 already exists; never overwrite an existing tag" >&2
+            exit 1
+          fi
+          gh release create v1.0.0 \
+            dist/opencmmc-v1.0.0-*.zip dist/opencmmc-v1.0.0-*.tar.gz \
+            dist/SHA256SUMS dist/SHA256SUMS.sha256 dist/SBOM.spdx.json \
+            dist/opencmmc-provenance.sigstore.json dist/opencmmc-sbom.sigstore.json \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "OpenCMMC v1.0.0 | Offline CMMC Readiness Workbench" \
+            --notes-file docs/RELEASE_NOTES_v1.0.0.md --draft --latest=false
+
+      - name: Re-download draft assets; revalidate hashes, signer and every approval
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir "$RUNNER_TEMP/ga-publication-verify"
+          gh release download v1.0.0 --repo "$GITHUB_REPOSITORY" \
+            --dir "$RUNNER_TEMP/ga-publication-verify"
+          (cd "$RUNNER_TEMP/ga-publication-verify" && \
+            sha256sum -c SHA256SUMS && sha256sum -c SHA256SUMS.sha256)
+          python3 scripts/verify_distribution.py \
+            --artifacts "$RUNNER_TEMP/ga-publication-verify" --version v1.0.0
+          python3 scripts/verify_ga_signoffs.py \
+            --version v1.0.0 --source-sha "$GITHUB_SHA" \
+            --dist "$RUNNER_TEMP/ga-publication-verify" \
+            --records-dir "$RUNNER_TEMP/ga-independent-approval/records" \
+            --trust-dir "$RUNNER_TEMP/ga-independent-approval/trusted"
+          for archive in "$RUNNER_TEMP"/ga-publication-verify/opencmmc-*.zip \
+                         "$RUNNER_TEMP"/ga-publication-verify/opencmmc-*.tar.gz; do
+            gh attestation verify "$archive" --repo "$GITHUB_REPOSITORY" \
+              --bundle "$RUNNER_TEMP/ga-publication-verify/opencmmc-provenance.sigstore.json" \
+              --predicate-type https://slsa.dev/provenance/v1 --format json > /dev/null
+            gh attestation verify "$archive" --repo "$GITHUB_REPOSITORY" \
+              --bundle "$RUNNER_TEMP/ga-publication-verify/opencmmc-sbom.sigstore.json" \
+              --predicate-type https://spdx.dev/Document/v2.3 --format json > /dev/null
+          done
+          echo "PASS: every downloadable draft asset matches approved source and signed identity"
+
+      - name: Publish exactly the previously verified draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release edit v1.0.0 --repo "$GITHUB_REPOSITORY" --draft=false
+          status="$(gh release view v1.0.0 --repo "$GITHUB_REPOSITORY" \
+            --json tagName,isDraft,isPrerelease \
+            --jq 'select(.tagName == "v1.0.0" and .isDraft == false and .isPrerelease == false) | .tagName')"
+          test "$status" = "v1.0.0"
+          echo "PASS: independently approved, signed v1.0.0 release is publicly available"
