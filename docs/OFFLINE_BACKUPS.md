@@ -1,5 +1,12 @@
 # Offline assessment backups, verification and restoration
 
+**Availability:** This feature is merged in the latest OpenCMMC source and signed
+CI test artifacts after November 18, 2026. It is **not** included in the
+previously published `v1.0.0-rc.11` portable archives. Verify the installed
+build before attempting these commands; do not assume a README on `main`
+describes an older public download.
+
+
 OpenCMMC v1 workspace data is stored on the local machine. Backups are
 complete snapshots of the workspace, its state file, and **only referenced**
 evidence whose SHA-256 hashes match the workspace.

@@ -4,6 +4,8 @@
 
 Built by BlockSiFr for defense contractors and security teams. No subscription, account, or cloud service required for the local workbench.
 
+**Release status (November 18, 2026):** The public `v1.0.0-rc.11` binaries predate the latest `main` hardening (Go 1.27.4, verified backup/restore, signed build attestations and four-platform backup smoke tests). Those features are **not** in rc.11 downloads. The current source and verified CI artifacts are not yet an approved v1.0 GA release. [See the production acceptance record](https://github.com/blocksifrdev/OpenCMMC/issues/24).
+
 **Latest download:** [OpenCMMC v1.0.0-rc.11](https://github.com/blocksifrdev/OpenCMMC/releases/tag/v1.0.0-rc.11), an OpenCMMC release candidate. This is a **release candidate**, not a finished or certified CMMC assessment product.
 
 **Chromebook Linux:** If ChromeOS Chrome reports `ORIGIN_MISMATCH`, use the [Linux-native Firefox recovery steps](docs/INSTALL_V1.md#chromebook-open-opencmmc-without-chromeos-browser-forwarding) instead of turning off Origin/CSRF protection. The host-Chrome issue remains open in [issue #49](https://github.com/blocksifrdev/OpenCMMC/issues/49).
