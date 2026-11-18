@@ -277,7 +277,10 @@ func (u *localUI) csrfOK(r *http.Request) bool {
 func (u *localUI) ServeHTTP(w http.ResponseWriter,r *http.Request) {
     w.Header().Set("X-OpenCMMC-Version",releaseVersion)
     w.Header().Set("Cache-Control","no-store")
-    w.Header().Set("Referrer-Policy","no-referrer")
+    // A no-referrer policy causes Chromium to send Origin: null on ordinary
+    // HTML form POSTs. Preserve trustworthy Origin values for CSRF checks
+    // while preventing referrer disclosure to external websites.
+    w.Header().Set("Referrer-Policy","same-origin")
     w.Header().Set("X-Content-Type-Options","nosniff")
     w.Header().Set("X-Frame-Options","DENY")
     w.Header().Set("Content-Security-Policy","default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'")
